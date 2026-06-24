@@ -23,7 +23,10 @@ Data.initialize(client)
 # Routes
 @app.route('/')
 def index():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     user = None
     if user_response is not None:
         user = user_response.user
@@ -35,7 +38,10 @@ def index():
 # Registration selection
 @app.route("/registration")
 def registration():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is not None:
         return redirect(url_for("index"))
 
@@ -45,7 +51,10 @@ def registration():
 # Captain registration
 @app.route("/captain_registration")
 def captain_registration():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is not None:
         return redirect(url_for("index"))
     
@@ -54,7 +63,10 @@ def captain_registration():
 
 @app.route("/captain_registration", methods=["POST"])
 def captain_registration_post():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is not None:
         return redirect(url_for("index"))
 
@@ -84,7 +96,10 @@ def captain_registration_post():
 # Runner registration
 @app.route("/runner_registration")
 def runner_registration():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is not None:
         return redirect(url_for("index"))
     
@@ -93,7 +108,10 @@ def runner_registration():
 
 @app.route("/runner_registration", methods=["POST"])
 def runner_registration_post():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is not None:
         return redirect(url_for("index"))
     
@@ -138,7 +156,10 @@ def runner_registration_post():
 
 @app.route("/login")
 def login():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is not None:
         return redirect(url_for("index"))
 
@@ -147,7 +168,10 @@ def login():
 
 @app.route("/login", methods=["POST"])
 def login_post():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is not None:
         return redirect(url_for("index"))
 
@@ -188,7 +212,10 @@ def login_post():
 
 @app.route("/profile")
 def profile():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is None:
         flash("You must log in to view this page.")
         return redirect(url_for("login"))
@@ -205,7 +232,10 @@ def logout():
 
 @app.route("/team_registration")
 def team_registration():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is None:
         flash("You must log in to view this page.")
         return redirect(url_for("login"))
@@ -216,7 +246,10 @@ def team_registration():
 
 @app.route("/team_registration", methods=["POST"])
 def team_registration_post():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is None:
         flash("You must log in to view this page.")
         return redirect(url_for("login"))
@@ -244,7 +277,10 @@ def team_registration_post():
 
 @app.route("/team_created")
 def team_created():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is None:
         flash("You must log in to view this page.")
         return redirect(url_for("login"))
@@ -269,7 +305,10 @@ def team_created():
 
 @app.route("/team_information")
 def team_information():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is None:
         flash("You must log in to view this page.")
         return redirect(url_for("login"))
@@ -296,7 +335,10 @@ def team_information():
 
 @app.route("/teams")
 def teams():
-    user_response = client.auth.get_user()
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
     if user_response is None:
         flash("You must log in to view this page.")
         return redirect(url_for("login"))
