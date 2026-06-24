@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* ── Reset & base ── */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #F0F2F5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  color: #1E2235;
+}
+
+.registration h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  margin-top: 0.25rem;
+  margin-bottom: 2.3rem;
+}
+
+/* ── Registration card ── */
+.registration {
+  background: #1E2235;
+  border-radius: 16px;
+  padding: 2.5rem 2.25rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow:
+    0 4px 24px rgba(30, 34, 53, 0.18),
+    0 1px 4px rgba(30, 34, 53, 0.10);
+}
+
+/* ── Form layout ── */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* ── Inputs ── */
+.text_input {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #1E2235;
+  background: #FFFFFF;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  outline: none;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+/* Placeholder hints via attribute — browsers show name as placeholder */
+.text_input[name="email"]::placeholder    { content: "Email address"; }
+.text_input[name="username"]::placeholder { content: "Username"; }
+.text_input[name="password"]::placeholder { content: "Password"; }
+
+/* Signature element: indigo glow on focus */
+.text_input:focus {
+  border-color: #6C7AE0;
+  box-shadow: 0 0 0 3.5px rgba(108, 122, 224, 0.22);
+}
+
+/* ── Submit button ── */
+.submit {
+  margin-top: 0.4rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #FFFFFF;
+  background: #6C7AE0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
+}
+
+.submit:hover {
+  background: #5A67D8;
+  box-shadow: 0 4px 14px rgba(108, 122, 224, 0.38);
+}
+
+.submit:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.have_an_account > p {
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.have_an_account a {
+  font-size: 0.82rem;
+  color: #6c7ae0;
+}
+
+/* ── Flash messages ── */
+.flashes {
+  margin-top: 1.25rem;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.flashes p {
+  background: #FFF5F5;
+  color: #C53030;
+  border: 1px solid #FEB2B2;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .registration {
+    padding: 2rem 1.5rem;
+  }
+}

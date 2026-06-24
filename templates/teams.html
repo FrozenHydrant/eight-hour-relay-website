@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/static/css/title_then_list.css">
+  </head>
+  <body>
+      <div class="top_bar_info">
+        <div class="top_bar_insides">
+          <a href="{{ url_for('index') }}">Home Page</a>
+          <a href="{{ url_for('profile') }}">Profile</a>
+        </div>
+      </div>
+      <div class="top_info">
+        <h3>Welcome {{ username }}.</h3>
+        <p>The teams you currently manage are below:</p>
+      </div>
+      <div class="add_team_button">
+        <a href="{{ url_for('team_registration') }}">Create Team</a>
+      </div>
+      <div class="bottom_list">
+        {% for team in teams %}
+          <div class="bottom_list_item">
+            <p class="muted">{{ team["id"] }}</p>
+            <p class="title">{{ team["name"] }}</p>
+            <a href="{{ url_for('team_information', team_id=team['id']) }}"><button>Manage</button></a>
+          </div>
+        {% endfor %}
+      </div>
+  </body>
+</html>

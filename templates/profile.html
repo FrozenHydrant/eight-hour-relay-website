@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="/static/css/profile.css">
+    </head>
+    <body>
+        <a class="main_button home" href="{{ url_for('index') }}">Home</a>
+        <div class="bonus_info">
+            <div class="bonus_info_inside">
+            <h3>User Info</h3></div>
+        </div>
+        <div class="main_info">
+            <p>Email: {{ email }}</p>
+            <p>Username: {{ username }}</p>
+            <p>Password: ****</p>
+        </div>
+        <a class="main_button logout" href="{{ url_for('logout') }}">Logout</a>
+        <div class="my_flashes">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                <p>{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        </div>
+    </body>
+</html>

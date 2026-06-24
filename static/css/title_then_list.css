@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* ── Reset & base ── */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #F0F2F5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1.5rem 3rem;
+  color: #1E2235;
+}
+
+/* ── Top navigation bar ── */
+.top_bar_info {
+  position: fixed;
+  background: #1E2235;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;  
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  height: 60px;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.top_bar_insides {
+    margin-right: 0;
+    margin-left: auto;
+}
+
+.top_bar_info a {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #A0A8C8;
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.top_bar_info a:hover {
+  color: #FFFFFF;
+  background: rgba(108, 122, 224, 0.18);
+}
+
+/* ── Page header ── */
+.top_info {
+  width: 100%;
+  max-width: 640px;
+  margin-top: 65px;
+  margin-bottom: 1.25rem;
+}
+
+.top_info h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.3rem;
+  color: #1E2235;
+}
+
+.top_info p {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ── Create Team button ── */
+.add_team_button {
+  width: 100%;
+  max-width: 640px;
+  margin-bottom: 1rem;
+}
+
+.add_team_button a {
+  display: inline-block;
+  padding: 0.65rem 1.25rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #FFFFFF;
+  background: #6C7AE0;
+  border-radius: 8px;
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
+}
+
+.add_team_button a:hover {
+  background: #5A67D8;
+  box-shadow: 0 4px 14px rgba(108, 122, 224, 0.38);
+}
+
+.add_team_button a:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* ── Teams list ── */
+.bottom_list {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* ── Individual team row ── */
+.bottom_list_item {
+  background: #FFFFFF;
+  border-radius: 10px;
+  padding: 0.9rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow:
+    0 1px 4px rgba(30, 34, 53, 0.08),
+    0 0 0 1px rgba(30, 34, 53, 0.05);
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.bottom_list_item p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #1E2235;
+}
+
+/* Team ID — muted label */
+.bottom_list_item .muted {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #A0A8C8;
+  min-width: 2.5rem;
+}
+
+/* Team name — grows to fill space */
+.bottom_list_item .title {
+  font-weight: 600;
+  flex: 1;
+}
+
+/* ── Manage button ── */
+.bottom_list_item a {
+  text-decoration: none;
+}
+
+.bottom_list_item button {
+  padding: 0.45rem 1rem;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #6C7AE0;
+  background: transparent;
+  border: 1.5px solid #6C7AE0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.bottom_list_item button:hover {
+  background: #6C7AE0;
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(108, 122, 224, 0.3);
+}
+
+.bottom_list_item button:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .top_bar_info {
+    padding: 0 1rem;
+  }
+
+  .bottom_list_item {
+    padding: 0.75rem 1rem;
+  }
+}

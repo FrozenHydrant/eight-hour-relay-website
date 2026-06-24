@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/static/css/login.css">
+  </head>
+  <body>
+    <div class="login">
+      <h3>Create New Team</h3>
+      <form method="POST" class="login_form">
+        <input type="text" class="text_input" name="team_name" placeholder="Team Name">
+        <button class="submit">Create Team</button>
+      </form>
+    </div>
+    <div class="flashes">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/static/css/title_then_list.css">
+  </head>
+  <body>
+      <div class="top_bar_info">
+        <div class="top_bar_insides">
+          <a href="{{ url_for('index') }}">Home Page</a>
+          <a href="{{ url_for('teams') }}">My Teams</a>
+          <a href="{{ url_for('profile') }}">Profile</a>
+        </div>
+      </div>
+      <div class="top_info">
+        <h3>Team {{ team["name"] }}</h3>
+      </div>
+      <div class="team_info_box">
+        <p>Team ID: {{ team["id"] }}</p>
+        <p>Team Payment Status: #TODO</p>
+      </div>
+      <div class="bottom_info">
+        <h3>Members:</h3>
+      </div>
+      <div class="bottom_list">
+        {% for member in members %}
+          <div class="bottom_list_item">
+            <p class="title">{{ member.email }}</p>
+            <p class="title">{{ member.user_metadata["username"] }}</p>
+          </div>
+        {% endfor %}
+      </div>
+  </body>
+</html>

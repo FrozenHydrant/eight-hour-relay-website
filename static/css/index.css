@@ -1,0 +1,320 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ── Reset & base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #F0F2F5;
+  color: #1E2235;
+}
+
+/* ══════════════════════════════════════
+   TOP BAR
+══════════════════════════════════════ */
+.top_bar_info {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  height: 60px;
+  background: #1E2235;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.top_bar_insides {
+    margin-right: 0;
+    margin-left: auto;
+}
+
+.top_bar_info a {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #A0A8C8;
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.top_bar_info a:hover {
+  color: #FFFFFF;
+  background: rgba(108, 122, 224, 0.18);
+}
+
+/* ══════════════════════════════════════
+   MAIN PAGE — full-viewport hero
+══════════════════════════════════════ */
+.main_page {
+  position: relative;
+  min-height: 100vh;
+  background: #1E2235;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 1.5rem 3rem; /* 64px offsets the fixed bar */
+  overflow: hidden;
+}
+
+/* ── Logo ── */
+.logo {
+  position: absolute;
+  top: 80px; /* 64px bar + 16px gap */
+  left: 2.5rem;
+}
+
+.logo img {
+  height: 38px;
+  width: auto;
+  display: block;
+}
+
+/* ── Countdown ── */
+.countdown {
+  text-align: center;
+  z-index: 1;
+}
+
+/* Date label */
+.countdown > h3 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6C7AE0;
+  margin-bottom: 0.5rem;
+}
+
+/* "COUNTDOWN TO THE EVENT" subtitle */
+.countdown > p {
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #8B90A8;
+  margin-bottom: 3.5rem;
+}
+
+/* Horizontal units row */
+.countdown_insides_horizontal {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+}
+
+/* Each unit block — these are also .countdown divs */
+.countdown_insides_horizontal .countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 2.5rem;
+  min-width: 160px;
+}
+
+/* Divider lines between units */
+.countdown_insides_horizontal .countdown + .countdown {
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* The number */
+.countdown_insides_horizontal .countdown span:first-child {
+  font-size: clamp(4rem, 10vw, 7.5rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The label (Days / Hours / Minutes) */
+.countdown_insides_horizontal .countdown span:last-child {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8B90A8;
+  margin-top: 0.75rem;
+}
+
+/* ── Register Now button ── */
+.main_page > a {
+  text-decoration: none;
+  z-index: 1;
+  margin-top: 3.5rem;
+}
+
+.main_page > a button {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  background: #6C7AE0;
+  border: none;
+  border-radius: 10px;
+  padding: 0.85rem 2.5rem;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+
+.main_page > a button:hover {
+  background: #5A67D8;
+  box-shadow: 0 6px 20px rgba(108, 122, 224, 0.4);
+}
+
+.main_page > a button:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.sub_title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1E2235;
+  letter-spacing: -0.02em;
+  margin-bottom: 3rem;
+}
+
+/* ══════════════════════════════════════
+   INFORMATION SECTION
+══════════════════════════════════════ */
+.information {
+  background: #FFFFFF;
+  padding: 5rem 2rem;
+  text-align: center;
+}
+
+.horizontal_info_panel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.info_block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 2.5rem;
+}
+
+.info_block + .info_block {
+  border-left: 1px solid #E5E7EB;
+}
+
+.info_title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6C7AE0;
+  margin-bottom: 0.5rem;
+}
+
+.info_block > span:not(.info_title) {
+  font-size: 0.95rem;
+  color: #4B5563;
+  font-weight: 500;
+}
+
+/* Team fee sub-panel */
+.info_block_sub_panel {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.25rem;
+}
+
+.info_block_sub_block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.info_block_sub_block span:first-child {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9CA3AF;
+}
+
+.info_block_sub_block span:last-child {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1E2235;
+}
+
+/* ABOUT
+
+*/
+
+.about {
+  background:#b6bbc3;
+  padding: 5rem 15rem;
+  text-align: center;
+}
+
+.inner_text {
+  text-align: left;
+  padding: 1.2rem;
+}
+
+.rules {
+  padding: 5rem 25rem;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 640px) {
+  .countdown_insides_horizontal {
+    gap: 0;
+  }
+
+  .countdown_insides_horizontal .countdown {
+    padding: 0 1.25rem;
+    min-width: unset;
+  }
+
+  .horizontal_info_panel {
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .info_block + .info_block {
+    border-left: none;
+    border-top: 1px solid #E5E7EB;
+    padding-top: 2rem;
+  }
+
+  .top_bar_info {
+    padding: 0 1.25rem;
+    gap: 1.25rem;
+  }
+
+  .logo {
+    left: 1.25rem;
+  }
+}

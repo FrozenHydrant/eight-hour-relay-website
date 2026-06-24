@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/static/css/team_created.css">
+  </head>
+  <body>
+    <div class="main_block">
+      <div class="main_top_info">
+        <h3>Team successfully created</h3>
+        <p class="info_label">You created a new team! Here's some important information:</p>
+      </div>
+      <div class="main_center_info">
+        <p class="info_label">Team ID:</p>
+        <p class="important_info">{{ team_id }}</p>
+        <p class="info_label">Team Token:</p>
+        <p class="important_info">{{ team_token }}</p>
+        <p class="dangerous">Do NOT lose your team token! You cannot view it after you leave this page!</p>
+      </div>
+      <div class="main_bottom">
+        <a href="{{ url_for('team_information', team_id=team_id) }}"><button>Continue</button></a>
+      </div>
+    </div>
+    <div class="flashes">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    </div>
+  </body>
+</html>

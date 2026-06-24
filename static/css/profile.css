@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* ── Reset & base ── */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #F0F2F5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  color: #1E2235;
+}
+
+/* ── Profile card ── */
+.bonus_info {
+  background: #1E2235;
+  border-radius: 16px 16px 0 0;
+  padding: 1.75rem 2.25rem 1.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.bonus_info_inside h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* ── User info section ── */
+.main_info {
+  background: #FFFFFF;
+  border-radius: 0 0 16px 16px;
+  padding: 1.5rem 2.25rem 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow:
+    0 4px 24px rgba(30, 34, 53, 0.18),
+    0 1px 4px rgba(30, 34, 53, 0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.main_info p {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1E2235;
+  padding: 0.65rem 0;
+  margin: 0;
+  border-bottom: 1px solid #F0F2F5;
+}
+
+.main_info p:last-child {
+  border-bottom: none;
+}
+
+/* ── Buttons ── */
+.main_button {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 0.75rem 1rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
+}
+
+.main_button.home {
+  color: #1E2235;
+  background: #FFFFFF;
+  border: 1.5px solid #E2E5EE;
+  margin-bottom: 0.75rem;
+}
+
+.main_button.home:hover {
+  background: #F0F2F5;
+  box-shadow: 0 2px 8px rgba(30, 34, 53, 0.08);
+}
+
+.main_button.logout {
+  color: #FFFFFF;
+  background: #d66161;
+  border: none;
+  margin-top: 0.75rem;
+}
+
+.main_button.logout:hover {
+  background: #ec7171;
+  box-shadow: 0 4px 14px rgba(108, 122, 224, 0.38);
+}
+
+.main_button:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* ── Flash messages ── */
+.my_flashes {
+  margin-top: 1.25rem;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.my_flashes p {
+  background: #FFF5F5;
+  color: #C53030;
+  border: 1px solid #FEB2B2;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .bonus_info {
+    padding: 1.5rem 1.5rem 1.25rem;
+  }
+
+  .main_info {
+    padding: 1.25rem 1.5rem 1.5rem;
+  }
+}

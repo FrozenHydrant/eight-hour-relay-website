@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/static/css/login.css">
+  </head>
+  <body>
+    <div class="login">
+      <h3>Login</h3>
+      <form method="POST" class="login_form">
+        <input type="text" class="text_input" name="email" placeholder="Email">
+        <input type="password" class="text_input" name="password" placeholder="Password">
+        <button class="submit">Login</button>
+      </form>
+    </div>
+    <div class="want_to_sign_up">
+      <p>Don't have an account? <a href="{{ url_for('registration') }}">Sign up</a></p>
+    </div>
+    <div class="flashes">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    </div>
+  </body>
+</html>
