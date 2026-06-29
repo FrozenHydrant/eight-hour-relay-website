@@ -26,7 +26,7 @@ class Data:
     # Creates a team and returns the ID. None if failure.
     def create_team(team_name: str, user_id: str, token: str, division: str, email: str) -> str:
         try:
-            response = Data.client.table("teams").insert({"owner_id": user_id, "encrypted_token": generate_password_hash(token), "division": division, "email": email}).execute()
+            response = Data.client.table("teams").insert({"owner_id": user_id, "encrypted_token": generate_password_hash(token), "division": division, "email": email, "paid": False}).execute()
             if response is None:
                 return None
             if len(response.data) < 1:
@@ -111,6 +111,18 @@ class Data:
         if len(response.data) < 1:
             return []
         return [item["user_id"] for item in response.data]
+    
+
+    def get_enrolled_team(user_id: str):
+        try:
+            response = Data.client.table("enrollment").select("team_id").eq("user_id", user_id).execute()
+        except Exception as e:
+            return None
+        if response is None:
+            return None
+        if len(response.data) < 1:
+            return None
+        return response.data[0]["team_id"]
         
 
     # Given a list of member_ids, give their info from the member_info table

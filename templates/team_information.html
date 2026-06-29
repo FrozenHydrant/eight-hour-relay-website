@@ -7,7 +7,9 @@
       <div class="top_bar_info">
         <div class="top_bar_insides">
           <a href="{{ url_for('index') }}">Home Page</a>
-          <a href="{{ url_for('teams') }}">My Teams</a>
+          {% if is_captain %}
+            <a href="{{ url_for('teams') }}">My Teams</a>
+          {% endif %}
           <a href="{{ url_for('profile') }}">Profile</a>
         </div>
       </div>
@@ -19,10 +21,12 @@
         <p class="inner_text">Team Payment Status: #TODO</p>
         <p class="inner_text">Team Division: {{ team["division"] }}</p>
         <p class="inner_text">Team Email: {{ team["email"] }}</p>
-        <div class="token_regeneration">
-          <a class="button" href="{{ url_for('team_token_reset',team_id=team['id']) }}">Regenerate Team Token</a>
-          <p class="inner_note">Invalidate your old token and create a new one.</p>
-        </div>
+        {% if is_captain %}
+          <div class="token_regeneration">
+            <a class="button" href="{{ url_for('team_token_reset',team_id=team['id']) }}">Regenerate Team Token</a>
+            <p class="inner_note">Invalidate your old token and create a new one.</p>
+          </div>
+        {% endif %}
       </div>
       <div class="bottom_info">
         <h3>Members:</h3>

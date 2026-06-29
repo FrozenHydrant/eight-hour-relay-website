@@ -13,7 +13,11 @@
       <div class="top_bar_info">
         <div class="top_bar_insides">
         <a href="#about">Mission</a>
-        <a href="{{ url_for('teams') }}">My Teams</a>
+        {% if is_captain %}
+          <a href="{{ url_for('teams') }}">My Teams</a>
+        {% elif not not_logged_in %}
+          <a href="{{ url_for('team_information', team_id=team_id) }}">View My Team</a>
+        {% endif %}
         {% if current_user %}
           <a href="{{ url_for('profile') }}">Profile</a>
         {% else %}
@@ -43,9 +47,15 @@
           </div>
         </div>
       </div>
-      <a href="{{ url_for('team_registration') }}">
-        <button>Register Team Now</button>
-      </a>
+      {% if is_captain or not_logged_in %}
+        <a href="{{ url_for('team_registration') }}">
+          <button>Register Team Now</button>
+        </a>
+      {% else %}
+        <a href="{{ url_for('team_information', team_id=team_id) }}">
+          <button>View My Team</button>
+        </a>
+      {% endif %}
     </div>
 
     <div class="information">
