@@ -3,7 +3,7 @@ from flask import flash
 
 class Util:
     valid_characters = string.ascii_letters + string.digits + string.punctuation
-    valid_username_characters = string.ascii_letters + string.digits + "._" 
+    valid_username_characters = string.ascii_letters + string.digits + "._ " 
 
     def verify_email_characters(email: str) -> bool:
         #  verify correctness

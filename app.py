@@ -137,18 +137,21 @@ def runner_registration_post():
         return redirect(url_for("runner_registration"))
     
     # Do signup
+    #print("Signing up user...")
     try:
         response = client.auth.sign_up({
             "email": email,
             "password": password,
             "options": {"data": {"username": username, "is_captain": False}}
         })
+        # TODO
         new_response = Data.enroll_user_in_team(response.user.id, team_id)
-        #print(new_response)
-        if new_response is None:
-            flash("Unexpected error in registration.")
-            return redirect(url_for("runner_registration"))
+        print(Data.get_team_basic_info(team_id), "basicteaminfoo")
+        #print(Data.get_team_info(team_id)["owner_id"], "istheownerid")
+        basic_team_info = Data.get_team_basic_info(team_id)
+        Data.create_new_basic_runner(response.user.id, email, username, basic_team_info["owner_id"])
     except Exception as e:
+        #print("Doom and despair,", e)
         flash(str(e))
         return redirect(url_for("runner_registration"))
     return redirect(url_for("login"))
@@ -256,7 +259,9 @@ def team_registration_post():
     user = user_response.user
 
     team_name = request.form.get("team_name")
+    division = request.form.get("division")
 
+    # Verify team name
     if not Util.verify_username_characters(team_name):
         flash("Team name contains invalid characters.")
         return redirect(url_for("team_registration"))
@@ -264,11 +269,16 @@ def team_registration_post():
         flash("Team name must be between 3-16 characters.")
         return redirect(url_for("team_registration"))
     
+    # Verify division correctness
+    if division not in set(["open", "mixed", "master"]):
+        flash("Something went wrong while setting the division of your team.")
+        return redirect(url_for("team_registration"))
+    
     # Create token
     token = secrets.token_urlsafe()
 
     # Add table entry
-    team_id: str = Data.create_team(team_name, user.id, token)
+    team_id: str = Data.create_team(team_name, user.id, token, division, user.email)
     if team_id is None:
         return redirect(url_for("error_page"))
     
@@ -314,23 +324,58 @@ def team_information():
         return redirect(url_for("login"))
     user = user_response.user
 
+    # Get the team ID
     team_id = request.args.get("team_id")
-
     if team_id is None:
         return redirect(url_for("error_page"))
 
+    # Now get the team info from that
     team_info = Data.get_team_info(team_id)
     if team_info is None:
         return redirect(url_for("error_page"))
     
+    # Make sure we actually own the team
+    owned_teams = Data.get_owned_teams(user.id)
+    if team_id not in owned_teams:
+        return redirect(url_for("error_page"))
+    
     member_ids = Data.get_members_list(team_id)
-    members = []
+    members_info = Data.get_members_info(member_ids)
+    #print(member_ids)
     # TODO: fix
     #for member_id in member_ids:
     #    u = client.auth.admin.get_user_by_id(member_id)
     #    members.append(u)
 
-    return render_template("team_information.html", team=team_info, members=[])
+    return render_template("team_information.html", team=team_info, members=members_info)
+
+
+@app.route("/team_token_reset")
+def team_token_reset():
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
+    if user_response is None:
+        flash("You must log in to view this page.")
+        return redirect(url_for("login"))
+    user = user_response.user
+
+    # Get team id
+    team_id = request.args.get("team_id")
+    if team_id is None:
+        return redirect(url_for("error_page"))
+    
+    # Check if we actually have permission to modify this team
+    owned_teams = Data.get_owned_teams(user.id)
+    if team_id not in owned_teams:
+        return redirect(url_for("error_page"))
+    
+    new_token = Data.generate_new_team_token(team_id)
+    if new_token is None:
+        return redirect(url_for("error_page"))
+    
+    return render_template("team_token_reset.html", team_token=new_token, team_id=team_id)
 
 
 @app.route("/teams")
@@ -345,7 +390,7 @@ def teams():
     user = user_response.user
 
     teams = Data.get_owned_teams_info(user.id)
-    print(teams)
+    #print(teams, "teams")
     return render_template("teams.html", username=user.user_metadata["username"], teams=teams)
 
 

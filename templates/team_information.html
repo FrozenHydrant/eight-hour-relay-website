@@ -15,8 +15,14 @@
         <h3>Team {{ team["name"] }}</h3>
       </div>
       <div class="team_info_box">
-        <p>Team ID: {{ team["id"] }}</p>
-        <p>Team Payment Status: #TODO</p>
+        <p class="inner_text">Team ID: {{ team["id"] }}</p>
+        <p class="inner_text">Team Payment Status: #TODO</p>
+        <p class="inner_text">Team Division: {{ team["division"] }}</p>
+        <p class="inner_text">Team Email: {{ team["email"] }}</p>
+        <div class="token_regeneration">
+          <a class="button" href="{{ url_for('team_token_reset',team_id=team['id']) }}">Regenerate Team Token</a>
+          <p class="inner_note">Invalidate your old token and create a new one.</p>
+        </div>
       </div>
       <div class="bottom_info">
         <h3>Members:</h3>
@@ -24,8 +30,7 @@
       <div class="bottom_list">
         {% for member in members %}
           <div class="bottom_list_item">
-            <p class="title">{{ member.email }}</p>
-            <p class="title">{{ member.user_metadata["username"] }}</p>
+            <p class="title">{{ member["email"] }}</p>
           </div>
         {% endfor %}
       </div>
