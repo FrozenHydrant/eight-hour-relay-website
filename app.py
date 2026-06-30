@@ -232,6 +232,10 @@ def profile():
         return redirect(url_for("login"))
     user = user_response.user
 
+    # Don't let captains do this! for now. TODO reconsider it
+    if user.user_metadata["is_captain"]:
+        return render_template("profile_cap.html", email=user.email, username=user.user_metadata["username"])
+
     info = Data.get_members_info([user.id])[0]
     # Change None to empty string
     for k in info:
