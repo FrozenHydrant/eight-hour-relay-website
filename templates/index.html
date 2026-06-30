@@ -18,7 +18,7 @@
         {% elif not not_logged_in %}
           <a href="{{ url_for('team_information', team_id=team_id) }}">View My Team</a>
         {% endif %}
-        {% if current_user %}
+        {% if not not_logged_in %}
           <a href="{{ url_for('profile') }}">Profile</a>
         {% else %}
           <a href="{{ url_for('login')}}">Sign In</a>
@@ -52,10 +52,13 @@
           <a href="{{ url_for('team_registration') }}">
             <button>Register Team Now</button>
           </a>
+        {% endif %}
+        {% if not_logged_in %}
           <a href="{{ url_for('runner_registration') }}">
             <button>Sign up as Runner</button>
           </a>
-        {% else %}
+        {% endif %}
+        {% if not is_captain and not not_logged_in %}
           <a href="{{ url_for('team_information', team_id=team_id) }}">
             <button>View My Team</button>
           </a>

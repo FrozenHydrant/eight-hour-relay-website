@@ -40,7 +40,7 @@ def index():
         team_id = Data.get_enrolled_team(user.id)
 
     time_left = EVENT_DATE - dt.datetime.now()
-    return render_template("index.html", current_user=user, team_id=team_id, not_logged_in=not_logged_in, is_captain=is_captain, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
+    return render_template("index.html", team_id=team_id, not_logged_in=not_logged_in, is_captain=is_captain, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
 
 
 # Registration selection
