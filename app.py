@@ -232,13 +232,61 @@ def profile():
         return redirect(url_for("login"))
     user = user_response.user
 
-    return render_template("profile.html", email=user.email, username=user.user_metadata["username"])
+    info = Data.get_members_info([user.id])[0]
+    # Change None to empty string
+    for k in info:
+        if info[k] is None:
+            info[k] = ""
+
+    return render_template("profile.html", user_info=info, email=info["email"], username=user.user_metadata["username"])
 
 
 @app.route("/logout")
 def logout():
     client.auth.sign_out()
     return redirect(url_for("index"))
+
+
+@app.route("/profile", methods=["POST"])
+def profile_post():
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
+    if user_response is None:
+        flash("You must log in to view this page.")
+        return redirect(url_for("login"))
+    user = user_response.user
+
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+    gender = request.form.get("gender")
+    age = request.form.get("age")
+    phone_number = request.form.get("phone_number")
+    emergency_phone = request.form.get("emergency_phone")
+
+    success = Util.verify_all_lists_and_create_response([], [], [], [phone_number, emergency_phone], [first_name, last_name], [gender])
+    if not success:
+        return redirect(url_for("profile"))
+    
+    try:
+        age = int(age)
+    except Exception as e:
+        flash("A problem occured: " + str(e))
+        return redirect(url_for("profile"))
+    
+    if age < 1 or age > 100:
+        flash("Enter a valid age.")
+        return redirect(url_for("profile"))
+    
+    updated_info = {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_phone": emergency_phone}
+    success = Data.update_runner_info(user.id, updated_info)
+    if not success:
+        flash("Error occured while updating information.")
+        return redirect(url_for("profile"))
+    
+    flash("Successfully updated information.")
+    return redirect(url_for("profile"))
 
 
 @app.route("/team_registration")

@@ -4,15 +4,35 @@
         <link rel="stylesheet" href="/static/css/profile.css">
     </head>
     <body>
-        <a class="main_button home" href="{{ url_for('index') }}">Home</a>
-        <div class="bonus_info">
-            <div class="bonus_info_inside">
-            <h3>User Info</h3></div>
+        <div class="top_bar_info">
+            <div class="top_bar_insides">
+                <a href="{{ url_for('index') }}">Home</a>
+            </div>
         </div>
-        <div class="main_info">
-            <p>Email: {{ email }}</p>
-            <p>Username: {{ username }}</p>
-            <p>Password: ****</p>
+        <div class="main_frame">
+            <div class="main_panel">
+                <div class="bonus_info">
+                    <div class="bonus_info_inside">
+                    <h3>User Info</h3></div>
+                </div>
+                <div class="main_info">
+                    <p>Email: {{ email }}</p>
+                    <p>Username: {{ username }}</p>
+                    <p>Password: ****</p>
+                </div>
+            </div>
+            <div class="more_info">
+                <h3>Extra Information</h3>
+                <form method="post" class="info_form">
+                    <input type="text" name="first_name" placeholder="First Name" value="{{ user_info['first_name'] }}">
+                    <input type="text" name="last_name" placeholder="Last Name" value="{{ user_info['last_name'] }}">
+                    <input type="text" name="gender" placeholder="Gender" value="{{ user_info['gender'] }}">
+                    <input type="text" name="age" placeholder="Age" value="{{ user_info['age'] }}">
+                    <input type="text" name="phone_number" placeholder="Phone Number" value="{{ user_info['phone_number'] }}">
+                    <input type="text" name="emergency_phone" placeholder="Emergency Phone Contact" value="{{ user_info['emergency_phone'] }}">
+                    <button class="button">Save Changes</button>
+                </form>
+            </div>
         </div>
         <a class="main_button logout" href="{{ url_for('logout') }}">Logout</a>
         <div class="my_flashes">

@@ -159,7 +159,16 @@ class Data:
     #         response = Data.client.table("runner_info").insert({"user_id": user_id, "email": email, "username": username, "first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_phone": emergency_phone}).execute()
     #    except Exception as e:
     #        return None
-        
+
+
+    # Update user info with the provided dict
+    def update_runner_info(user_id: str, user_info: dict) -> bool:
+        try:
+            response = Data.client.table("runner_info").update(user_info).eq("user_id", user_id).execute()
+        except Exception as e:
+            return False
+        return True
+
 
     def generate_new_team_token(team_id: str):
         token = secrets.token_urlsafe()
