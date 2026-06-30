@@ -63,6 +63,7 @@ body {
   min-height: 100vh;
   background: #1E2235;
   background-image: url(/static/bg.jpg);
+  background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -152,13 +153,19 @@ body {
 }
 
 /* ── Register Now button ── */
-.main_page > a {
-  text-decoration: none;
-  z-index: 1;
-  margin-top: 3.5rem;
+.buttons {
+  flex-direction: column;
+  display: flex;
+  margin-top: 3rem;
+  align-items: center;
 }
 
-.main_page > a button {
+.buttons > a {
+  text-decoration: none;
+  margin-top: 0.3rem;
+}
+
+.buttons > a button {
   font-family: inherit;
   font-size: 0.9rem;
   font-weight: 600;
@@ -173,12 +180,12 @@ body {
   transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
 }
 
-.main_page > a button:hover {
+.buttons > a button:hover {
   background: #5A67D8;
   box-shadow: 0 6px 20px rgba(108, 122, 224, 0.4);
 }
 
-.main_page > a button:active {
+.buttons > a button:active {
   transform: translateY(1px);
   box-shadow: none;
 }
@@ -281,8 +288,9 @@ body {
 }
 
 .rules {
-  padding: 5rem 25rem;
+  padding: 5rem 15rem;
   text-align: center;
+  align-items: center;
 }
 
 /* ══════════════════════════════════════

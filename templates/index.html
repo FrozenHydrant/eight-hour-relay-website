@@ -47,15 +47,20 @@
           </div>
         </div>
       </div>
-      {% if is_captain or not_logged_in %}
-        <a href="{{ url_for('team_registration') }}">
-          <button>Register Team Now</button>
-        </a>
-      {% else %}
-        <a href="{{ url_for('team_information', team_id=team_id) }}">
-          <button>View My Team</button>
-        </a>
-      {% endif %}
+      <div class="buttons">
+        {% if is_captain or not_logged_in %}
+          <a href="{{ url_for('team_registration') }}">
+            <button>Register Team Now</button>
+          </a>
+          <a href="{{ url_for('runner_registration') }}">
+            <button>Sign up as Runner</button>
+          </a>
+        {% else %}
+          <a href="{{ url_for('team_information', team_id=team_id) }}">
+            <button>View My Team</button>
+          </a>
+        {% endif %}
+      </div>
     </div>
 
     <div class="information">
@@ -100,16 +105,18 @@
 
     <div class="rules">
       <h3 class="sub_title">Rules</h3>
-      <ul class="inner_text">
-        <li>Each team must have exactly 8 registered runners.</li>
-        <li>Each runner completes exactly two legs.</li>
-        <li>Each leg is approximately 30 minutes.</li>
-        <li>A ±3-minute margin is allowed to complete a full lap before exchange.</li>
-        <li>Teams must submit a fixed running order before the registration deadline.</li>
-        <li>The same running order is used for both rounds.</li>
-        <li>The team covering the greatest total distance within 8 hours wins.</li>
-        <li>Only completed laps are counted.</li>
-      </ul>
+      <div class="inner_rules">
+        <ul class="inner_text">
+          <li>Each team must have exactly 8 registered runners.</li>
+          <li>Each runner completes exactly two legs.</li>
+          <li>Each leg is approximately 30 minutes.</li>
+          <li>A ±3-minute margin is allowed to complete a full lap before exchange.</li>
+          <li>Teams must submit a fixed running order before the registration deadline.</li>
+          <li>The same running order is used for both rounds.</li>
+          <li>The team covering the greatest total distance within 8 hours wins.</li>
+          <li>Only completed laps are counted.</li>
+        </ul>
+      </div>
     </div>
 
     <div class="gallery">
