@@ -11,7 +11,7 @@ class Data:
 
     # Verify if token is right for the id
     def check_team_table_credentials(team_id: str, token: str) -> bool:
-        response = Data.client.table("teams").select("*").eq("id", team_id).execute()
+        response = Data.client.table("teams_public").select("encrypted_token").eq("id", team_id).execute()
 
         if response is None:
             return False
@@ -26,13 +26,13 @@ class Data:
     # Creates a team and returns the ID. None if failure.
     def create_team(team_name: str, user_id: str, token: str, division: str, email: str) -> str:
         try:
-            response = Data.client.table("teams").insert({"owner_id": user_id, "encrypted_token": generate_password_hash(token), "division": division, "email": email, "paid": False}).execute()
+            response = Data.client.table("teams").insert({"owner_id": user_id, "division": division, "email": email, "paid": False}).execute()
             if response is None:
                 return None
             if len(response.data) < 1:
                 return None
             team_id = str(response.data[0]["id"])
-            _ = Data.client.table("teams_public").insert({"id": team_id, "owner_id": user_id, "team_name": team_name}).execute()
+            _ = Data.client.table("teams_public").insert({"id": team_id, "owner_id": user_id, "team_name": team_name,  "encrypted_token": generate_password_hash(token)}).execute()
             return team_id
         except Exception as e:
             #print(e)
@@ -148,7 +148,7 @@ class Data:
     def create_new_basic_runner(user_id: str, email: str, username: str, captain_id: str):
         try:
              response = Data.client.table("runner_info").insert({"user_id": user_id, "email": email, "captain_id": captain_id}).execute()
-             _ = Data.client.table("runners_public").insert({"user_id": user_id, "username": username}).execute()
+             _ = Data.client.table("members_public").insert({"user_id": user_id, "username": username}).execute()
         except Exception as e:
             print(e)
             return None
@@ -161,6 +161,19 @@ class Data:
     #        return None
 
 
+    def has_authority_over_member(user_id: str, target_id: str, team_id: str) -> bool:
+        if target_id is None or team_id is None:
+            return False
+    
+        # Then check if the member is in a team we own
+        user_owned_teams = Data.get_owned_teams(user_id)
+        members = Data.get_members_list(team_id)
+        if team_id not in user_owned_teams or target_id not in members:
+            return False
+        
+        return True
+
+
     # Update user info with the provided dict
     def update_runner_info(user_id: str, user_info: dict) -> bool:
         try:
@@ -170,10 +183,57 @@ class Data:
         return True
 
 
+    def create_new_basic_captain(user_id: str, username: str):
+        try:
+             _ = Data.client.table("members_public").insert({"user_id": user_id, "username": username}).execute()
+        except Exception as e:
+            print(e)
+            return None
+        
+
+    def get_members_basic_info(member_ids: list[str]):
+        member_infos = []
+        for member_id in member_ids:
+            try:
+                response = Data.client.table("members_public").select("*").eq("user_id", member_id).execute()
+            except Exception as e:
+                continue
+            if response is None:
+                continue
+            if len(response.data) < 1:
+                continue
+            member_infos.append(response.data[0])
+        return member_infos
+        
+
+    # Get combined basic and combined info for all members ids in list
+    def get_members_joint_info(member_ids: list[str]):
+        basic_info = Data.get_members_basic_info(member_ids)
+        advanced_info = Data.get_members_info(member_ids)
+        #print("Infos", basic_info, advanced_info)
+        for combine_info in basic_info:
+            for target_info in advanced_info:
+                #print(combine_info, target_info)
+                if combine_info["user_id"] == target_info["user_id"]:
+                    target_info["username"] = combine_info["username"]
+        
+        return advanced_info
+    
+
+    def unenroll_member_from_team(member_id: str, team_id: str) -> bool:
+        try:
+            _ = Data.client.table("enrollment").delete().eq("user_id", member_id).eq("team_id", team_id).execute()
+            #_ = Data.client.table("runner_info").update({"captain_id": None}).eq("user_id", member_id).execute()
+        except Exception as e:
+            print(e)
+            return False
+        return True
+    
+
     def generate_new_team_token(team_id: str):
         token = secrets.token_urlsafe()
         try:
-            response = Data.client.table("teams").update({"encrypted_token": generate_password_hash(token)}).eq("id", team_id).execute()
+            response = Data.client.table("teams_public").update({"encrypted_token": generate_password_hash(token)}).eq("id", team_id).execute()
         except Exception as e:
             print("Problem during generating new team token,", e)
             return None

@@ -57,7 +57,7 @@ body {
 .top_info {
   width: 100%;
   max-width: 640px;
-  margin-top: 65px;
+  margin-top: 3.5rem;
   margin-bottom: 1.25rem;
 }
 
@@ -183,6 +183,26 @@ body {
 .bottom_list_item button:active {
   transform: translateY(1px);
   box-shadow: none;
+}
+
+/* ── Flash messages ── */
+.flashes {
+  margin-top: 3.6rem;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.flashes p {
+  background: #FFF5F5;
+  color: #C53030;
+  border: 1px solid #FEB2B2;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 500;
 }
 
 /* ── Responsive ── */

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="/static/css/profile.css">
+    </head>
+    <body>
+        <div class="top_bar_info">
+            <div class="top_bar_insides">
+                <a href="{{ url_for('index') }}">Home</a>
+            </div>
+        </div>
+        <div class="main_frame">
+            <div class="main_panel">
+                <div class="bonus_info">
+                    <a href="{{ url_for('team_information', team_id=team_id) }}">Back</a>
+                    <div class="bonus_info_inside">
+                    <h3>Runner Info</h3></div>
+                </div>
+                <div class="main_info">
+                    <p>Email: {{ member["email"] }}</p>
+                    <p>Username: {{ member["username"] }}</p>
+                    <p>Name: {{ member["first_name"] }} {{ member["last_name"] }}</p>
+                    <p>Gender: {{ member["gender"] }}</p>
+                    <p>Age: {{ member["age"] }}</p>
+                    <p>Phone: {{ member["phone_number"] }}</p>
+                </div>
+                <a href="{{ url_for('delete_from_team',team_id=team_id,member_id=member['user_id']) }}">Remove From Team</a>
+            </div>
+        </div>
+        <div class="my_flashes">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                <p>{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        </div>
+    </body>
+</html>

@@ -6,7 +6,6 @@ from util import Util
 import math
 import datetime as dt
 import secrets
-from werkzeug.security import generate_password_hash, check_password_hash
 from data import Data
 
 # App initialization happens here
@@ -40,6 +39,9 @@ def index():
         team_id = Data.get_enrolled_team(user.id)
 
     time_left = EVENT_DATE - dt.datetime.now()
+    
+    if team_id is None:
+        team_id = "no_team"
     return render_template("index.html", team_id=team_id, not_logged_in=not_logged_in, is_captain=is_captain, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
 
 
@@ -78,7 +80,7 @@ def captain_registration_post():
     if user_response is not None:
         return redirect(url_for("index"))
 
-    print(request.remote_addr, "registration.")
+    #print(request.remote_addr, "registration.")
     email = request.form.get("email")
     username = request.form.get("username")
     password = request.form.get("password")
@@ -93,8 +95,10 @@ def captain_registration_post():
         response = client.auth.sign_up({
             "email": email,
             "password": password,
-            "options": {"data": {"username": username, "is_captain": True}}
+            "options": {"data": {"is_captain": True}}
         })
+        #basic_team_info = Data.get_team_basic_info(team_id)
+        Data.create_new_basic_captain(response.user.id, username)
     except Exception as e:
         flash(str(e))
         return redirect(url_for("captain_registration"))
@@ -150,7 +154,7 @@ def runner_registration_post():
         response = client.auth.sign_up({
             "email": email,
             "password": password,
-            "options": {"data": {"username": username, "is_captain": False}}
+            "options": {"data": {"is_captain": False}}
         })
         # TODO
         new_response = Data.enroll_user_in_team(response.user.id, team_id)
@@ -231,10 +235,11 @@ def profile():
         flash("You must log in to view this page.")
         return redirect(url_for("login"))
     user = user_response.user
+    username = Data.get_members_basic_info([user.id])[0]["username"]
 
     # Don't let captains do this! for now. TODO reconsider it
     if user.user_metadata["is_captain"]:
-        return render_template("profile_cap.html", email=user.email, username=user.user_metadata["username"])
+        return render_template("profile_cap.html", email=user.email, username=username)
 
     info = Data.get_members_info([user.id])[0]
     # Change None to empty string
@@ -242,7 +247,7 @@ def profile():
         if info[k] is None:
             info[k] = ""
 
-    return render_template("profile.html", user_info=info, email=info["email"], username=user.user_metadata["username"])
+    return render_template("profile.html", user_info=info, email=info["email"], username=username)
 
 
 @app.route("/logout")
@@ -401,21 +406,99 @@ def team_information():
     if team_id is None:
         return redirect(url_for("error_page"))
 
+    # Handle no team -> We got kicked ?
+    if team_id == "no_team":
+        return redirect(url_for("join_new_team"))
+    
     # Now get the team info from that
     team_info = Data.get_team_info(team_id)
+    #print(team_info, "team_info")
     if team_info is None:
         return redirect(url_for("error_page"))
     
     # Make sure we actually own the team OR are part of it
     owned_teams = Data.get_owned_teams(user.id)
     team_members = Data.get_members_list(team_id)
+    print("owned", owned_teams, team_members)
     if team_id not in owned_teams and user.id not in team_members:
         return redirect(url_for("error_page"))
     
-    #member_ids = Data.get_members_list(team_id)
-    members_info = Data.get_members_info(team_members)
+    combined_member_infos = Data.get_members_joint_info(team_members)
+    
+    # If I'm a runner and I have unfinished info, finish it!
+    # (All fields must be filled simultaneously, so just checking one is fine)
+    for member_info in combined_member_infos:
+        #print(member_info)
+        if member_info["user_id"] == user.id and member_info["first_name"] is None:
+            flash("You have not filled in your Runner Info yet! Please go to your Profile and finish adding your information. You must do this before the deadline! ")
 
-    return render_template("team_information.html", team=team_info, is_captain=user.user_metadata["is_captain"], members=members_info)
+    #print(combined_member_infos)
+    return render_template("team_information.html", team=team_info, is_captain=user.user_metadata["is_captain"], members=combined_member_infos)
+
+
+@app.route("/join_new_team")
+def join_new_team():
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
+    if user_response is None:
+        flash("You must log in to view this page.")
+        return redirect(url_for("login"))
+    user = user_response.user
+
+    # Make sure we are a runner not a captain
+    if user.user_metadata["is_captain"]:
+        return redirect(url_for("index"))
+    
+    # Make sure we actually have no team
+    in_team = Data.get_enrolled_team(user.id)
+    if in_team is not None:
+        return redirect(url_for("index"))
+    
+    return render_template("join_new_team.html")
+
+
+@app.route("/join_new_team", methods=["POST"])
+def join_new_team_post():
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
+    if user_response is None:
+        flash("You must log in to view this page.")
+        return redirect(url_for("login"))
+    user = user_response.user
+
+    # Make sure we are a runner not a captain
+    if user.user_metadata["is_captain"]:
+        return redirect(url_for("index"))
+    
+    # And we actually have no team
+    in_team = Data.get_enrolled_team(user.id)
+    if in_team is not None:
+        return redirect(url_for("index"))
+    
+    team_id = request.form.get("team_id")
+    team_token = request.form.get("team_token")
+
+    if team_id is None or team_token is None:
+        flash("Must enter Team Id and Token.")
+        return redirect(url_for("join_new_team"))
+    
+    # Then check token
+    success = Data.check_team_table_credentials(team_id, team_token)
+    if not success:
+        flash("Team ID or Token is wrong.")
+        return redirect(url_for("join_new_team"))
+    
+    # Update all categories
+    _ = Data.enroll_user_in_team(user.id, team_id)
+    basic_info = Data.get_team_basic_info(team_id)
+    Data.update_runner_info(user.id, {"captain_id": basic_info["owner_id"]})
+
+    # Bring us to main page
+    return redirect(url_for("profile",team_id=team_id))
 
 
 @app.route("/team_token_reset")
@@ -463,7 +546,64 @@ def teams():
 
     teams = Data.get_owned_teams_info(user.id)
     #print(teams, "teams")
-    return render_template("teams.html", username=user.user_metadata["username"], teams=teams)
+    username = Data.get_members_basic_info([user.id])[0]["username"]
+    return render_template("teams.html", username=username, teams=teams)
+
+
+@app.route("/manage_team_member")
+def manage_team_member():
+
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
+    if user_response is None:
+        flash("You must log in to view this page.")
+        return redirect(url_for("login"))
+    user = user_response.user
+
+    # Only captains are allowed!
+    if not user.user_metadata["is_captain"]:
+        return redirect(url_for("index"))
+    
+    member_id = request.args.get("member_id")
+    team_id = request.args.get("team_id")
+
+    if not Data.has_authority_over_member(user.id, member_id, team_id):
+        return redirect(url_for("error_page"))
+    
+    member_info = Data.get_members_joint_info([member_id])[0]
+
+    for k in member_info:
+        if member_info[k] is None:
+            member_info[k] = "No Data"
+    return render_template("manage_team_member.html", team_id=team_id, member=member_info)
+
+
+@app.route("/delete_from_team")
+def delete_from_team():
+
+    try:
+        user_response = client.auth.get_user()
+    except:
+        user_response = None
+    if user_response is None:
+        flash("You must log in to view this page.")
+        return redirect(url_for("login"))
+    user = user_response.user
+
+    # Only captains are allowed!
+    if not user.user_metadata["is_captain"]:
+        return redirect(url_for("index"))
+    
+    member_id = request.args.get("member_id")
+    team_id = request.args.get("team_id")
+    if not Data.has_authority_over_member(user.id, member_id, team_id):
+        return redirect(url_for("error_page"))
+    
+    s = Data.unenroll_member_from_team(member_id, team_id)
+    # TODO: warning on s being false (operation failed) ?
+    return redirect(url_for("team_information", team_id=team_id))
 
 
 @app.route("/error_page")

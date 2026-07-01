@@ -62,8 +62,8 @@ body {
 }
 
 .main_panel {
-  display: block;
-  width: 100%;
+  display: inline-block;
+  min-width: 25rem;
 }
 
 .bonus_info_inside h3 {
@@ -105,13 +105,17 @@ body {
 }
 
 .main_frame {
+  width: 100%;
   margin-top: 5rem;
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── Extra information card ── */
 .more_info {
+  display: inline-block;
   margin-left: 2.6rem;
   background: #FFFFFF;
   border-radius: 16px;
