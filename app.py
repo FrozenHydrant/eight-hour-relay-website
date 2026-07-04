@@ -28,36 +28,31 @@ s_price_id = os.getenv("STRIPE_PRICE_ID")
 s_endpoint_secret = os.getenv("STRIPE_ENDPOINT_SECRET")
 
 
-def is_user_logged_out():
+def user_logout_status():
     user_response = None
     try:
-        user_response = client.auth.get_claims()
+        user_response = client.auth.get_user()
     except:
         pass
     if user_response is not None:
         print("User claims found! Must have been logged in!")
-        return False
+        return user_response.user
     print("No user claims found. Must have been logged out...")
-    return True
+    return None
 
 
 # Routes <Main Page>
 @app.route('/')
 def index():
-    try:
-        user_response = client.auth.get_user()
-    except:
-        user_response = None
-    # Initialize some info we need
-    user = None
+    user = user_logout_status()
     team_id = -1
     is_captain = False
     not_logged_in = True
     is_undecided = True
 
     # User exists
-    if user_response is not None:
-        user = user_response.user
+    if user is not None:
+        #user = user_response.user
         not_logged_in = False
         if "is_captain" in user.user_metadata:
             is_captain = user.user_metadata["is_captain"]
@@ -74,15 +69,15 @@ def index():
 # Registration for the whole website
 @app.route("/registration")
 def registration():
-    logged_out = is_user_logged_out()
-    if not logged_out:
+    user = user_logout_status()
+    if user:
         return redirect(url_for("index"))
     return render_template("registration.html")
 
 @app.route("/registration", methods=["POST"])
 def registration_post():
-    logged_out = is_user_logged_out()
-    if not logged_out:
+    user = user_logout_status()
+    if user:
         return redirect(url_for("index"))
     
     email = request.form.get("email")
@@ -111,10 +106,10 @@ def registration_post():
 # Captain registration
 @app.route("/captain_registration")
 def captain_registration():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    user = client.auth.get_user().user
+    #user = client.auth.get_user().user
     
     # Make sure we are not in any teams beforehand
     enrolled_team = Data.get_enrolled_team(user.id)
@@ -131,10 +126,9 @@ def captain_registration():
 
 @app.route("/captain_registration", methods=["POST"])
 def captain_registration_post():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    user = client.auth.get_user().user
 
     # Make sure we are not in any teams beforehand
     enrolled_team = Data.get_enrolled_team(user.id)
@@ -156,15 +150,15 @@ def captain_registration_post():
 # Login for the whole website
 @app.route("/login")
 def login():
-    logged_out = is_user_logged_out()
-    if not logged_out:
+    logged_in = user_logout_status()
+    if logged_in:
         return redirect(url_for("index"))
     return render_template("login.html")
 
 @app.route("/login", methods=["POST"])
 def login_post():
-    logged_out = is_user_logged_out()
-    if not logged_out:
+    logged_in = user_logout_status()
+    if logged_in:
         return redirect(url_for("index"))
 
     email = request.form.get("email")
@@ -189,10 +183,9 @@ def login_post():
 # Runner registration
 @app.route("/runner_registration")
 def runner_registration():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    user = client.auth.get_user().user
     
     # Make sure we are not in any teams beforehand
     enrolled_team = Data.get_enrolled_team(user.id)
@@ -210,10 +203,9 @@ def runner_registration():
 
 @app.route("/runner_registration", methods=["POST"])
 def runner_registration_post():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    user = client.auth.get_user().user
 
     # Make sure we are not in any teams beforehand
     enrolled_team = Data.get_enrolled_team(user.id)
@@ -271,11 +263,9 @@ def runner_registration_post():
 
 @app.route("/profile")
 def profile():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    
-    user = client.auth.get_user().user
 
     list_info = Data.get_members_info([user.id])
     if len(list_info) < 1:
@@ -292,8 +282,8 @@ def profile():
 
 @app.route("/logout")
 def logout():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    logged_in = user_logout_status()
+    if not logged_in:
         return redirect(url_for("index"))
     client.auth.sign_out(options={"scope": "local"})
     return redirect(url_for("index"))
@@ -301,11 +291,9 @@ def logout():
 
 @app.route("/profile", methods=["POST"])
 def profile_post():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    
-    user = client.auth.get_user().user
 
     first_name = request.form.get("first_name")
     last_name = request.form.get("last_name")
@@ -340,10 +328,9 @@ def profile_post():
 
 @app.route("/team_registration")
 def team_registration():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    user = client.auth.get_user().user
 
     # Only captains
     if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
@@ -354,10 +341,9 @@ def team_registration():
 
 @app.route("/team_registration", methods=["POST"])
 def team_registration_post():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    user = client.auth.get_user().user
 
     # Only captains
     if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
@@ -391,11 +377,9 @@ def team_registration_post():
 
 @app.route("/team_created")
 def team_created():
-    logged_out = is_user_logged_out()
-    if logged_out:
-        return redirect(url_for("index"))
-    
-    user = client.auth.get_user().user
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
 
     # Only captains
     if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
@@ -420,10 +404,9 @@ def team_created():
 
 @app.route("/team_information")
 def team_information():
-    logged_out = is_user_logged_out()
-    if logged_out:
-        return redirect(url_for("index"))
-    user = client.auth.get_user().user
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
 
     # Get the team ID
     team_id = request.args.get("team_id")
@@ -465,10 +448,9 @@ def team_information():
 
 @app.route("/team_token_reset")
 def team_token_reset():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    user = client.auth.get_user().user
 
     # Get team id
     team_id = request.args.get("team_id")
@@ -489,10 +471,9 @@ def team_token_reset():
 
 @app.route("/teams")
 def teams():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    user = client.auth.get_user().user
     # Don't do it if I'm not a captain (we should not see this page)
     if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
         return redirect(url_for("index"))
@@ -504,10 +485,9 @@ def teams():
 
 @app.route("/manage_team_member")
 def manage_team_member():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    user = client.auth.get_user().user
 
     # Only captains are allowed!
     if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
@@ -530,11 +510,9 @@ def manage_team_member():
 #TODO: critical actions should use post requests not get requests
 @app.route("/delete_from_team")
 def delete_from_team():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    
-    user = client.auth.get_user().user 
 
     # Only captains are allowed!
     if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
@@ -553,10 +531,9 @@ def delete_from_team():
 
 @app.route("/team_payment")
 def team_payment():
-    logged_out = is_user_logged_out()
-    if logged_out:
+    user = user_logout_status()
+    if not user:
         return redirect(url_for("login"))
-    user = client.auth.get_user().user
 
     # Only captains are allowed!
     if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
