@@ -32,12 +32,20 @@ def user_logout_status():
     user_response = None
     try:
         user_response = client.auth.get_user()
-    except:
-        pass
+    except Exception as e:
+        print("Login status exception: ", e)
     if user_response is not None:
         print("User claims found! Must have been logged in!")
         return user_response.user
     print("No user claims found. Must have been logged out...")
+    print("Try it again!")
+    for i in range(5):
+        user_response = client.auth.get_user()
+        if user_response is not None:
+            print("On try ", i, "user claims found")
+            return user_response.user
+
+    print("Despite all that, no user claims found...")
     return None
 
 
