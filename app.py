@@ -31,11 +31,13 @@ s_endpoint_secret = os.getenv("STRIPE_ENDPOINT_SECRET")
 def is_user_logged_out():
     user_response = None
     try:
-        user_response = client.auth.get_user()
+        user_response = client.auth.get_claims()
     except:
         pass
     if user_response is not None:
+        print("User claims found! Must have been logged in!")
         return False
+    print("No user claims found. Must have been logged out...")
     return True
 
 
@@ -290,7 +292,10 @@ def profile():
 
 @app.route("/logout")
 def logout():
-    client.auth.sign_out()
+    logged_out = is_user_logged_out()
+    if logged_out:
+        return redirect(url_for("index"))
+    client.auth.sign_out(options={"scope": "local"})
     return redirect(url_for("index"))
 
 
