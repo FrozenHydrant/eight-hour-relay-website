@@ -27,8 +27,12 @@
       </div>
       <div class="team_info_box">
         <p class="inner_text">Team ID: {{ team["id"] }}</p>
-        <p class="inner_text">Team Payment Status: #TODO</p>
         <p class="inner_text">Team Division: {{ team["division"] }}</p>
+        {% if team["paid"] %}
+          <p class="inner_text">Team Fee Paid: Yes</p>
+        {% else %}
+          <p class="inner_text">Team Fee Paid: No</p>
+        {% endif %}
         <p class="inner_text">Team Email: {{ team["email"] }}</p>
         {% if is_captain %}
           <div class="token_regeneration">
@@ -43,8 +47,7 @@
       <div class="bottom_list">
         {% for member in members %}
           <div class="bottom_list_item">
-            <p class="muted">{{ member["email"] }}</p>
-            <p class="title">{{ member["username"] }}</p>
+            <p class="title">{{ member["email"] }}</p>
             {% if is_captain %}<a href="{{ url_for('manage_team_member',team_id=team['id'],member_id=member['user_id']) }}"><button>Manage</button></a>{% endif %}
           </div>
         {% endfor %}

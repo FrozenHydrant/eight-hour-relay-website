@@ -61,7 +61,7 @@ body {
 .main_page {
   position: relative;
   min-height: 100vh;
-  background: #1E2235;
+  background-size: cover;
   background-image: url(/static/bg.jpg);
   background-repeat: no-repeat;
   display: flex;
@@ -156,36 +156,34 @@ body {
 .buttons {
   flex-direction: column;
   display: flex;
-  margin-top: 3rem;
+  margin-top: 6rem;
   align-items: center;
+  text-align: center;
 }
 
 .buttons > a {
+  width: 100%;
   text-decoration: none;
   margin-top: 0.3rem;
-}
-
-.buttons > a button {
   font-family: inherit;
-  font-size: 0.9rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #FFFFFF;
   background: #6C7AE0;
+  color: #FFFFFF;
   border: none;
-  border-radius: 10px;
-  padding: 0.85rem 2.5rem;
-  cursor: pointer;
-  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  border-radius: 8px;
+  padding: 0.9rem 1.2rem;
+   transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
 }
 
-.buttons > a button:hover {
+.buttons > a:hover {
   background: #5A67D8;
   box-shadow: 0 6px 20px rgba(108, 122, 224, 0.4);
 }
 
-.buttons > a button:active {
+.buttons > a:active {
   transform: translateY(1px);
   box-shadow: none;
 }

@@ -17,68 +17,63 @@ body {
   color: #1E2235;
 }
 
-.registration h3 {
-  font-size: 1.35rem;
-  font-weight: 600;
-  color: #FFFFFF;
-  letter-spacing: -0.02em;
-  margin-top: 0.25rem;
-  margin-bottom: 2.3rem;
-}
-
-/* ── Registration card ── */
-.registration {
+/* ── Main card ── */
+.main_block {
   background: #1E2235;
   border-radius: 16px;
   padding: 2.5rem 2.25rem;
   width: 100%;
-  max-width: 400px;
+  max-width: 440px;
   box-shadow:
     0 4px 24px rgba(30, 34, 53, 0.18),
     0 1px 4px rgba(30, 34, 53, 0.10);
-}
-
-/* ── Form layout ── */
-form {
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
 }
 
-/* ── Inputs ── */
-.text_input {
-  width: 100%;
-  padding: 0.7rem 1rem;
-  font-family: inherit;
-  font-size: 0.9rem;
-  color: #1E2235;
-  background: #FFFFFF;
+.main_block > h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+}
+
+/* ── Registration option cards ── */
+.main_sub_block {
+  background: #272C42;
+  border-radius: 10px;
+  padding: 1.25rem 1.35rem;
   border: 1.5px solid transparent;
-  border-radius: 8px;
-  outline: none;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease;
+  transition: border-color 0.18s ease, background 0.18s ease;
 }
 
-/* Placeholder hints via attribute — browsers show name as placeholder */
-.text_input[name="email"]::placeholder    { content: "Email address"; }
-.text_input[name="username"]::placeholder { content: "Username"; }
-.text_input[name="password"]::placeholder { content: "Password"; }
-
-/* Signature element: indigo glow on focus */
-.text_input:focus {
-  border-color: #6C7AE0;
-  box-shadow: 0 0 0 3.5px rgba(108, 122, 224, 0.22);
+.sub_title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.5rem;
 }
 
-/* ── Submit button ── */
-.submit {
-  margin-top: 0.4rem;
+.sub_desc {
+  font-size: 0.82rem;
+  color: #A0A8C8;
+  line-height: 1.55;
+  margin: 0 0 1.1rem;
+}
+
+/* ── Registration buttons ── */
+.main_registration_button {
+  text-decoration: none;
+}
+
+.main_registration_button button {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.65rem 1rem;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: #FFFFFF;
@@ -92,31 +87,44 @@ form {
     box-shadow 0.15s ease;
 }
 
-.submit:hover {
+.main_registration_button button:hover {
   background: #5A67D8;
   box-shadow: 0 4px 14px rgba(108, 122, 224, 0.38);
 }
 
-.submit:active {
+.main_registration_button button:active {
   transform: translateY(1px);
   box-shadow: none;
 }
 
-.have_an_account > p {
-  font-size: 0.82rem;
-  color: #6b7280;
+/* ── Sign in link ── */
+.subinfo {
+  margin-top: 1.1rem;
+  width: 100%;
+  max-width: 440px;
 }
 
-.have_an_account a {
+.subinfo p {
   font-size: 0.82rem;
-  color: #6c7ae0;
+  color: #6b7280;
+  margin: 0;
+}
+
+.subinfo a {
+  font-size: 0.82rem;
+  color: #6C7AE0;
+  text-decoration: none;
+}
+
+.subinfo a:hover {
+  text-decoration: underline;
 }
 
 /* ── Flash messages ── */
 .flashes {
   margin-top: 1.25rem;
   width: 100%;
-  max-width: 400px;
+  max-width: 440px;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -130,11 +138,12 @@ form {
   padding: 0.65rem 1rem;
   font-size: 0.82rem;
   font-weight: 500;
+  margin: 0;
 }
 
 /* ── Responsive ── */
 @media (max-width: 480px) {
-  .registration {
+  .main_block {
     padding: 2rem 1.5rem;
   }
 }

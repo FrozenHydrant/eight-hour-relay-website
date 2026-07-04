@@ -13,11 +13,6 @@
       <div class="top_bar_info">
         <div class="top_bar_insides">
         <a href="#about">Mission</a>
-        {% if is_captain %}
-          <a href="{{ url_for('teams') }}">My Teams</a>
-        {% elif not not_logged_in %}
-          <a href="{{ url_for('team_information', team_id=team_id) }}">View My Team</a>
-        {% endif %}
         {% if not not_logged_in %}
           <a href="{{ url_for('profile') }}">Profile</a>
         {% else %}
@@ -48,19 +43,24 @@
         </div>
       </div>
       <div class="buttons">
-        {% if is_captain or not_logged_in %}
-          <a href="{{ url_for('team_registration') }}">
-            <button>Register Team Now</button>
-          </a>
+        {% if not_logged_in or is_undecided %}
+        <a href="{{ url_for('captain_registration') }}">
+          Register Team Now
+        </a>
+        <a href="{{ url_for('runner_registration') }}">
+          Register as Runner
+        </a>
         {% endif %}
-        {% if not_logged_in %}
-          <a href="{{ url_for('runner_registration') }}">
-            <button>Sign up as Runner</button>
-          </a>
+
+        {% if not is_undecided and not is_captain %}
+        <a href="{{ url_for('team_information', team_id=team_id) }}">
+          View my Team
+        </a>
         {% endif %}
-        {% if not is_captain and not not_logged_in %}
-          <a href="{{ url_for('team_information', team_id=team_id) }}">
-            <button>View My Team</button>
+        
+        {% if is_captain %}
+          <a href="{{ url_for('teams') }}">
+            Manage my Teams
           </a>
         {% endif %}
       </div>
