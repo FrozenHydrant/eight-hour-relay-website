@@ -429,6 +429,9 @@ def team_information():
     #print(team_info, "team_info")
     if team_info is None:
         return redirect(url_for("error_page"))
+    # Get team name and combine into
+    team_name = Data.get_team_basic_info(team_id)["team_name"]
+    team_info["team_name"] = team_name
     
     # Make sure we actually own the team OR are part of it
     owned_teams = Data.get_owned_teams(user.id)
@@ -560,11 +563,10 @@ def team_payment():
     if payment_state:
         return redirect(url_for("error_page"))
     
-    completion_url = request.url_root[:-1:] + url_for("team_information", team_id=team_id)
+    #completion_url = request.url_root[:-1:] + url_for("team_information", team_id=team_id)
     #print(completion_url)
     payment_link = s_client.v1.payment_links.create({
         "line_items": [{"price": s_price_id, "quantity": 1}],
-        "after_completion": {"type": "redirect", "redirect": {"url": completion_url}},
         "metadata": {"team_id": team_id, "user_id": user.id}
     })
     

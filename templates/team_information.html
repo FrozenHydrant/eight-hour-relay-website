@@ -39,6 +39,11 @@
             <a class="button" href="{{ url_for('team_token_reset',team_id=team['id']) }}">Regenerate Team Token</a>
             <p class="inner_note">Invalidate your old token and create a new one.</p>
           </div>
+          {% if not team["paid"] %}
+          <div class="payment">
+            <a class="button" href="{{ url_for('team_payment',team_id=team['id'])}}">Team Payment</a>
+          </div>
+          {% endif %}
         {% endif %}
       </div>
       <div class="bottom_info">
