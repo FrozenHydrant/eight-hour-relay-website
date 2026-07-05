@@ -65,6 +65,12 @@ class Sanitization:
                 return True
         return False 
     
+    def verify_next_page(next_page: str) -> str:
+        valid_next_pages = ("captain_registration","runner_registration")
+        if next_page in valid_next_pages:
+            return next_page
+        return "index"
+
     def verify_all_and_create_response(email: str, username: str, password: str) -> bool:
         # Verify lengths
         if not Sanitization.verify_email_length(email):

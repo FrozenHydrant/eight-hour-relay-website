@@ -11,18 +11,18 @@
         </div>
       </div>
       <div class="top_info">
-        <h3>Welcome {{ username }}.</h3>
-        <p>The teams you currently manage are below:</p>
-      </div>
-      <div class="add_team_button">
-        <a href="{{ url_for('team_registration') }}">Create Team</a>
+        <div>
+          <h3>Welcome {{ username }}.</h3>
+          <p>The teams you currently manage are below:</p>
+        </div>
+        <a href="{{ url_for('team_registration') }}" class="top_button">Create Team</a>
       </div>
       <div class="bottom_list">
         {% for team in teams %}
           <div class="bottom_list_item">
-            <p class="muted">{{ team["id"] }}</p>
+            
             <p class="title">{{ team["team_name"] }}</p>
-            <a href="{{ url_for('team_information', team_id=team['id']) }}"><button>Manage</button></a>
+            <a href="{{ url_for('team_information', team_id=team['id']) }}" class="button">Manage</a>
           </div>
         {% endfor %}
       </div>

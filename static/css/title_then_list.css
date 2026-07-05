@@ -57,8 +57,12 @@ body {
 .top_info {
   width: 100%;
   max-width: 640px;
-  margin-top: 3.5rem;
+  margin-top: 5.6rem;
   margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .top_info h3 {
@@ -75,23 +79,69 @@ body {
   margin: 0;
 }
 
-/* ── Create Team button ── */
-.add_team_button {
+.team_info_box {
   width: 100%;
   max-width: 640px;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  background: #FFFFFF;
+  border-radius: 18px;
+  padding: 1.5rem;
+  box-shadow:
+    0 10px 30px rgba(30, 34, 53, 0.08),
+    0 0 0 1px rgba(30, 34, 53, 0.04);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(3, auto);
+  gap: 1rem;
+  align-items: start;
 }
 
-.add_team_button a {
+.team_info_box p {
+  margin: 0;
+  color: #1E2235;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.team_info_box .inner_text {
+  background: #F8FAFC;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
   display: inline-block;
-  padding: 0.65rem 1.25rem;
-  font-family: inherit;
+  width: 100%;
+}
+
+.team_info_box .token_regeneration,
+.team_info_box .payment {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.team_info_box .inner_note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6B7280;
+}
+
+.team_info_box .top_button {
+  width: 100%;
+}
+
+/* ── Create Team button / top actions ── */
+.top_button,
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
   font-size: 0.9rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
   color: #FFFFFF;
   background: #6C7AE0;
-  border-radius: 8px;
+  border: none;
+  border-radius: 10px;
   text-decoration: none;
   transition:
     background 0.15s ease,
@@ -99,14 +149,28 @@ body {
     box-shadow 0.15s ease;
 }
 
-.add_team_button a:hover {
-  background: #5A67D8;
-  box-shadow: 0 4px 14px rgba(108, 122, 224, 0.38);
+.red_button {
+  background: #F56565;
 }
 
-.add_team_button a:active {
+.top_button:hover,
+.button:hover {
+  background: #5A67D8;
+  box-shadow: 0 6px 18px rgba(108, 122, 224, 0.18);
+}
+
+.red_button:hover{
+  background: #E53E3E;
+  box-shadow: 0 6px 18px rgba(229, 62, 62, 0.18);
+}
+
+.top_button:active,
+.button:active {
   transform: translateY(1px);
-  box-shadow: none;
+}
+
+.top_button {
+  margin-left: auto;
 }
 
 /* ── Teams list ── */
@@ -122,68 +186,66 @@ body {
 .bottom_list_item {
   background: #FFFFFF;
   border-radius: 10px;
-  padding: 0.9rem 1.25rem;
+  padding: 1rem 1.25rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
   box-shadow:
     0 1px 4px rgba(30, 34, 53, 0.08),
     0 0 0 1px rgba(30, 34, 53, 0.05);
   transition: box-shadow 0.15s ease, transform 0.1s ease;
 }
 
-.bottom_list_item p {
+.bottom_list_insides {
+  display: grid;
+  width: 80%;
+  grid-template-columns: minmax(2.5rem, auto) minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+}
+
+.bottom_list_insides p {
   margin: 0;
   font-size: 0.9rem;
   color: #1E2235;
 }
 
-/* Team ID — muted label */
-.bottom_list_item .muted {
+.bottom_list_insides .muted {
+  grid-column: 1;
+  align-self: center;
   font-size: 0.78rem;
   font-weight: 500;
   color: #A0A8C8;
-  min-width: 2.5rem;
 }
 
-/* Team name — grows to fill space */
-.bottom_list_item .title {
+.bottom_list_insides .title {
   font-weight: 600;
-  flex: 1;
+}
+
+.bottom_list_insides .subtitle {
+  grid-column: 2;
+  color: #6B7280;
+  font-size: 0.85rem;
+}
+
+.bottom_list_insides .button {
+  grid-column: 2;
+  justify-self: end;
+  align-self: center;
+  min-width: 5.5rem;
+}
+
+.bottom_list_insides .right_form {
+  grid-column: 2;
+  justify-self: end;
+  align-self: center;
+  display: flex;
+  gap: 0.5rem;
 }
 
 /* ── Manage button ── */
-.bottom_list_item a {
-  text-decoration: none;
-}
 
-.bottom_list_item button {
-  padding: 0.45rem 1rem;
-  font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: #6C7AE0;
-  background: transparent;
-  border: 1.5px solid #6C7AE0;
-  border-radius: 6px;
-  cursor: pointer;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-.bottom_list_item button:hover {
-  background: #6C7AE0;
-  color: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(108, 122, 224, 0.3);
-}
-
-.bottom_list_item button:active {
-  transform: translateY(1px);
-  box-shadow: none;
-}
 
 /* ── Flash messages ── */
 .flashes {

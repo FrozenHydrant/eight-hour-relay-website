@@ -113,7 +113,7 @@ def registration_post():
 def captain_registration():
     user = user_logout_status(request.cookies.get("access_token"))
     if not user:
-        return redirect(url_for("login"))
+        return redirect(url_for("login",next_page="captain_registration"))
     #user = client.auth.get_user().user
     
     # Make sure we are not in any teams beforehand
@@ -158,7 +158,10 @@ def login():
     logged_in = user_logout_status(request.cookies.get("access_token"))
     if logged_in:
         return redirect(url_for("index"))
-    return render_template("login.html")
+
+    # Hidden next page parameter for redirecting after login
+    next_page = request.args.get("next_page", "")
+    return render_template("login.html", next_page=next_page)
 
 @app.route("/login", methods=["POST"])
 def login_post():
@@ -168,6 +171,7 @@ def login_post():
 
     email = request.form.get("email")
     password = request.form.get("password")
+    next_page = request.form.get("next_page")
 
     success = Sanitization.verify_all_and_create_response(email, "ValidUname", password)
 
@@ -184,7 +188,9 @@ def login_post():
         flash(str(e))
         return redirect(url_for("login"))
     
-    return generate_cookied_response(redirect(url_for("index")), {"key": "access_token", "value": response.session.access_token})
+    next_page = Sanitization.verify_next_page(next_page)
+
+    return generate_cookied_response(redirect(url_for(next_page)), {"key": "access_token", "value": response.session.access_token})
 
 
 # Runner registration
@@ -192,7 +198,7 @@ def login_post():
 def runner_registration():
     user = user_logout_status(request.cookies.get("access_token"))
     if not user:
-        return redirect(url_for("login"))
+        return redirect(url_for("login", next_page="runner_registration"))
     
     # Make sure we are not in any teams beforehand
     enrolled_team = Data.get_enrolled_team(user.id)
@@ -202,11 +208,18 @@ def runner_registration():
 
     # And also not a captain
     if "is_captain" in user.user_metadata and user.user_metadata["is_captain"]:
-        flash("You are already a Runner!")
+        flash("You are already a Captain!")
         return redirect(url_for("index"))
             
     teams = Data.get_all_teams_info()
-    return render_template("registration_runner.html", teams=teams)
+
+    # Ensure runner record exists and pass existing info to the form so fields can be prefilled
+    user_info = Data.get_members_info([user.id])[0]
+    for k in user_info:
+        if user_info[k] is None:
+            user_info[k] = ""
+
+    return render_template("registration_runner.html", teams=teams, user_info=user_info)
 
 @app.route("/runner_registration", methods=["POST"])
 def runner_registration_post():
@@ -257,11 +270,19 @@ def runner_registration_post():
     if not success:
         flash("Team ID or Token is wrong.")
         return redirect(url_for("runner_registration"))
+
+    # Check team capacity
+    members = Data.get_members_list(team_id)
+    if len(members) >= 8:
+        flash("This team already has the maximum of 8 members.")
+        return redirect(url_for("runner_registration"))
     
     # Do team enrollment
     try:
         _ = Data.enroll_user_in_team(user.id, team_id)
         s = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_phone": emergency_phone})
+        _ = Data.setup_user_position(user.id, team_id)
+        client.auth.update_user({"data": {"is_captain": False}})
     except Exception as e:
         flash(str(e))
         return redirect(url_for("runner_registration"))
@@ -276,9 +297,11 @@ def profile():
 
     list_info = Data.get_members_info([user.id])
     if len(list_info) < 1:
+        # Try again
         Data.create_new_basic_runner(user.id, user.email)
+        return redirect(url_for("profile"))
 
-    info = Data.get_members_info([user.id])[0]
+    info = list_info[0]
     # Change None to empty string
     for k in info:
         if info[k] is None:
@@ -441,6 +464,14 @@ def team_information():
         return redirect(url_for("error_page"))
     
     combined_member_infos = Data.get_members_info(team_members)
+    member_positions = Data.get_positions_info(team_members)
+    for i in combined_member_infos:
+        for j in member_positions:
+            if i["user_id"] == j["user_id"]:
+                i["position"] = j["position"]
+
+    #print(combined_member_infos, "combined_member_infos")
+    combined_member_infos.sort(key=lambda x: x["position"])
     
     # If I'm a runner and I have unfinished info, finish it!
     # (All fields must be filled simultaneously, so just checking one is fine)
@@ -517,8 +548,7 @@ def manage_team_member():
     return render_template("manage_team_member.html", team_id=team_id, member=member_info)
 
 
-#TODO: critical actions should use post requests not get requests
-@app.route("/delete_from_team")
+@app.route("/delete_from_team", methods=["POST"])
 def delete_from_team():
     user = user_logout_status(request.cookies.get("access_token"))
     if not user:
@@ -528,8 +558,8 @@ def delete_from_team():
     if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
         return redirect(url_for("index"))
     
-    member_id = request.args.get("member_id")
-    team_id = request.args.get("team_id")
+    member_id = request.form.get("member_id")
+    team_id = request.form.get("team_id")
     if not Data.has_authority_over_member(user.id, member_id, team_id):
         return redirect(url_for("error_page"))
     
@@ -538,7 +568,7 @@ def delete_from_team():
     # TODO: warning on s being false (operation failed) ?
     return redirect(url_for("team_information", team_id=team_id))
 
-
+#TODO: critical actions should use post requests not get requests
 @app.route("/team_payment")
 def team_payment():
     user = user_logout_status(request.cookies.get("access_token"))
@@ -598,6 +628,26 @@ def team_payment_webhook():
         Transactions.complete_payment(checkout_session.id)
         return ""
     return "Event not supported", 500
+
+
+@app.route("/move_team_member_up", methods=["POST"])
+def move_team_member_up():
+    user = user_logout_status(request.cookies.get("access_token"))
+    if not user:
+        return redirect(url_for("login"))
+
+    # Only captains are allowed!
+    if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
+        return redirect(url_for("index"))
+    
+    member_id = request.form.get("member_id")
+    team_id = request.form.get("team_id")
+
+    if not Data.has_authority_over_member(user.id, member_id, team_id):
+        return redirect(url_for("error_page"))
+    
+    s = Data.move_member_position_in_team(member_id, team_id, "up")
+    return redirect(url_for("team_information", team_id=team_id))
 
 
 @app.route("/error_page")

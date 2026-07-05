@@ -8,23 +8,24 @@
       <h3>Register as Runner</h3>
       <p class="inner_text">Please fill in the following information to become a member of a team.</p>
       <form method="POST">
-        <input type="text" class="text_input" name="first_name", placeholder="First Name">
-        <input type="text" class="text_input" name="last_name", placeholder="Last Name">
-        <input type="text" class="text_input" name="age", placeholder="Age">
-        <input type="text" class="text_input" name="gender", placeholder="Gender">
-        <input type="text" class="text_input" name="phone_number", placeholder="Phone Number">
-        <input type="text" class="text_input" name="emergency_phone", placeholder="Emergency Phone">
+        <input type="text" class="text_input" name="first_name" placeholder="First Name" value="{{ user_info['first_name'] }}">
+        <input type="text" class="text_input" name="last_name" placeholder="Last Name" value="{{ user_info['last_name'] }}">
+        <input type="text" class="text_input" name="age" placeholder="Age" value="{{ user_info['age'] }}">
+        <input type="text" class="text_input" name="gender" placeholder="Gender" value="{{ user_info['gender'] }}">
+        <input type="text" class="text_input" name="phone_number" placeholder="Phone Number" value="{{ user_info['phone_number'] }}">
+        <input type="text" class="text_input" name="emergency_phone" placeholder="Emergency Phone" value="{{ user_info['emergency_phone'] }}">
 
         <select name="team_id" class="dropdown">
+          <option disabled selected value> -- select a team -- </option>
           {% for team in teams %}
             <option value="{{ team['id'] }}">{{ team['id'] }} {{ team["team_name"] }}</option>
           {% endfor %}
         </select>
-        <input type="password" class="text_input" name="team_token", placeholder="Team Token">
+        <input type="password" class="text_input" name="team_token" placeholder="Team Token">
         <button class="submit">Join this Team</button>
       </form>
     </div>
-    <div class="have_an_account">
+    <div class="extra_text">
       <p>If you don't know your Team ID / Team Token, ask your team captain.</p>
       <p>Have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
     </div>

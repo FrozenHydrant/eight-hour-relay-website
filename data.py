@@ -116,6 +116,23 @@ class Data:
         return response.data[0]
     
 
+    def setup_user_position(user_id: str, team_id: str):
+        try:
+            members = Data.get_positions_info(Data.get_members_list(team_id))
+
+            used_positions = []
+            for m in members:
+                used_positions.append(m["position"])
+            position = 1
+            while position in used_positions:
+                position += 1 
+
+            Data.client.table("runner_positions").insert({"user_id": user_id, "position": position}).execute()
+        except Exception as e:
+            print("Error occurred while setting up user position:", e)
+            return False
+
+
     def get_members_list(team_id: str):
         try:
             response = Data.client.table("enrollment").select("user_id").eq("team_id", team_id).execute()
@@ -159,12 +176,28 @@ class Data:
         return member_infos
             
 
+    def get_positions_info(member_ids: list):
+
+        member_infos = []
+        for member_id in member_ids:
+            try:
+                response = Data.client.table("runner_positions").select("*").eq("user_id", member_id).execute()
+            except Exception as e:
+                continue
+            if response is None:
+                continue
+            if len(response.data) < 1:
+                continue
+            member_infos.append(response.data[0])
+        return member_infos
+
+
     # Add a user to the member_info table
     def create_new_basic_runner(user_id: str, email: str) -> bool:
         try:
-             s = Data.client.table("runner_info").insert({"user_id": user_id, "email": email}).execute()
-             if not s:
-                 return False
+            s = Data.client.table("runner_info").insert({"user_id": user_id, "email": email}).execute()
+            if not s:
+                return False
         except Exception as e:
             print(e)
             return False
@@ -228,3 +261,50 @@ class Data:
         except Exception as e:
             return False
         return True
+    
+
+    def get_member_position_in_team(member_id: str) -> int:
+        try:
+            response = Data.client.table("runner_positions").select("position").eq("user_id", member_id).execute()
+        except Exception as e:
+            print("Error occurred while retrieving member position:", e)
+            return -1
+        if response is None or len(response.data) < 1:
+            return -1
+        return response.data[0]["position"]
+    
+
+    def swap_team_positions(member_id_1: str, member_id_2: str) -> bool:
+        try:
+            position_1 = Data.get_member_position_in_team(member_id_1)
+            position_2 = Data.get_member_position_in_team(member_id_2)
+            if position_1 == -1 or position_2 == -1:
+                return False
+            Data.client.table("runner_positions").update({"position": position_2}).eq("user_id", member_id_1).execute()
+            Data.client.table("runner_positions").update({"position": position_1}).eq("user_id", member_id_2).execute()
+        except Exception as e:
+            print("Error occurred while swapping team positions:", e)
+            return False
+        return True
+
+
+    def move_member_position_in_team(member_id: str, team_id: str, direction: str) -> bool:
+        try:
+            target_position = Data.get_member_position_in_team(member_id)
+            match direction:
+                case "up":
+                    target_position -= 1
+                case "down":
+                    target_position += 1
+                case _:
+                    return False
+            if target_position < 1 or target_position > 8:
+                return False
+            positions_info = Data.get_positions_info(Data.get_members_list(team_id))
+            for neighbouring_member in positions_info:
+                if neighbouring_member["position"] == target_position:
+                    Data.swap_team_positions(member_id, neighbouring_member["user_id"])
+                    return True
+        except Exception as e:
+            print("Error occurred while moving member position:", e)
+        return False

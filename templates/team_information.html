@@ -36,12 +36,12 @@
         <p class="inner_text">Team Email: {{ team["email"] }}</p>
         {% if is_captain %}
           <div class="token_regeneration">
-            <a class="button" href="{{ url_for('team_token_reset',team_id=team['id']) }}">Regenerate Team Token</a>
+            <a class="top_button" href="{{ url_for('team_token_reset',team_id=team['id']) }}">Regenerate Team Token</a>
             <p class="inner_note">Invalidate your old token and create a new one.</p>
           </div>
           {% if not team["paid"] %}
           <div class="payment">
-            <a class="button" href="{{ url_for('team_payment',team_id=team['id'])}}">Team Payment</a>
+            <a class="top_button" href="{{ url_for('team_payment',team_id=team['id'])}}">Team Payment</a>
           </div>
           {% endif %}
         {% endif %}
@@ -52,9 +52,28 @@
       <div class="bottom_list">
         {% for member in members %}
           <div class="bottom_list_item">
-            <p class="title">{{ member["email"] }}</p>
-            {% if is_captain %}<a href="{{ url_for('manage_team_member',team_id=team['id'],member_id=member['user_id']) }}"><button>Manage</button></a>{% endif %}
+            <p class="title">{{ member["position"] }} {{ member["email"] }}</p>
+            <div class="bottom_list_insides">
+              <p class="muted">{{ member["first_name"] }} {{ member["last_name"] }}</p>
+              <p class="muted">Age: {{ member["age"] }}</p>
+              <p class="muted">Gender: {{ member["gender"] }}</p>
+              <p class="muted">Phone: {{ member["phone_number"] }}</p>
+              <p class="muted">Emergency Phone: {{ member["emergency_phone"] }}</p>
+              <p class="muted"></p>
+              {% if is_captain %}<form method="POST" action="{{ url_for('delete_from_team') }}" class="right_form">
+                <input type="hidden" name="team_id" value="{{ team['id'] }}">
+                <input type="hidden" name="member_id" value="{{ member['user_id'] }}">
+                <button class="button red_button">Remove</button>
+              </form>
+              <form method="POST" action="{{ url_for('move_team_member_up') }}" class="right_form">
+
+                <input type="hidden" name="team_id" value="{{ team['id'] }}">
+                <input type="hidden" name="member_id" value="{{ member['user_id'] }}">
+                <button class="button">Move Up</button>            
+              </form>{% endif %}
+            </div>
           </div>
+          
         {% endfor %}
       </div>
   </body>

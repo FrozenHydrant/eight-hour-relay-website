@@ -17,7 +17,7 @@ body {
   color: #1E2235;
 }
 
-.registration h3 {
+.registration h3, .login h3 {
   font-size: 1.35rem;
   font-weight: 600;
   color: #FFFFFF;
@@ -26,8 +26,9 @@ body {
   margin-bottom: 2.3rem;
 }
 
-/* ── Registration card ── */
-.registration {
+/* ── Registration/login cards ── */
+.registration,
+.login {
   background: #1E2235;
   border-radius: 16px;
   padding: 2.5rem 2.25rem;
@@ -38,6 +39,11 @@ body {
     0 1px 4px rgba(30, 34, 53, 0.10);
 }
 
+.login {
+  display: inline-block;
+  padding-bottom: 2rem;
+}
+
 /* ── Form layout ── */
 form {
   display: flex;
@@ -46,7 +52,8 @@ form {
 }
 
 /* ── Inputs ── */
-.text_input {
+.text_input,
+.dropdown {
   width: 100%;
   padding: 0.7rem 1rem;
   font-family: inherit;
@@ -61,15 +68,28 @@ form {
     box-shadow 0.18s ease;
 }
 
+.dropdown {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
 /* Placeholder hints via attribute — browsers show name as placeholder */
 .text_input[name="email"]::placeholder    { content: "Email address"; }
 .text_input[name="username"]::placeholder { content: "Username"; }
 .text_input[name="password"]::placeholder { content: "Password"; }
 
 /* Signature element: indigo glow on focus */
-.text_input:focus {
+.text_input:focus,
+.dropdown:focus {
   border-color: #6C7AE0;
   box-shadow: 0 0 0 3.5px rgba(108, 122, 224, 0.22);
+}
+
+.inner_text {
+  margin-bottom: 1.25rem;
+  color: #D1D5DB;
+  line-height: 1.6;
 }
 
 /* ── Submit button ── */
@@ -102,31 +122,32 @@ form {
   box-shadow: none;
 }
 
-.have_an_account > p {
+.extra_text > p {
   font-size: 0.82rem;
   color: #6b7280;
 }
 
-.have_an_account a {
+.extra_text a {
   font-size: 0.82rem;
   color: #6c7ae0;
 }
 
 /* ── Flash messages ── */
 .flashes {
-  margin-top: 1.25rem;
+  position: fixed;
+  top: 1rem;
   width: 100%;
   max-width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 .flashes p {
   background: #FFF5F5;
   color: #C53030;
   border: 1px solid #FEB2B2;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0.65rem 1rem;
   font-size: 0.82rem;
   font-weight: 500;
