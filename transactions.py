@@ -20,6 +20,7 @@ class Transactions:
                     session_id,
                     params={'expand': ['line_items']},
                 )
+                #print(checkout_session, " checking it out")
 
                 # Is the fulfillment already, well, fulfilled?
                 if "fulfilled" in checkout_session.metadata and checkout_session.metadata["fulfilled"]:
@@ -31,6 +32,7 @@ class Transactions:
 
                     team_id = checkout_session.metadata["team_id"]
                     user_id = checkout_session.metadata["user_id"]
+                    email = checkout_session.customer_details.email
 
                     for item in checkout_session.line_items.data:
                         product_id = item.price.product
@@ -38,7 +40,7 @@ class Transactions:
                         amount_paid = item.amount_total
                         currency = item.currency
 
-                        s = Data.create_transaction(team_id, user_id, product_id, qty, amount_paid, currency)
+                        s = Data.create_transaction(team_id, user_id, product_id, qty, amount_paid, currency, email)
                         if not s:
                             return
                         

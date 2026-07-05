@@ -213,9 +213,9 @@ class Data:
         return token
     
 
-    def create_transaction(team_id: str, user_id: str, product: str, quantity: int, amount_paid, currency: str) -> bool:
+    def create_transaction(team_id: str, user_id: str, product: str, quantity: int, amount_paid, currency: str, email: str) -> bool:
         try:
-            _ = Data.client.table("transactions").insert({"team_id": team_id, "user_id": user_id, "product": product, "quantity": quantity, "amount_paid": amount_paid, "transaction_id": str(uuid.uuid4()), "currency": currency}).execute()
+            _ = Data.client.table("transactions").insert({"team_id": team_id, "user_id": user_id, "product": product, "quantity": quantity, "amount_paid": amount_paid, "transaction_id": str(uuid.uuid4()), "currency": currency, "transaction_email": email}).execute()
         except Exception as e:
             print("Transaction problem", e)
             return False
