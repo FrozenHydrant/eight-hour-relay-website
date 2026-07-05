@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, make_response
 from supabase import create_client, Client, ClientOptions
 from dotenv import load_dotenv
 from sanitization import Sanitization
@@ -9,20 +9,14 @@ import datetime as dt
 import secrets
 from data import Data
 import stripe
-from awesome_session_storage import MyAwesomeStorage
 
 # App initialization happens here
 EVENT_DATE = dt.datetime(2026, 9, 12)
 load_dotenv()
 app = Flask(__name__)
-storage = MyAwesomeStorage()
 client: Client = create_client(
     os.environ.get("SUPABASE_URL"),
-    os.environ.get("SUPABASE_KEY"),
-    options=ClientOptions(
-        flow_type="pkce",
-        storage=storage
-    )
+    os.environ.get("SUPABASE_KEY")
 )
 
 app.secret_key = os.environ.get("SECRET_KEY")
@@ -33,19 +27,29 @@ s_client = stripe.StripeClient(s_key)
 s_price_id = os.getenv("STRIPE_PRICE_ID")
 s_endpoint_secret = os.getenv("STRIPE_ENDPOINT_SECRET")
 
+# Helpers
+def user_logout_status(access_token):
+    try:
+        user_response = client.auth.get_user(access_token)
+        if user_response is not None:
+            return user_response.user
+    except:
+        return None
 
-def user_logout_status():
-    user_response = client.auth.get_user()
-    if user_response is not None:
-        return user_response.user
-    print("No user found...")
-    return None
+def generate_cookied_response(response, key_value):
+    cookied_response = make_response(response)
+    cookied_response.set_cookie(key_value["key"], key_value["value"], httponly=True, secure=True, samesite="Strict", max_age=3600)    
+    return cookied_response
 
+def generate_uncookied_response(response, key):
+    uncookied_response = make_response(response)
+    uncookied_response.set_cookie(key, "", expires=0)
+    return uncookied_response
 
 # Routes <Main Page>
 @app.route('/')
 def index():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     team_id = -1
     is_captain = False
     not_logged_in = True
@@ -70,14 +74,14 @@ def index():
 # Registration for the whole website
 @app.route("/registration")
 def registration():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if user:
         return redirect(url_for("index"))
     return render_template("registration.html")
 
 @app.route("/registration", methods=["POST"])
 def registration_post():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if user:
         return redirect(url_for("index"))
     
@@ -101,13 +105,13 @@ def registration_post():
         flash(str(e))
         return redirect(url_for("registration"))
     
-    return redirect(url_for("index"))
+    return generate_cookied_response(redirect(url_for("index")), {"key": "access_token", "value": response.session.access_token})
 
 
 # Captain registration
 @app.route("/captain_registration")
 def captain_registration():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
     #user = client.auth.get_user().user
@@ -127,7 +131,7 @@ def captain_registration():
 
 @app.route("/captain_registration", methods=["POST"])
 def captain_registration_post():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
@@ -151,14 +155,14 @@ def captain_registration_post():
 # Login for the whole website
 @app.route("/login")
 def login():
-    logged_in = user_logout_status()
+    logged_in = user_logout_status(request.cookies.get("access_token"))
     if logged_in:
         return redirect(url_for("index"))
     return render_template("login.html")
 
 @app.route("/login", methods=["POST"])
 def login_post():
-    logged_in = user_logout_status()
+    logged_in = user_logout_status(request.cookies.get("access_token"))
     if logged_in:
         return redirect(url_for("index"))
 
@@ -170,6 +174,7 @@ def login_post():
     if not success:
         return redirect(url_for("login"))
     
+    response = None
     try:
         response = client.auth.sign_in_with_password({
             'email': email,
@@ -178,13 +183,14 @@ def login_post():
     except Exception as e:
         flash(str(e))
         return redirect(url_for("login"))
-    return redirect(url_for("index"))
+    
+    return generate_cookied_response(redirect(url_for("index")), {"key": "access_token", "value": response.session.access_token})
 
 
 # Runner registration
 @app.route("/runner_registration")
 def runner_registration():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
     
@@ -204,7 +210,7 @@ def runner_registration():
 
 @app.route("/runner_registration", methods=["POST"])
 def runner_registration_post():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
@@ -264,7 +270,7 @@ def runner_registration_post():
 
 @app.route("/profile")
 def profile():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
@@ -283,16 +289,16 @@ def profile():
 
 @app.route("/logout")
 def logout():
-    logged_in = user_logout_status()
+    logged_in = user_logout_status(request.cookies.get("access_token"))
     if not logged_in:
         return redirect(url_for("index"))
     client.auth.sign_out(options={"scope": "local"})
-    return redirect(url_for("index"))
+    return generate_uncookied_response(redirect(url_for("index")), "access_token")
 
 
 @app.route("/profile", methods=["POST"])
 def profile_post():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
@@ -329,7 +335,7 @@ def profile_post():
 
 @app.route("/team_registration")
 def team_registration():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
@@ -342,7 +348,7 @@ def team_registration():
 
 @app.route("/team_registration", methods=["POST"])
 def team_registration_post():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
@@ -378,7 +384,7 @@ def team_registration_post():
 
 @app.route("/team_created")
 def team_created():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
@@ -405,7 +411,7 @@ def team_created():
 
 @app.route("/team_information")
 def team_information():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
@@ -449,7 +455,7 @@ def team_information():
 
 @app.route("/team_token_reset")
 def team_token_reset():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
@@ -472,7 +478,7 @@ def team_token_reset():
 
 @app.route("/teams")
 def teams():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
     # Don't do it if I'm not a captain (we should not see this page)
@@ -486,7 +492,7 @@ def teams():
 
 @app.route("/manage_team_member")
 def manage_team_member():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
@@ -511,7 +517,7 @@ def manage_team_member():
 #TODO: critical actions should use post requests not get requests
 @app.route("/delete_from_team")
 def delete_from_team():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
@@ -532,7 +538,7 @@ def delete_from_team():
 
 @app.route("/team_payment")
 def team_payment():
-    user = user_logout_status()
+    user = user_logout_status(request.cookies.get("access_token"))
     if not user:
         return redirect(url_for("login"))
 
