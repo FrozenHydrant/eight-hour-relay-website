@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request, flash, redirect, url_for
-from supabase import create_client, Client
+from supabase import create_client, Client, ClientOptions
 from dotenv import load_dotenv
 from sanitization import Sanitization
 from transactions import Transactions
@@ -9,16 +9,22 @@ import datetime as dt
 import secrets
 from data import Data
 import stripe
-import requests
+from awesome_session_storage import MyAwesomeStorage
 
 # App initialization happens here
 EVENT_DATE = dt.datetime(2026, 9, 12)
 load_dotenv()
 app = Flask(__name__)
+storage = MyAwesomeStorage()
 client: Client = create_client(
     os.environ.get("SUPABASE_URL"),
-    os.environ.get("SUPABASE_KEY")
+    os.environ.get("SUPABASE_KEY"),
+    options=ClientOptions(
+        flow_type="pkce",
+        storage=storage
+    )
 )
+
 app.secret_key = os.environ.get("SECRET_KEY")
 Data.initialize(client)
 # Stripe
@@ -30,9 +36,6 @@ s_endpoint_secret = os.getenv("STRIPE_ENDPOINT_SECRET")
 
 def user_logout_status():
     user_response = client.auth.get_user()
-    print(client.auth.get_claims(), "\n")
-    print(client.auth.get_session(), "\n")
-    print(client.auth.get_user(), "\n")
     if user_response is not None:
         return user_response.user
     print("No user found...")
@@ -168,7 +171,7 @@ def login_post():
         return redirect(url_for("login"))
     
     try:
-        _ = client.auth.sign_in_with_password({
+        response = client.auth.sign_in_with_password({
             'email': email,
             'password': password,
         })
