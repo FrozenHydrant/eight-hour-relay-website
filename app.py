@@ -29,23 +29,13 @@ s_price_id = os.getenv("STRIPE_PRICE_ID")
 s_endpoint_secret = os.getenv("STRIPE_ENDPOINT_SECRET")
 
 # Helpers
-ACTIVE_SESSIONS = {}
-SESSION_COOKIE_NAME = "app_session_id"
-
 
 def user_logout_status(access_token=None):
-    session_id = request.cookies.get(SESSION_COOKIE_NAME)
-    if session_id is not None:
-        session_data = ACTIVE_SESSIONS.get(session_id)
-        if session_data is None:
-            return None
-        print(len(ACTIVE_SESSIONS), "found the access token via the session.")
-        access_token = session_data["access_token"]
-    #elif access_token is None:
-    #    access_token = request.cookies.get("access_token")
+    if access_token is None:
+        access_token = request.cookies.get("access_token")
 
-    #if access_token is None:
-    #    return None
+    if access_token is None:
+        return None
 
     try:
         user_response = client.auth.get_user(access_token)
@@ -64,32 +54,14 @@ def cookie_options():
     }
 
 
-def generate_cookied_response(response, key_value, user_id=None):
+def generate_cookied_response(response, key_value):
     cookied_response = make_response(response)
-    #cookied_response.set_cookie(
-    #    key_value["key"],
-    #    key_value["value"],
-    #    max_age=3600,
-    #    **cookie_options(),
-    #)
-
-    if user_id is not None:
-        session_id = secrets.token_urlsafe(24)
-        for existing_session_id, session_data in list(ACTIVE_SESSIONS.items()):
-            if session_data.get("user_id") == user_id:
-                ACTIVE_SESSIONS.pop(existing_session_id, None)
-
-        ACTIVE_SESSIONS[session_id] = {
-            "user_id": user_id,
-            "access_token": key_value["value"],
-        }
-        cookied_response.set_cookie(
-            SESSION_COOKIE_NAME,
-            session_id,
-            max_age=3600,
-            **cookie_options(),
-        )
-
+    cookied_response.set_cookie(
+        key_value["key"],
+        key_value["value"],
+        max_age=3600,
+        **cookie_options(),
+    )
     return cookied_response
 
 
@@ -187,7 +159,6 @@ def registration_post():
     return generate_cookied_response(
         redirect(url_for("index")),
         {"key": "access_token", "value": response.session.access_token},
-        user_id=user.id,
     )
 
 
@@ -279,7 +250,6 @@ def login_post():
     return generate_cookied_response(
         redirect(url_for(next_page)),
         {"key": "access_token", "value": response.session.access_token},
-        user_id=response.user.id,
     )
 
 
@@ -434,13 +404,7 @@ def logout():
     except Exception:
         pass
 
-    session_id = request.cookies.get(SESSION_COOKIE_NAME)
-    if session_id in ACTIVE_SESSIONS:
-        ACTIVE_SESSIONS.pop(session_id, None)
-
-    response = generate_uncookied_response(redirect(url_for("index")), ("access_token", SESSION_COOKIE_NAME))
-    #response = generate_uncookied_response(response, SESSION_COOKIE_NAME)
-    return response
+    return generate_uncookied_response(redirect(url_for("index")), ["access_token"])
 
 
 @app.route("/profile", methods=["POST"])
