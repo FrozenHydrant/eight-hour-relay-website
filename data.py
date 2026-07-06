@@ -180,6 +180,7 @@ class Data:
                 response = Data.client.table("runner_info").select("*").eq("user_id", member_id).execute()
                 #print(response)
             except Exception as e:
+                print("Get members info problem", e)
                 continue
             if response is None:
                 continue
@@ -212,7 +213,7 @@ class Data:
             if not s:
                 return False
         except Exception as e:
-            print(e)
+            print("Error creating new runner:", e)
             return False
         return True
         
