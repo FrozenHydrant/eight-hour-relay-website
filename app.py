@@ -78,6 +78,13 @@ def generate_uncookied_response(response, keys):
     return uncookied_response
 
 
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers["Cache-Control"] = "private, no-store, no-cache, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    return response
+
+
 # Routes <Main Page>
 @app.route('/')
 def index():
