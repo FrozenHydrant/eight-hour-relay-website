@@ -24,16 +24,29 @@ class Data:
         return True
     
 
-    # Creates a team and returns the ID. None if failure.
-    def create_team(team_name: str, user_id: str, token: str, division: str, email: str) -> str:
+    def team_name_exists(team_name: str) -> bool:
         try:
-            response = Data.client.table("teams").insert({"owner_id": user_id, "division": division, "email": email, "paid": False}).execute()
+            response = Data.client.table("teams_public").select("team_name").eq("team_name", team_name).execute()
+        except Exception as e:
+            print("Error checking team name:", e)
+            return False
+        if response is None:
+            return False
+        return len(response.data) > 0
+
+
+    # Creates a team and returns the ID. None if failure.
+    def create_team(team_name: str, user_id: str, token: str, division: str, email: str, captain_name: str) -> str:
+        try:
+            if Data.team_name_exists(team_name):
+                return None
+            response = Data.client.table("teams").insert({"owner_id": user_id, "email": email, "paid": False, "captain_name": captain_name}).execute()
             if response is None:
                 return None
             if len(response.data) < 1:
                 return None
             team_id = str(response.data[0]["id"])
-            _ = Data.client.table("teams_public").insert({"id": team_id, "owner_id": user_id, "team_name": team_name,  "encrypted_token": generate_password_hash(token)}).execute()
+            _ = Data.client.table("teams_public").insert({"id": team_id, "owner_id": user_id, "team_name": team_name, "division": division, "encrypted_token": generate_password_hash(token)}).execute()
             return team_id
         except Exception as e:
             #print(e)
@@ -228,8 +241,21 @@ class Data:
 
     def unenroll_member_from_team(member_id: str, team_id: str) -> bool:
         try:
+            removed_position = Data.get_member_position_in_team(member_id)
+            member_ids = Data.get_members_list(team_id)
+            positions_info = Data.get_positions_info(member_ids)
+
+            if removed_position != -1:
+                for position_entry in positions_info:
+                    if position_entry.get("user_id") == member_id:
+                        continue
+                    if position_entry.get("position", 0) > removed_position:
+                        new_position = position_entry["position"] - 1
+                        _ = Data.client.table("runner_positions").update({"position": new_position}).eq("user_id", position_entry["user_id"]).execute()
+
+            _ = Data.client.table("runner_positions").delete().match({"user_id": member_id}).execute()
             _ = Data.client.table("enrollment").delete().match({"user_id": member_id, "team_id": team_id}).execute()
-            #print(_)
+
         except Exception as e:
             print("Unenrollment Problem:", e)
             return False

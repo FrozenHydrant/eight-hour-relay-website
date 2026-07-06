@@ -176,47 +176,83 @@ body {
 /* ── Teams list ── */
 .bottom_list {
   width: 100%;
-  max-width: 640px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
 }
 
-/* ── Individual team row ── */
 .bottom_list_item {
-  background: #FFFFFF;
-  border-radius: 10px;
-  padding: 1rem 1.25rem;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #FFFFFF;
+  border-radius: 12px;
   box-shadow:
     0 1px 4px rgba(30, 34, 53, 0.08),
     0 0 0 1px rgba(30, 34, 53, 0.05);
-  transition: box-shadow 0.15s ease, transform 0.1s ease;
 }
 
-.bottom_list_insides {
-  display: grid;
-  width: 80%;
-  grid-template-columns: minmax(2.5rem, auto) minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
-  gap: 0.5rem 0.75rem;
-  align-items: center;
-}
-
-.bottom_list_insides p {
+.bottom_list_item .title {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 600;
   color: #1E2235;
 }
 
-.bottom_list_insides .muted {
-  grid-column: 1;
-  align-self: center;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: #A0A8C8;
+/* ── Members table ── */
+.members_table {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: #FFFFFF;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 4px rgba(30, 34, 53, 0.08),
+    0 0 0 1px rgba(30, 34, 53, 0.05);
+}
+
+.members_table th,
+.members_table td {
+  padding: 0.8rem 0.75rem;
+  border-bottom: 1px solid #E5E7EB;
+  text-align: left;
+  font-size: 0.9rem;
+  color: #1E2235;
+  vertical-align: middle;
+}
+
+.members_table th {
+  background: #F8FAFC;
+  font-weight: 600;
+  color: #475569;
+}
+
+.members_table tr:hover {
+  background: #F8FAFC;
+}
+
+.members_table .actions_cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 180px;
+}
+
+.members_table .right_form {
+  display: flex;
+}
+
+.members_table .button {
+  white-space: nowrap;
+  padding: 0.6rem 0.8rem;
 }
 
 .bottom_list_insides .title {

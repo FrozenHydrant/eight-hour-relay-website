@@ -2,27 +2,36 @@
 <html lang="en">
   <head>
     <link rel="stylesheet" href="/static/css/registration.css">
+    <script src="/static/js/registration_runner.js"></script>
   </head>
   <body>
     <div class="registration">
       <h3>Register as Runner</h3>
       <p class="inner_text">Please fill in the following information to become a member of a team.</p>
       <form method="POST">
-        <input type="text" class="text_input" name="first_name" placeholder="First Name" value="{{ user_info['first_name'] }}">
-        <input type="text" class="text_input" name="last_name" placeholder="Last Name" value="{{ user_info['last_name'] }}">
-        <input type="text" class="text_input" name="age" placeholder="Age" value="{{ user_info['age'] }}">
-        <input type="text" class="text_input" name="gender" placeholder="Gender" value="{{ user_info['gender'] }}">
-        <input type="text" class="text_input" name="phone_number" placeholder="Phone Number" value="{{ user_info['phone_number'] }}">
-        <input type="text" class="text_input" name="emergency_phone" placeholder="Emergency Phone" value="{{ user_info['emergency_phone'] }}">
+        <input type="text" class="text_input" name="first_name" placeholder="First Name" value="{{ user_info['first_name'] }}" required>
+        <input type="text" class="text_input" name="last_name" placeholder="Last Name" value="{{ user_info['last_name'] }}" required>
+        <input type="text" class="text_input" name="age" placeholder="Age" value="{{ user_info['age'] }}" required>
+        <input type="text" class="text_input" name="gender" placeholder="Gender" value="{{ user_info['gender'] }}" required>
+        <input type="text" class="text_input" name="phone_number" placeholder="Phone Number" value="{{ user_info['phone_number'] }}" required>
+        <input type="text" class="text_input" name="emergency_name" placeholder="Emergency Contact Name" value="{{ user_info['emergency_name'] }}" required>
+        <input type="text" class="text_input" name="emergency_phone" placeholder="Emergency Phone" value="{{ user_info['emergency_phone'] }}" required>
 
-        <select name="team_id" class="dropdown">
+        <select name="team_id" class="dropdown" required>
           <option disabled selected value> -- select a team -- </option>
           {% for team in teams %}
-            <option value="{{ team['id'] }}">{{ team['id'] }} {{ team["team_name"] }}</option>
+            <option value="{{ team['id'] }}">{{ team['id'] }} {{ team["team_name"] }} ({{ team["division"] }})</option>
           {% endfor %}
         </select>
-        <input type="password" class="text_input" name="team_token" placeholder="Team Token">
-        <button class="submit">Join this Team</button>
+        <input type="password" class="text_input" name="team_token" placeholder="Team Token" required>
+        <div class="waiver_block">
+          <a href="#" onclick="openWaiver(); return false;">Open waiver</a>
+          <label class="waiver_label" for="waiverCheckbox">
+            <input type="checkbox" id="waiverCheckbox" name="waiver_agreed" disabled>
+            By clicking this checkbox, I indicate that I have read and understand the waiver
+          </label>
+        </div>
+        <button id="joinTeamButton" class="submit">Join this Team</button>
       </form>
     </div>
     <div class="extra_text">

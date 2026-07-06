@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request, flash, redirect, url_for, make_response
-from supabase import create_client, Client, ClientOptions
+from supabase import create_client, Client
 from dotenv import load_dotenv
 from sanitization import Sanitization
 from transactions import Transactions
@@ -243,27 +243,46 @@ def runner_registration_post():
     gender = request.form.get("gender")
     age = request.form.get("age")
     phone_number = request.form.get("phone_number")
+    emergency_name = request.form.get("emergency_name")
     emergency_phone = request.form.get("emergency_phone")
     team_id = request.form.get("team_id")
     team_token = request.form.get("team_token")
+    waiver_agreed = request.form.get("waiver_agreed") == "on"
 
-    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number, emergency_phone], [first_name, last_name], [gender])
+    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number, emergency_phone], [first_name, last_name, emergency_name], [gender])
     if not success:
         return redirect(url_for("runner_registration"))
     
     if team_id is None or team_token is None:
         flash("Must enter Team Id and Token.")
         return redirect(url_for("runner_registration"))
+
+    if not waiver_agreed:
+        flash("You must open the waiver and agree to it before registering.")
+        return redirect(url_for("runner_registration"))
     
     try:
         age = int(age)
     except Exception as e:
         flash("A problem occured: " + str(e))
-        return redirect(url_for("profile"))
+        return redirect(url_for("runner_registration"))
     
     if age < 1 or age > 100:
         flash("Enter a valid age.")
-        return redirect(url_for("profile"))
+        return redirect(url_for("runner_registration"))
+
+    team_division = None
+    team_basic_info = Data.get_team_basic_info(team_id)
+    if team_basic_info is not None:
+        team_division = team_basic_info.get("division")
+
+    if team_division == "master" and age < 50:
+        flash("Master teams require runners to be at least 50 years old.")
+        return redirect(url_for("runner_registration"))
+
+    if team_division in ("open", "mixed") and age < 15:
+        flash("Open and mixed teams require runners to be at least 15 years old.")
+        return redirect(url_for("runner_registration"))
     
     # Then check token
     success = Data.check_team_table_credentials(team_id, team_token)
@@ -280,7 +299,7 @@ def runner_registration_post():
     # Do team enrollment
     try:
         _ = Data.enroll_user_in_team(user.id, team_id)
-        s = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_phone": emergency_phone})
+        s = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
         _ = Data.setup_user_position(user.id, team_id)
         client.auth.update_user({"data": {"is_captain": False}})
     except Exception as e:
@@ -330,9 +349,10 @@ def profile_post():
     gender = request.form.get("gender")
     age = request.form.get("age")
     phone_number = request.form.get("phone_number")
+    emergency_name = request.form.get("emergency_name")
     emergency_phone = request.form.get("emergency_phone")
 
-    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number, emergency_phone], [first_name, last_name], [gender])
+    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number, emergency_phone], [first_name, last_name, emergency_name], [gender])
     if not success:
         return redirect(url_for("profile"))
     
@@ -346,7 +366,7 @@ def profile_post():
         flash("Enter a valid age.")
         return redirect(url_for("profile"))
     
-    updated_info = {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_phone": emergency_phone}
+    updated_info = {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone}
     success = Data.update_runner_info(user.id, updated_info)
     if not success:
         flash("Error occured while updating information.")
@@ -380,25 +400,26 @@ def team_registration_post():
         return redirect(url_for("index"))
     
     team_name = request.form.get("team_name")
+    captain_name = request.form.get("captain_name")
     division = request.form.get("division")
 
-    # Verify team name
-    if not Sanitization.verify_username_characters(team_name):
-        flash("Team name contains invalid characters.")
+    # Verify namnes
+    if not Sanitization.verify_all_lists_and_create_response([], [], [], [], [team_name, captain_name], []):
         return redirect(url_for("team_registration"))
-    if not Sanitization.verify_username_length(team_name):
-        flash("Team name must be between 3-16 characters.")
-        return redirect(url_for("team_registration"))
-    
+        
     # Verify division correctness
     if division not in set(["open", "mixed", "master"]):
         flash("Something went wrong while setting the division of your team.")
+        return redirect(url_for("team_registration"))
+
+    if Data.team_name_exists(team_name):
+        flash("A team with that name already exists. Please choose another name.")
         return redirect(url_for("team_registration"))
     
     token = secrets.token_urlsafe(3)
 
     # Add table entry
-    team_id: str = Data.create_team(team_name, user.id, token, division, user.email)
+    team_id: str = Data.create_team(team_name, user.id, token, division, user.email, captain_name)
     if team_id is None:
         return redirect(url_for("error_page"))
     
@@ -449,12 +470,16 @@ def team_information():
     
     # Now get the team info from that
     team_info = Data.get_team_info(team_id)
-    #print(team_info, "team_info")
-    if team_info is None:
+    team_basic_info = Data.get_team_basic_info(team_id)
+
+    if team_info is None or team_basic_info is None:
         return redirect(url_for("error_page"))
-    # Get team name and combine into
-    team_name = Data.get_team_basic_info(team_id)["team_name"]
-    team_info["team_name"] = team_name
+
+    if team_info.get("captain_name") is None:
+        team_info["captain_name"] = "Unknown"
+
+    team_info["division"] = team_basic_info.get("division")
+    team_info["team_name"] = team_basic_info.get("team_name")
     
     # Make sure we actually own the team OR are part of it
     owned_teams = Data.get_owned_teams(user.id)

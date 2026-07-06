@@ -92,6 +92,33 @@ form {
   line-height: 1.6;
 }
 
+/* ── Waiver block ── */
+.waiver_block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.7rem 0.1rem 0;
+}
+
+.waiver_block a {
+  color: #A7B2FF;
+  font-size: 0.86rem;
+  text-decoration: underline;
+}
+
+.waiver_label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  color: #E5E7EB;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.waiver_label input {
+  margin-top: 0.2rem;
+}
+
 /* ── Submit button ── */
 .submit {
   margin-top: 0.4rem;
@@ -115,6 +142,22 @@ form {
 .submit:hover {
   background: #5A67D8;
   box-shadow: 0 4px 14px rgba(108, 122, 224, 0.38);
+}
+
+.invalid_input {
+  border-color: #F56565 !important;
+  box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.18) !important;
+}
+
+.disabled_button {
+  background: #9CA3AF;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.disabled_button:hover {
+  background: #9CA3AF;
+  box-shadow: none;
 }
 
 .submit:active {

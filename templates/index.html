@@ -50,6 +50,11 @@
         <a href="{{ url_for('runner_registration') }}">
           Register as Runner
         </a>
+        {% if not_logged_in %}
+        <a href="{{ url_for('login') }}">
+          Sign In
+        </a>
+        {% endif %}
         {% endif %}
 
         {% if not is_undecided and not is_captain %}
