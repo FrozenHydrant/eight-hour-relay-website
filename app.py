@@ -284,7 +284,10 @@ def runner_registration():
     teams = Data.get_all_teams_info()
 
     # Ensure runner record exists and pass existing info to the form so fields can be prefilled
-    user_info = Data.get_members_info([user.id])[0]
+    users_info = Data.get_members_info([user.id])
+    user_info = {"first_name": "", "last_name": "", "age": "", "gender": "", "phone_number": "", "emergency_name": "", "emergency_phone": ""}
+    if len(users_info) > 0:
+        user_info = users_info[0]
     for k in user_info:
         if user_info[k] is None:
             user_info[k] = ""
