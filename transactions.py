@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 import stripe
 import threading
+from emails import EmailSender
 
 class Transactions:
     load_dotenv()
@@ -34,19 +35,27 @@ class Transactions:
                     user_id = checkout_session.metadata["user_id"]
                     email = checkout_session.customer_details.email
 
+                    transaction_ids = []
+
                     for item in checkout_session.line_items.data:
                         product_id = item.price.product
                         qty = item.quantity # Should not be above 1!
                         amount_paid = item.amount_total
                         currency = item.currency
 
-                        s = Data.create_transaction(team_id, user_id, product_id, qty, amount_paid, currency, email)
-                        if not s:
+                        transaction_id = Data.create_transaction(team_id, user_id, product_id, qty, amount_paid, currency, email)
+                        if not transaction_id:
                             return
                         
+                        transaction_ids.append(transaction_id)
+
                         s = Data.set_team_payment_status(team_id, True)
                         if not s:
                             return
                         
+                    # Send verification email
+                    #print(email, team_id, transaction_ids)
+                    EmailSender.send_team_payment_email(email, team_id, transaction_ids)
+
                     # Fulfilled as long as both, no all, above succeeded
                     checkout_session.update({"metadata": {"fulfilled": True}})

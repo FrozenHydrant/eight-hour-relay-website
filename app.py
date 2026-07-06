@@ -4,6 +4,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 from sanitization import Sanitization
 from transactions import Transactions
+from emails import EmailSender
 import math
 import datetime as dt
 import secrets
@@ -56,8 +57,9 @@ def index():
     is_undecided = True
 
     # User exists
+    is_admin = False
     if user is not None:
-        #user = user_response.user
+        is_admin = Data.is_user_admin(user.id)
         not_logged_in = False
         if "is_captain" in user.user_metadata:
             is_captain = user.user_metadata["is_captain"]
@@ -68,7 +70,8 @@ def index():
     
     if team_id is None:
         team_id = "no_team"
-    return render_template("index.html", team_id=team_id, not_logged_in=not_logged_in, is_undecided=is_undecided, is_captain=is_captain, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
+
+    return render_template("index.html", team_id=team_id, not_logged_in=not_logged_in, is_admin=is_admin, is_undecided=is_undecided, is_captain=is_captain, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
 
 
 # Registration for the whole website
@@ -302,6 +305,10 @@ def runner_registration_post():
         s = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
         _ = Data.setup_user_position(user.id, team_id)
         client.auth.update_user({"data": {"is_captain": False}})
+
+        team_basic_info = Data.get_team_basic_info(team_id)
+        if team_basic_info is not None:
+            EmailSender.send_team_registration_email(user.email, team_id, team_basic_info.get("team_name", "Unknown"), team_basic_info.get("division", "Unknown"))
     except Exception as e:
         flash(str(e))
         return redirect(url_for("runner_registration"))
@@ -481,11 +488,12 @@ def team_information():
     team_info["division"] = team_basic_info.get("division")
     team_info["team_name"] = team_basic_info.get("team_name")
     
-    # Make sure we actually own the team OR are part of it
+    # Make sure we actually own the team OR are part of it OR are an admin
     owned_teams = Data.get_owned_teams(user.id)
     team_members = Data.get_members_list(team_id)
+    is_admin = Data.is_user_admin(user.id)
     #print("owned", owned_teams, team_members)
-    if team_id not in owned_teams and user.id not in team_members:
+    if team_id not in owned_teams and user.id not in team_members and not is_admin:
         return redirect(url_for("error_page"))
     
     combined_member_infos = Data.get_members_info(team_members)
@@ -678,6 +686,20 @@ def move_team_member_up():
 @app.route("/error_page")
 def error_page():
     return "TODO: error page"
+
+
+@app.route("/admin_panel")
+def admin_panel():
+    user = user_logout_status(request.cookies.get("access_token"))
+    if not user:
+        return redirect(url_for("login"))
+
+    is_admin = Data.is_user_admin(user.id)
+    if not is_admin:
+        return redirect(url_for("index"))
+
+    teams = Data.get_all_teams_info()
+    return render_template("teams.html", username="Awesome Eighthourrelay Admin", teams=teams)
 
 
 if __name__ == '__main__':

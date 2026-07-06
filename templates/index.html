@@ -68,6 +68,12 @@
             Manage my Teams
           </a>
         {% endif %}
+
+        {% if is_admin %}
+          <a href="{{ url_for('admin_panel') }}">
+            Admin Panel
+          </a>
+        {% endif %}
       </div>
     </div>
 

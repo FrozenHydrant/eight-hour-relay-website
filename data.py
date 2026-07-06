@@ -263,7 +263,7 @@ class Data:
     
 
     def generate_new_team_token(team_id: str):
-        token = secrets.token_urlsafe()
+        token = secrets.token_urlsafe(3)
         try:
             _ = Data.client.table("teams_public").update({"encrypted_token": generate_password_hash(token)}).eq("id", team_id).execute()
         except Exception as e:
@@ -273,14 +273,15 @@ class Data:
     
 
     def create_transaction(team_id: str, user_id: str, product: str, quantity: int, amount_paid, currency: str, email: str) -> bool:
+        transaction_id = str(uuid.uuid4())
         try:
-            _ = Data.client.table("transactions").insert({"team_id": team_id, "user_id": user_id, "product": product, "quantity": quantity, "amount_paid": amount_paid, "transaction_id": str(uuid.uuid4()), "currency": currency, "transaction_email": email}).execute()
+            _ = Data.client.table("transactions").insert({"team_id": team_id, "user_id": user_id, "product": product, "quantity": quantity, "amount_paid": amount_paid, "transaction_id": transaction_id, "currency": currency, "transaction_email": email}).execute()
         except Exception as e:
             print("Transaction problem", e)
-            return False
-        return True
+            return None
+        return transaction_id
+ 
     
-
     def set_team_payment_status(team_id: str, payment: bool) -> bool:
         try:
             _ = Data.client.table("teams").update({"paid": payment}).eq("id", team_id).execute()
@@ -334,3 +335,14 @@ class Data:
         except Exception as e:
             print("Error occurred while moving member position:", e)
         return False
+    
+
+    def is_user_admin(member_id: str) -> bool:
+        try:
+            response = Data.client.table("admin").select("is_admin").eq("user_id", member_id).execute()
+        except Exception as e:
+            print("Error occurred while checking if user is admin:", e)
+            return False
+        if response is None or len(response.data) < 1:
+            return False
+        return response.data[0]["is_admin"]
