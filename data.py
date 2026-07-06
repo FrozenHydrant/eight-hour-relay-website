@@ -49,7 +49,7 @@ class Data:
             _ = Data.client.table("teams_public").insert({"id": team_id, "owner_id": user_id, "team_name": team_name, "division": division, "encrypted_token": generate_password_hash(token)}).execute()
             return team_id
         except Exception as e:
-            #print(e)
+            print("Create team exception", e)
             return None
         
         
@@ -96,6 +96,7 @@ class Data:
         try:
             response = Data.client.table("teams").select("*").eq("id", team_id).execute()
         except Exception as e:
+            print("Team info exception", e)
             return None
         if response is None:
             return None
@@ -108,6 +109,7 @@ class Data:
         try: 
             response = Data.client.table("teams_public").select("*").eq("id", team_id).execute()
         except Exception as e:
+            print("Team basic info exception", e)
             return None
         if response is None:
             return None
@@ -178,7 +180,7 @@ class Data:
             try:
                 #print(member_id, "m_id")
                 response = Data.client.table("runner_info").select("*").eq("user_id", member_id).execute()
-                #print(response)
+                #print("Get members resp:", member_id, response)
             except Exception as e:
                 print("Get members info problem", e)
                 continue
@@ -253,10 +255,13 @@ class Data:
                     if position_entry.get("position", 0) > removed_position:
                         new_position = position_entry["position"] - 1
                         _ = Data.client.table("runner_positions").update({"position": new_position}).eq("user_id", position_entry["user_id"]).execute()
+                        #print(upd_resp, "Updated runner position\n")
 
             _ = Data.client.table("runner_positions").delete().match({"user_id": member_id}).execute()
-            _ = Data.client.table("enrollment").delete().match({"user_id": member_id, "team_id": team_id}).execute()
+            #print(rps_resp, "Runner Position Response")
 
+            _ = Data.client.table("enrollment").delete().match({"user_id": member_id, "team_id": team_id}).execute()
+            #print(enr_resp, "Unenrollment Response.")
         except Exception as e:
             print("Unenrollment Problem:", e)
             return False
@@ -304,12 +309,10 @@ class Data:
 
     def swap_team_positions(member_id_1: str, member_id_2: str) -> bool:
         try:
-            position_1 = Data.get_member_position_in_team(member_id_1)
-            position_2 = Data.get_member_position_in_team(member_id_2)
-            if position_1 == -1 or position_2 == -1:
-                return False
-            Data.client.table("runner_positions").update({"position": position_2}).eq("user_id", member_id_1).execute()
-            Data.client.table("runner_positions").update({"position": position_1}).eq("user_id", member_id_2).execute()
+            Data.client.rpc("swap_team_positions", {
+                "member_id_1": member_id_1,
+                "member_id_2": member_id_2,
+            }).execute()
         except Exception as e:
             print("Error occurred while swapping team positions:", e)
             return False
@@ -329,9 +332,9 @@ class Data:
             if target_position < 1 or target_position > 8:
                 return False
             positions_info = Data.get_positions_info(Data.get_members_list(team_id))
-            for neighbouring_member in positions_info:
-                if neighbouring_member["position"] == target_position:
-                    Data.swap_team_positions(member_id, neighbouring_member["user_id"])
+            for other_member in positions_info:
+                if other_member["position"] == target_position:
+                    Data.swap_team_positions(member_id, other_member["user_id"])
                     return True
         except Exception as e:
             print("Error occurred while moving member position:", e)

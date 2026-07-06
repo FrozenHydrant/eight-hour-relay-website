@@ -210,9 +210,7 @@ def captain_registration_post():
 
     # Update
     try:
-        #print(user.id, "now doing a captain registration")
-        s = client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": True}})
-        #print(s, "outcome")
+        _ = client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": True}})
     except Exception as e:
         flash(str(e))
         print(e, "captain reg failed")
@@ -373,12 +371,17 @@ def runner_registration_post():
     
     # Do team enrollment
     try:
-        #print("Doing team enrollment")
-        client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": False}})
-        #print("Done team enrollment")
-        _ = Data.enroll_user_in_team(user.id, team_id)
-        _ = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
-        _ = Data.setup_user_position(user.id, team_id)
+        upd_resp = client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": False}})
+        #print("Update Captain Status Response: ", upd_resp)
+
+        enr_resp = Data.enroll_user_in_team(user.id, team_id)
+        #print("Enrollment response: ", enr_resp)
+
+        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
+        #print("Update Runner Info Response: ", upd_resp)
+        
+        usr_resp = Data.setup_user_position(user.id, team_id)
+        #print("Setup User Pos Resp: ", usr_resp)
 
         team_basic_info = Data.get_team_basic_info(team_id)
         if team_basic_info is not None:
@@ -531,7 +534,6 @@ def team_created():
     # Then check if everything is correct (we didn't do anything silly like modify the url)
     success = Data.check_team_table_credentials(team_id, team_token)
     owned_teams = Data.get_owned_teams(user.id)
-    #print(owned_teams, success, team_id)
 
     if not success or team_id not in owned_teams:
         return redirect(url_for("error_page"))
@@ -548,7 +550,8 @@ def team_information():
     # Get the team ID
     team_id = request.args.get("team_id")
     if team_id is None:
-        return redirect(url_for("error_page"))
+        flash("No team was specified in the request!")
+        return redirect(url_for("index"))
 
     # Handle no team -> We got kicked ?
     if team_id == "no_team":
@@ -559,7 +562,8 @@ def team_information():
     team_basic_info = Data.get_team_basic_info(team_id)
 
     if team_info is None or team_basic_info is None:
-        return redirect(url_for("error_page"))
+        flash("We couldn't get the information about that team!")
+        return redirect(url_for("index"))
 
     if team_info.get("captain_name") is None:
         team_info["captain_name"] = "Unknown"
@@ -571,28 +575,36 @@ def team_information():
     owned_teams = Data.get_owned_teams(user.id)
     team_members = Data.get_members_list(team_id)
     is_admin = Data.is_user_admin(user.id)
-    #print("owned", owned_teams, team_members)
+
     if team_id not in owned_teams and user.id not in team_members and not is_admin:
-        return redirect(url_for("error_page"))
+        flash("You don't have access to that team!")
+        return redirect(url_for("index"))
     
-    combined_member_infos = Data.get_members_info(team_members)
-    member_positions = Data.get_positions_info(team_members)
+    # If runner, only get own info
+    combined_member_infos = []
+    member_positions = []
+    if team_id in owned_teams:
+        combined_member_infos = Data.get_members_info(team_members)
+        member_positions = Data.get_positions_info(team_members)
+    else:
+        combined_member_infos = Data.get_members_info([user.id])
+        member_positions = Data.get_positions_info([user.id])
+    
+    #print("Member info / position", combined_member_infos, member_positions, len(combined_member_infos), len(member_positions))
+
     for i in combined_member_infos:
         for j in member_positions:
             if i["user_id"] == j["user_id"]:
                 i["position"] = j["position"]
 
-    #print(combined_member_infos, "combined_member_infos")
     combined_member_infos.sort(key=lambda x: x["position"])
     
     # If I'm a runner and I have unfinished info, finish it!
     # (All fields must be filled simultaneously, so just checking one is fine)
     for member_info in combined_member_infos:
-        #print(member_info)
         if member_info["user_id"] == user.id and member_info["first_name"] is None:
             flash("You have not filled in your Runner Info yet! Please go to your Profile and finish adding your information. You must do this before the deadline! ")
 
-    #print(combined_member_infos)
     is_captain = False
     if "is_captain" in user.user_metadata:
         is_captain = user.user_metadata["is_captain"]
@@ -632,12 +644,12 @@ def teams():
         return redirect(url_for("index"))
 
     teams = Data.get_owned_teams_info(user.id)
-    #print(teams, "teams")
     return render_template("teams.html", username=user.email, teams=teams)
 
 
-@app.route("/manage_team_member")
+#@app.route("/manage_team_member")
 def manage_team_member():
+    return ""
     user = user_logout_status()
     if not user:
         return redirect(url_for("login"))
@@ -673,12 +685,17 @@ def delete_from_team():
     member_id = request.form.get("member_id")
     team_id = request.form.get("team_id")
     if not Data.has_authority_over_member(user.id, member_id, team_id):
-        return redirect(url_for("error_page"))
+        flash("We can't delete them (maybe they are already gone?)")
+        return redirect(url_for("team_information", team_id=team_id))
     
     s = Data.unenroll_member_from_team(member_id, team_id)
-    #print(s, "Delete success")
-    # TODO: warning on s being false (operation failed) ?
+
+    if s:
+        flash("Member deleted successfully.")
+    else:
+        flash("Problem occured while deleting member.")
     return redirect(url_for("team_information", team_id=team_id))
+
 
 #TODO: critical actions should use post requests not get requests
 @app.route("/team_payment")
@@ -705,8 +722,6 @@ def team_payment():
     if payment_state:
         return redirect(url_for("error_page"))
     
-    #completion_url = request.url_root[:-1:] + url_for("team_information", team_id=team_id)
-    #print(completion_url)
     payment_link = s_client.v1.payment_links.create({
         "line_items": [{"price": s_price_id, "quantity": 1}],
         "metadata": {"team_id": team_id, "user_id": user.id}
@@ -756,9 +771,14 @@ def move_team_member_up():
     team_id = request.form.get("team_id")
 
     if not Data.has_authority_over_member(user.id, member_id, team_id):
-        return redirect(url_for("error_page"))
+        flash("We don't have authority over this member")
+        return redirect(url_for("team_information", team_id=team_id))
     
     s = Data.move_member_position_in_team(member_id, team_id, "up")
+    if s:
+        flash("Successfully changed member ordering.")
+    else:
+        flash("Unexpected failure while changing runner ordering.")
     return redirect(url_for("team_information", team_id=team_id))
 
 
