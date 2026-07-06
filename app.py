@@ -31,21 +31,21 @@ s_endpoint_secret = os.getenv("STRIPE_ENDPOINT_SECRET")
 # Helpers
 def user_logout_status(access_token):
     try:
-        user_response = client.auth.get_user(access_token)
+        user_response = client.auth.get_user()
         if user_response is not None:
             return user_response.user
     except:
         return None
 
-def generate_cookied_response(response, key_value):
-    cookied_response = make_response(response)
-    cookied_response.set_cookie(key_value["key"], key_value["value"], httponly=True, secure=True, samesite="Strict", max_age=3600)    
-    return cookied_response
+#def generate_cookied_response(response, key_value):
+#    cookied_response = make_response(response)
+#    cookied_response.set_cookie(key_value["key"], key_value["value"], httponly=True, secure=True, samesite="Strict", max_age=3600)    
+#    return cookied_response
 
-def generate_uncookied_response(response, key):
-    uncookied_response = make_response(response)
-    uncookied_response.set_cookie(key, "", expires=0)
-    return uncookied_response
+#def generate_uncookied_response(response, key):
+#    uncookied_response = make_response(response)
+#    uncookied_response.set_cookie(key, "", expires=0)
+#    return uncookied_response
 
 # Routes <Main Page>
 @app.route('/')
@@ -125,7 +125,8 @@ def registration_post():
         flash(str(e))
         return redirect(url_for("registration"))
     
-    return generate_cookied_response(redirect(url_for("index")), {"key": "access_token", "value": response.session.access_token})
+    return redirect(url_for("index"))
+    #return generate_cookied_response(redirect(url_for("index")), {"key": "access_token", "value": response.session.access_token})
 
 
 # Captain registration
@@ -213,7 +214,8 @@ def login_post():
     
     next_page = Sanitization.verify_next_page(next_page)
 
-    return generate_cookied_response(redirect(url_for(next_page)), {"key": "access_token", "value": response.session.access_token})
+    return redirect(url_for(next_page))
+    #return generate_cookied_response(redirect(url_for(next_page)), {"key": "access_token", "value": response.session.access_token})
 
 
 # Runner registration
@@ -363,7 +365,8 @@ def logout():
     if not logged_in:
         return redirect(url_for("index"))
     client.auth.sign_out(options={"scope": "local"})
-    return generate_uncookied_response(redirect(url_for("index")), "access_token")
+    return redirect(url_for("index"))
+    #return generate_uncookied_response(redirect(url_for("index")), "access_token")
 
 
 @app.route("/profile", methods=["POST"])
