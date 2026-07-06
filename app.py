@@ -361,8 +361,9 @@ def runner_registration_post():
     
     # Do team enrollment
     try:
+        #print("Doing team enrollment")
         client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": False}})
-
+        #print("Done team enrollment")
         _ = Data.enroll_user_in_team(user.id, team_id)
         s = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
         _ = Data.setup_user_position(user.id, team_id)
