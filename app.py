@@ -15,21 +15,21 @@ import stripe
 load_dotenv()
 EVENT_DATE = dt.datetime(2026, 9, 12)
 app = Flask(__name__)
-client: Client = create_client(
-    os.environ.get("SUPABASE_URL"),
-    os.environ.get("SUPABASE_KEY")
-)
-
+auth_client: Client = create_client(
+        os.environ.get("SUPABASE_URL"),
+        os.environ.get("SUPABASE_KEY")
+    )
 app.secret_key = os.environ.get("SECRET_KEY")
-Data.initialize(client)
+Data.initialize()
+
 # Stripe
 s_key = os.environ.get("STRIPE_K")
 s_client = stripe.StripeClient(s_key)
 s_price_id = os.getenv("STRIPE_PRICE_ID")
 s_endpoint_secret = os.getenv("STRIPE_ENDPOINT_SECRET")
 
-# Helpers
 
+# Helpers
 def user_logout_status(access_token=None):
     if access_token is None:
         access_token = request.cookies.get("access_token")
@@ -38,8 +38,9 @@ def user_logout_status(access_token=None):
         return None
 
     try:
-        user_response = client.auth.get_user(access_token)
+        user_response = auth_client.auth.get_user(access_token)
         if user_response is not None:
+            #print(user_response.user, type(user_response.user))
             return user_response.user
     except:
         return None
@@ -99,23 +100,28 @@ def index():
     if user is not None:
         is_admin = Data.is_user_admin(user.id)
         not_logged_in = False
-        if "is_captain" in user.user_metadata:
-            is_captain = user.user_metadata["is_captain"]
+        captain_status = Data.get_captain_status(user.id)
+        print("Captain status;", captain_status)
+        if captain_status != 0:
+            if captain_status == 1:
+                is_captain = False
+            else:
+                is_captain = True
             is_undecided=False
         team_id = Data.get_enrolled_team(user.id)
 
         # Properly populate "is_captain"
-        if not "is_captain" in user.user_metadata:
+        if captain_status == 0:
             if len(Data.get_owned_teams(user.id)) > 0:
                 try:
-                    client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": True}})
+                    Data.upsert_captain_status(user.id, True)
                 except:
                     pass
                 return redirect(url_for("index"))
 
             if team_id is not None:
                 try:
-                    client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": False}})
+                    Data.upsert_captain_status(user.id, False)
                 except:
                     pass
                 return redirect(url_for("index"))
@@ -153,7 +159,7 @@ def registration_post():
     
     # Do signup
     try:
-        response = client.auth.sign_up({
+        response = auth_client.auth.sign_up({
             "email": email,
             "password": password,
         })
@@ -184,7 +190,7 @@ def captain_registration():
         return redirect(url_for("index"))
 
     # And also not a captain
-    if "is_captain" in user.user_metadata and user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) == 2:
         flash("You are already a Captain!")
         return redirect(url_for("teams"))
     
@@ -203,14 +209,14 @@ def captain_registration_post():
         return redirect(url_for("captain_registration"))
 
     # And also not a captain
-    if "is_captain" in user.user_metadata and user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) == 2:
         flash("You are already a Captain!")
         return redirect(url_for("teams"))
 
 
     # Update
     try:
-        _ = client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": True}})
+        _ = Data.upsert_captain_status(user.id, True)
     except Exception as e:
         flash(str(e))
         print(e, "captain reg failed")
@@ -245,7 +251,7 @@ def login_post():
     
     response = None
     try:
-        response = client.auth.sign_in_with_password({
+        response = auth_client.auth.sign_in_with_password({
             'email': email,
             'password': password,
         })
@@ -275,7 +281,7 @@ def runner_registration():
         return redirect(url_for("index"))
 
     # And also not a captain
-    if "is_captain" in user.user_metadata and user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) == 2:
         flash("You are already a Captain!")
         return redirect(url_for("index"))
             
@@ -307,7 +313,7 @@ def runner_registration_post():
         return redirect(url_for("index"))
 
     # And also not a captain
-    if "is_captain" in user.user_metadata and user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) == 2:
         flash("You are already a Captain!")
         return redirect(url_for("index"))
     
@@ -371,7 +377,7 @@ def runner_registration_post():
     
     # Do team enrollment
     try:
-        upd_resp = client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": False}})
+        upd_resp = Data.upsert_captain_status(user.id, False)
         #print("Update Captain Status Response: ", upd_resp)
 
         enr_resp = Data.enroll_user_in_team(user.id, team_id)
@@ -420,7 +426,7 @@ def logout():
     
     access_token = request.cookies.get("access_token")
     try:
-        client.auth.admin.sign_out(access_token)
+        auth_client.auth.admin.sign_out(access_token)
     except Exception:
         pass
 
@@ -472,7 +478,7 @@ def team_registration():
         return redirect(url_for("login"))
 
     # Only captains
-    if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) != 2:
         return redirect(url_for("index"))
 
     return render_template("team_registration.html")
@@ -485,7 +491,7 @@ def team_registration_post():
         return redirect(url_for("login"))
 
     # Only captains
-    if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) != 2:
         return redirect(url_for("index"))
     
     team_name = request.form.get("team_name")
@@ -522,7 +528,7 @@ def team_created():
         return redirect(url_for("login"))
 
     # Only captains
-    if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) != 2:
         return redirect(url_for("index"))
     
     team_id = request.args.get("team_id")
@@ -606,8 +612,8 @@ def team_information():
             flash("You have not filled in your Runner Info yet! Please go to your Profile and finish adding your information. You must do this before the deadline! ")
 
     is_captain = False
-    if "is_captain" in user.user_metadata:
-        is_captain = user.user_metadata["is_captain"]
+    if Data.get_captain_status(user.id) == 2:
+        is_captain = True
     return render_template("team_information.html", team=team_info, is_captain=is_captain, members=combined_member_infos)
 
 
@@ -640,7 +646,7 @@ def teams():
     if not user:
         return redirect(url_for("login"))
     # Don't do it if I'm not a captain (we should not see this page)
-    if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) != 2:
         return redirect(url_for("index"))
 
     teams = Data.get_owned_teams_info(user.id)
@@ -655,7 +661,7 @@ def manage_team_member():
         return redirect(url_for("login"))
 
     # Only captains are allowed!
-    if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) != 2:
         return redirect(url_for("index"))
     
     member_id = request.args.get("member_id")
@@ -679,7 +685,7 @@ def delete_from_team():
         return redirect(url_for("login"))
 
     # Only captains are allowed!
-    if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) != 2:
         return redirect(url_for("index"))
     
     member_id = request.form.get("member_id")
@@ -705,7 +711,7 @@ def team_payment():
         return redirect(url_for("login"))
 
     # Only captains are allowed!
-    if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) != 2:
         return redirect(url_for("index"))
 
     team_id = request.args.get("team_id")
@@ -764,7 +770,7 @@ def move_team_member_up():
         return redirect(url_for("login"))
 
     # Only captains are allowed!
-    if "is_captain" not in user.user_metadata or not user.user_metadata["is_captain"]:
+    if Data.get_captain_status(user.id) != 2:
         return redirect(url_for("index"))
     
     member_id = request.form.get("member_id")
