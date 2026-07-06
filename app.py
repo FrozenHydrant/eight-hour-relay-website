@@ -12,8 +12,8 @@ from data import Data
 import stripe
 
 # App initialization happens here
-EVENT_DATE = dt.datetime(2026, 9, 12)
 load_dotenv()
+EVENT_DATE = dt.datetime(2026, 9, 12)
 app = Flask(__name__)
 client: Client = create_client(
     os.environ.get("SUPABASE_URL"),
@@ -285,9 +285,11 @@ def runner_registration():
 
     # Ensure runner record exists and pass existing info to the form so fields can be prefilled
     users_info = Data.get_members_info([user.id])
-    user_info = {"first_name": "", "last_name": "", "age": "", "gender": "", "phone_number": "", "emergency_name": "", "emergency_phone": ""}
-    if len(users_info) > 0:
-        user_info = users_info[0]
+    if len(users_info) < 1:
+        flash("An unknown problem occured")
+        return redirect(url_for("index"))
+    
+    user_info = users_info[0]
     for k in user_info:
         if user_info[k] is None:
             user_info[k] = ""
@@ -375,7 +377,7 @@ def runner_registration_post():
         client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": False}})
         #print("Done team enrollment")
         _ = Data.enroll_user_in_team(user.id, team_id)
-        s = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
+        _ = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
         _ = Data.setup_user_position(user.id, team_id)
 
         team_basic_info = Data.get_team_basic_info(team_id)
@@ -395,9 +397,8 @@ def profile():
 
     list_info = Data.get_members_info([user.id])
     if len(list_info) < 1:
-        # Try again
-        Data.create_new_basic_runner(user.id, user.email)
-        return redirect(url_for("profile"))
+        flash("An unknown problem occured, please try again in a moment")
+        return redirect(url_for("index"))
 
     info = list_info[0]
     # Change None to empty string
