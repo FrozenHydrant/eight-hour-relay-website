@@ -101,14 +101,14 @@ def index():
         if not "is_captain" in user.user_metadata:
             if len(Data.get_owned_teams(user.id)) > 0:
                 try:
-                    client.auth.update_user({"data": {"is_captain": True}})
+                    client.auth.admin.update_user_by_id(user.id, {"data": {"is_captain": True}})
                 except:
                     pass
                 return redirect(url_for("index"))
 
             if team_id is not None:
                 try:
-                    client.auth.update_user({"data": {"is_captain": False}})
+                    client.auth.admin.update_user_by_id(user.id, {"data": {"is_captain": False}})
                 except:
                     pass
                 return redirect(url_for("index"))
@@ -203,7 +203,7 @@ def captain_registration_post():
 
     # Update
     try:
-        client.auth.update_user({"data": {"is_captain": True}})
+        client.auth.admin.update_user_by_id(user.id, {"data": {"is_captain": True}})
     except Exception as e:
         flash(str(e))
     return redirect(url_for("teams"))
@@ -358,7 +358,7 @@ def runner_registration_post():
     
     # Do team enrollment
     try:
-        client.auth.update_user({"data": {"is_captain": False}})
+        client.auth.admin.update_user_by_id(user.id, {"data": {"is_captain": False}})
 
         _ = Data.enroll_user_in_team(user.id, team_id)
         s = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
@@ -399,8 +399,10 @@ def logout():
     logged_in = user_logout_status()
     if not logged_in:
         return redirect(url_for("index"))
+    
+    access_token = request.cookies.get("access_token")
     try:
-        client.auth.sign_out(options={"scope": "global"})
+        client.auth.admin.sign_out(access_token)
     except Exception:
         pass
 
