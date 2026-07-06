@@ -101,14 +101,14 @@ def index():
         if not "is_captain" in user.user_metadata:
             if len(Data.get_owned_teams(user.id)) > 0:
                 try:
-                    client.auth.admin.update_user_by_id(user.id, {"data": {"is_captain": True}})
+                    client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": True}})
                 except:
                     pass
                 return redirect(url_for("index"))
 
             if team_id is not None:
                 try:
-                    client.auth.admin.update_user_by_id(user.id, {"data": {"is_captain": False}})
+                    client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": False}})
                 except:
                     pass
                 return redirect(url_for("index"))
@@ -203,9 +203,12 @@ def captain_registration_post():
 
     # Update
     try:
-        client.auth.admin.update_user_by_id(user.id, {"data": {"is_captain": True}})
+        #print(user.id, "now doing a captain registration")
+        s = client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": True}})
+        #print(s, "outcome")
     except Exception as e:
         flash(str(e))
+        print(e, "captain reg failed")
     return redirect(url_for("teams"))
 
 
@@ -358,7 +361,7 @@ def runner_registration_post():
     
     # Do team enrollment
     try:
-        client.auth.admin.update_user_by_id(user.id, {"data": {"is_captain": False}})
+        client.auth.admin.update_user_by_id(user.id, {"user_metadata": {"is_captain": False}})
 
         _ = Data.enroll_user_in_team(user.id, team_id)
         s = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
