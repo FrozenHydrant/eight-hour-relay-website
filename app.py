@@ -280,12 +280,12 @@ def runner_registration():
         flash("You can't register for another team! Ask your captain to remove you from the current one!")
         return redirect(url_for("index"))
 
-    # And also not a captain
+    # And if we are a captain, only let us join our own team...
     if Data.get_captain_status(user.id) == 2:
-        flash("You are already a Captain!")
-        return redirect(url_for("index"))
-            
-    teams = Data.get_all_teams_info()
+        flash("Note: As a captain, you can only register into a team you own.")
+        teams = Data.get_owned_teams_info(user.id)
+    else:
+        teams = Data.get_all_teams_info()
 
     # Ensure runner record exists and pass existing info to the form so fields can be prefilled
     users_info = Data.get_members_info([user.id])
@@ -311,11 +311,6 @@ def runner_registration_post():
     if enrolled_team is not None:
         flash("You can't register for another team! Ask your captain to remove you from the current one!")
         return redirect(url_for("index"))
-
-    # And also not a captain
-    if Data.get_captain_status(user.id) == 2:
-        flash("You are already a Captain!")
-        return redirect(url_for("index"))
     
     first_name = request.form.get("first_name")
     last_name = request.form.get("last_name")
@@ -334,6 +329,11 @@ def runner_registration_post():
     
     if team_id is None or team_token is None:
         flash("Must enter Team Id and Token.")
+        return redirect(url_for("runner_registration"))
+    
+    # And also captain
+    if Data.get_captain_status(user.id) == 2 and team_id not in Data.get_owned_teams(user.id):
+        flash("You cannot join someone else's team as a captain!")
         return redirect(url_for("runner_registration"))
 
     if not waiver_agreed:
@@ -377,7 +377,9 @@ def runner_registration_post():
     
     # Do team enrollment
     try:
-        upd_resp = Data.upsert_captain_status(user.id, False)
+        # If we are undecided and join a team, we are a runner.
+        if Data.get_captain_status(user.id) == 0:
+            upd_resp = Data.upsert_captain_status(user.id, False)
         #print("Update Captain Status Response: ", upd_resp)
 
         enr_resp = Data.enroll_user_in_team(user.id, team_id)
