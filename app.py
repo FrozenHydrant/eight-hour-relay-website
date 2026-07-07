@@ -391,9 +391,10 @@ def runner_registration_post():
         usr_resp = Data.setup_user_position(user.id, team_id)
         #print("Setup User Pos Resp: ", usr_resp)
 
-        team_basic_info = Data.get_team_basic_info(team_id)
-        if team_basic_info is not None:
-            EmailSender.send_team_registration_email(user.email, team_id, team_basic_info.get("team_name", "Unknown"), team_basic_info.get("division", "Unknown"))
+        EmailSender.send_team_registration_email(user.email, team_id, team_basic_info.get("team_name", "Unknown"), team_basic_info.get("division", "Unknown"))
+        
+        team_email = Data.get_team_info(team_id)["email"]
+        EmailSender.send_team_registration_email_captain(team_email, team_id, team_basic_info.get("team_name", "Unknown"), user.email)
     except Exception as e:
         flash(str(e))
         return redirect(url_for("runner_registration"))
@@ -655,31 +656,6 @@ def teams():
     return render_template("teams.html", username=user.email, teams=teams)
 
 
-#@app.route("/manage_team_member")
-def manage_team_member():
-    return ""
-    user = user_logout_status()
-    if not user:
-        return redirect(url_for("login"))
-
-    # Only captains are allowed!
-    if Data.get_captain_status(user.id) != 2:
-        return redirect(url_for("index"))
-    
-    member_id = request.args.get("member_id")
-    team_id = request.args.get("team_id")
-
-    if not Data.has_authority_over_member(user.id, member_id, team_id):
-        return redirect(url_for("error_page"))
-    
-    member_info = Data.get_members_info([member_id])[0]
-
-    for k in member_info:
-        if member_info[k] is None:
-            member_info[k] = "No Data"
-    return render_template("manage_team_member.html", team_id=team_id, member=member_info)
-
-
 @app.route("/delete_from_team", methods=["POST"])
 def delete_from_team():
     user = user_logout_status()
@@ -738,7 +714,6 @@ def team_payment():
     return redirect(payment_link.url)
 
 
-# TODO: rename?
 # https://docs.stripe.com/webhooks
 @app.route("/team_payment_webhook", methods=["POST"])
 def team_payment_webhook():
