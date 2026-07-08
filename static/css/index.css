@@ -13,8 +13,6 @@ html {
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: #F0F2F5;
-  color: #1E2235;
 }
 
 /* ══════════════════════════════════════
@@ -167,11 +165,12 @@ body {
   margin-top: 0.3rem;
   font-family: inherit;
   font-weight: 600;
+  font-size: 1.4rem;
   background: #6C7AE0;
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
-  padding: 0.9rem 1.2rem;
+  padding: 1.2rem 1.5rem;
    transition:
     background 0.15s ease,
     transform 0.1s ease,
@@ -276,8 +275,6 @@ body {
 
 .about {
   background:#b6bbc3;
-  padding: 5rem 15rem;
-  text-align: center;
 }
 
 .inner_text {
@@ -285,8 +282,8 @@ body {
   padding: 1.2rem;
 }
 
-.rules, .divisions{
-  padding: 5rem 15rem;
+.bottom_block{
+  padding: 5rem 10rem;
   text-align: center;
   align-items: center;
 }
@@ -327,7 +324,7 @@ body {
   }
 
   .countdown_insides_horizontal .countdown {
-    padding: 0 1.25rem;
+    padding: 0 1rem;
     min-width: unset;
   }
 
@@ -350,5 +347,9 @@ body {
 
   .logo {
     left: 1.25rem;
+  }
+
+  .bottom_block {
+    padding: 5rem 6rem;
   }
 }
