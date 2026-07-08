@@ -15,6 +15,7 @@ import stripe
 # App initialization happens here
 load_dotenv()
 EVENT_DATE = dt.datetime(2026, 9, 12)
+GENDERS_MAPPING = {"male": "Male", "female": "Female", "non-binary": "Non-Binary"}
 app = Flask(__name__)
 auth_client: Client = create_client(
         os.environ.get("SUPABASE_URL"),
@@ -95,6 +96,7 @@ def index():
     is_captain = False
     not_logged_in = True
     is_undecided = True
+    user_email = None
 
     # User exists
     is_admin = False
@@ -109,7 +111,12 @@ def index():
             else:
                 is_captain = True
             is_undecided=False
+        
+        # Get more team info
         team_id = Data.get_enrolled_team(user.id)
+        
+        # Also set the email
+        user_email = user.email
 
         # Properly populate "is_captain"
         if captain_status == 0:
@@ -133,7 +140,7 @@ def index():
     if team_id is None:
         team_id = "no_team"
 
-    return render_template("index.html", team_id=team_id, not_logged_in=not_logged_in, is_admin=is_admin, is_undecided=is_undecided, is_captain=is_captain, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
+    return render_template("index.html", user_email=user_email, team_id=team_id, not_logged_in=not_logged_in, is_admin=is_admin, is_undecided=is_undecided, is_captain=is_captain, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
 
 
 # Registration for the whole website
@@ -195,7 +202,8 @@ def captain_registration():
         flash("You are already a Captain!")
         return redirect(url_for("teams"))
     
-    return render_template("captain_registration.html")
+    user_info = Data.get_members_info([user.id])    
+    return render_template("registration_captain.html", user_info=user_info, genders_mapping=GENDERS_MAPPING)
 
 @app.route("/captain_registration", methods=["POST"])
 def captain_registration_post():
@@ -299,7 +307,7 @@ def runner_registration():
         if user_info[k] is None:
             user_info[k] = ""
 
-    return render_template("registration_runner.html", teams=teams, user_info=user_info)
+    return render_template("registration_runner.html", teams=teams, user_info=user_info, genders_mapping=GENDERS_MAPPING)
 
 @app.route("/runner_registration", methods=["POST"])
 def runner_registration_post():
@@ -422,7 +430,7 @@ def profile():
         if info[k] is None:
             info[k] = ""
 
-    return render_template("profile.html", user_info=info, email=info["email"], username=user.email)
+    return render_template("profile.html", user_info=info, email=info["email"], username=user.email, genders_mapping=GENDERS_MAPPING)
 
 
 @app.route("/logout")
@@ -517,8 +525,8 @@ def team_registration_post():
     captain_name = request.form.get("captain_name")
     division = request.form.get("division")
 
-    # Verify namnes
-    if not Sanitization.verify_all_lists_and_create_response([], [], [], [], [team_name, captain_name], []):
+    # Verify names
+    if not Sanitization.verify_all_lists_and_create_response([], [team_name], [], [], [captain_name], []):
         return redirect(url_for("team_registration"))
         
     # Verify division correctness
@@ -633,7 +641,7 @@ def team_information():
     is_captain = False
     if Data.get_captain_status(user.id) == 2:
         is_captain = True
-    return render_template("team_information.html", team=team_info, is_captain=is_captain, members=combined_member_infos)
+    return render_template("team_information.html", user_email=user.email, team=team_info, is_captain=is_captain, members=combined_member_infos, genders_mapping=GENDERS_MAPPING)
 
 
 @app.route("/team_token_reset")

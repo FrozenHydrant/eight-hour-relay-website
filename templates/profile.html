@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="/static/js/profile_edits.js"></script>
         <link rel="stylesheet" href="/static/css/profile.css">
     </head>
     <body>
@@ -26,31 +27,57 @@
                 <form method="post" class="info_form">
                     <input type="text" name="first_name" placeholder="First Name" value="{{ user_info['first_name'] }}">
                     <input type="text" name="last_name" placeholder="Last Name" value="{{ user_info['last_name'] }}">
-                    <input type="text" name="gender" placeholder="Gender" value="{{ user_info['gender'] }}">
+                    <select name="gender" class="dropdown" required>
+                        {% if not user_info['gender'] or user_info['gender'] not in genders_mapping %}
+                            <option disabled selected value>Gender</option>
+                        {% else %}
+                            <option selected value="{{ user_info['gender'] }}">{{ genders_mapping[user_info['gender']] }}</option>
+                        {% endif %}
+                        {% for gender in genders_mapping %}
+                            {% if gender != user_info['gender'] %}
+                                <option value="{{ gender }}">{{ genders_mapping[gender] }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
                     <div class="date_row">
                         <select name="birthyear" class="short_dropdown" required>
-                            <option disabled selected value> -- birth year --</option>
+                            {% if not user_info['birthdate'] %}
+                                <option disabled selected value> -- birth year --</option>
+                            {% else %}
+                                <option disabled>-- birth year --</option>
+                                <option selected>{{ user_info['birthdate'].split("-")[0] }}</option>
+                            {% endif %}
                             {% for i in range(1900, 2011) %}
-                            <option value="{{ i }}">{{i}}</option>
+                            <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
                         </select>
                         <select name="birthmonth" class="short_dropdown" required>
-                            <option disabled selected value> -- birth month --</option>
+                            {% if not user_info['birthdate'] %}
+                                <option disabled selected value> -- birth month --</option>
+                            {% else %}
+                                <option disabled>-- birth month --</option>
+                                <option selected>{{ user_info['birthdate'].split("-")[1] }}</option>
+                            {% endif %}
                             {% for i in range(1, 13) %}
-                            <option value="{{ i }}">{{i}}</option>
+                            <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
                         </select>
                         <select id="birthday" name="birthday" class="short_dropdown" required>
-                            <option disabled selected value> -- birth day -- </option>
+                            {% if not user_info['birthdate'] %}
+                                <option disabled selected value> -- birth day --</option>
+                            {% else %}
+                                <option disabled>-- birth day --</option>
+                                <option selected>{{ user_info['birthdate'].split("-")[2] }}</option>
+                            {% endif %}
                             {% for i in range(1, 32) %}
-                            <option value="{{ i }}">{{i}}</option> 
+                            <option value="{{ i }}">{{ i }}</option> 
                             {% endfor %} 
                         </select>
                     </div>
                     <input type="text" name="phone_number" placeholder="Phone Number" value="{{ user_info['phone_number'] }}">
                     <input type="text" name="emergency_name" placeholder="Emergency Contact Name" value="{{ user_info['emergency_name'] }}">
                     <input type="text" name="emergency_phone" placeholder="Emergency Phone Contact" value="{{ user_info['emergency_phone'] }}">
-                    <button class="button">Save Changes</button>
+                    <button class="button" id="save_profile_edits">Save Changes</button>
                 </form>
             </div>
         </div>

@@ -93,7 +93,7 @@ body {
 
 /* Date label */
 .countdown > h3 {
-  font-size: 0.8rem;
+  font-size: 3.5rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -285,10 +285,14 @@ body {
   padding: 1.2rem;
 }
 
-.rules {
+.rules, .divisions{
   padding: 5rem 15rem;
   text-align: center;
   align-items: center;
+}
+
+.divisions {
+  background: #b6bbc3;
 }
 
 

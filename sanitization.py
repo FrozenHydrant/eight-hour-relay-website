@@ -149,8 +149,8 @@ class Sanitization:
             if not Sanitization.verify_name_length(gender):
                 flash("Please ensure your gender is between 1-127 characters")
                 return False
-            if not Sanitization.verify_name_characters(gender):
-                flash("Please ensure your gender contains no invalid characters.")
+            if not gender in ("male", "female", "non-binary"):
+                flash("Please ensure your gender is either: male, female, or non-binary.")
                 return False
             
         return True

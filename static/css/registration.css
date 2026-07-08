@@ -195,6 +195,10 @@ form {
   box-shadow: none;
 }
 
+.extra_text {
+  margin-top: 2rem;
+}
+
 .extra_text > p {
   font-size: 0.82rem;
   color: #6b7280;

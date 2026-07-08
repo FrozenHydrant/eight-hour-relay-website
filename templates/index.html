@@ -1,147 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <link rel="stylesheet" href="/static/css/index.css">
-    <script type="text/javascript" src="/static/js/index.js"></script>
-  </head>
-  <body>
 
-    <div class="main_page">
-      <div class="logo">
-        <img src="/static/logo_white.svg">
-      </div>
-      <div class="top_bar_info">
-        <div class="top_bar_insides">
+<head>
+  <link rel="stylesheet" href="/static/css/index.css">
+  <script type="text/javascript" src="/static/js/index.js"></script>
+</head>
+
+<body>
+
+  <div class="main_page">
+    <div class="logo">
+      <img src="/static/logo_white.svg">
+    </div>
+    <div class="top_bar_info">
+      <div class="top_bar_insides">
         <a href="#about">Mission</a>
         {% if not not_logged_in %}
-          <a href="{{ url_for('profile') }}">Profile</a>
+        <a href="{{ url_for('profile') }}">{{ user_email }}</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
         {% else %}
-          <a href="{{ url_for('login')}}">Sign In</a>
-        {% endif %}
-        </div>
-      </div>
-      <div class="countdown">
-        <h3 class="date_target">SEP 12 2026</h3>
-        <p>COUNTDOWN TO THE EVENT</p>
-        <div class="countdown_insides_horizontal">
-          <div class="countdown">
-            <span id="day_count">{{ days }}</span>
-            <span>Days</span>
-          </div>
-          <div class="countdown">
-            <span id="hour_count">{{ hours }}</span>
-            <span>Hours</span>
-          </div>
-          <div class="countdown">
-            <span id="minute_count">{{ minutes }}</span>
-            <span>Minutes</span>
-          </div>
-          <div class="countdown">
-            <span id="second_count">{{ seconds }}</span>
-            <span>Seconds</span>
-          </div>
-        </div>
-      </div>
-      <div class="buttons">
-        {% if not_logged_in or is_undecided or is_captain %}
-        {% if not is_captain %}
-        <a href="{{ url_for('captain_registration') }}">
-          Register Team Now
-        </a>
-        {% endif %}
-        <a href="{{ url_for('runner_registration') }}">
-          Register as Runner
-        </a>
-        {% endif %}
-
-        {% if not is_undecided and not is_captain %}
-        <a href="{{ url_for('team_information', team_id=team_id) }}">
-          View my Team
-        </a>
-        {% endif %}
-        
-        {% if is_captain %}
-          <a href="{{ url_for('teams') }}">
-            Manage my Teams
-          </a>
-        {% endif %}
-
-        {% if is_admin %}
-          <a href="{{ url_for('admin_panel') }}">
-            Admin Panel
-          </a>
+        <a href="{{ url_for('login')}}">Sign In</a>
         {% endif %}
       </div>
     </div>
-
-    <div class="information">
-      <h3 class="sub_title">Mark Your Calendar</h3>
-      <div class="horizontal_info_panel">
-        <div class="info_block">
-          <span class="info_title">Team Fee</span>
-          <div class="info_block_sub_panel">
-            <div class="info_block_sub_block">
-              <span>Ultra</span>
-              <span>$320</span>
-            </div>
-            <div class="info_block_sub_block">
-              <span>Master</span>
-              <span>$450</span>
-            </div>
-          </div>
+    <div class="countdown">
+      <h3 class="date_target">SEP 12 2026</h3>
+      <p>COUNTDOWN TO THE EVENT</p>
+      <div class="countdown_insides_horizontal">
+        <div class="countdown">
+          <span id="day_count">{{ days }}</span>
+          <span>Days</span>
         </div>
-        <div class="info_block">
-          <span class="info_title">When</span>
-          <span>8:00am - 4:00pm</span>
-          <span>Sep. 12, 2026</span>
+        <div class="countdown">
+          <span id="hour_count">{{ hours }}</span>
+          <span>Hours</span>
         </div>
-        <div class="info_block">
-          <span class="info_title">Where</span>
-          <span>Swangard Stadium</span>
-          <span>Burnaby, British Columbia</span>
+        <div class="countdown">
+          <span id="minute_count">{{ minutes }}</span>
+          <span>Minutes</span>
+        </div>
+        <div class="countdown">
+          <span id="second_count">{{ seconds }}</span>
+          <span>Seconds</span>
         </div>
       </div>
     </div>
+    <div class="buttons">
+      {% if not_logged_in or is_undecided or is_captain %}
+      {% if not is_captain %}
+      <a href="{{ url_for('captain_registration') }}">
+        Register Team Now
+      </a>
+      {% endif %}
+      <a href="{{ url_for('runner_registration') }}">
+        Register as Runner
+      </a>
+      {% endif %}
 
-    <div class="about" id="about">
-      <h3 class="sub_title">About the Race</h3>
-      <p class="inner_text">The BMAI 8-Hour Relay is a team endurance event designed for runners of all levels.
-      Unlike a traditional road race, this event focuses on teamwork, pacing, strategy, and community spirit. Each team consists of 8 runners. Runners take turns completing 30-minute legs in a fixed order. After all 8 runners complete their first leg, the same order repeats for the second round.
-      
-      
-      <p class="inner_text">The goal is simple: cover the longest total distance within 8 hours.
+      {% if not is_undecided and not is_captain %}
+      <a href="{{ url_for('team_information', team_id=team_id) }}">
+        View my Team
+      </a>
+      {% endif %}
+
+      {% if is_captain %}
+      <a href="{{ url_for('teams') }}">
+        Manage my Teams
+      </a>
+      {% endif %}
+
+      {% if is_admin %}
+      <a href="{{ url_for('admin_panel') }}">
+        Admin Panel
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="information">
+    <h3 class="sub_title">Mark Your Calendar</h3>
+    <div class="horizontal_info_panel">
+      <div class="info_block">
+        <span class="info_title">Team Fee</span>
+        <div class="info_block_sub_panel">
+          <div class="info_block_sub_block">
+            <span>Ultra</span>
+            <span>$320</span>
+          </div>
+          <div class="info_block_sub_block">
+            <span>Master</span>
+            <span>$450</span>
+          </div>
+        </div>
+      </div>
+      <div class="info_block">
+        <span class="info_title">When</span>
+        <span>8:00am - 4:00pm</span>
+        <span>Sep. 12, 2026</span>
+      </div>
+      <div class="info_block">
+        <span class="info_title">Where</span>
+        <span>Swangard Stadium</span>
+        <span>Burnaby, British Columbia</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="about" id="about">
+    <h3 class="sub_title">About the Race</h3>
+    <p class="inner_text">The BMAI 8-Hour Relay is a team endurance event designed for runners of all levels.
+      Unlike a traditional road race, this event focuses on teamwork, pacing, strategy, and community spirit. Each team
+      consists of 8 runners. Runners take turns completing 30-minute legs in a fixed order. After all 8 runners complete
+      their first leg, the same order repeats for the second round.
+
+    <p class="inner_text">The goal is simple: cover the longest total distance within 8 hours.
       Hosted by Vancouver Runaholics Running & Fitness Society.</p>
-      </p>
-    </div>
+    </p>
+  </div>
 
-    <div class="rules">
-      <h3 class="sub_title">Rules</h3>
-      <div class="inner_rules">
+  <div class="rules">
+    <h3 class="sub_title">Rules</h3>
+    <div class="inner_rules">
+      <ul class="inner_text">
+        <li>Each team must have exactly 8 registered runners.</li>
+        <li>Each runner completes exactly two legs.</li>
+        <li>Each leg is approximately 30 minutes.</li>
+        <li>A ±3-minute margin is allowed to complete a full lap before exchange.</li>
+        <li>Teams must submit a fixed running order before the registration deadline.</li>
+        <li>The same running order is used for both rounds.</li>
+        <li>The team covering the greatest total distance within 8 hours wins.</li>
+        <li>Only completed laps are counted.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divisions">
+    <h3 class="sub_title">Divisions</h3>
+    <div class="horizontal_info_panel">
+      <div class="info_block">
+        <span>Open Division</span>
         <ul class="inner_text">
-          <li>Each team must have exactly 8 registered runners.</li>
-          <li>Each runner completes exactly two legs.</li>
-          <li>Each leg is approximately 30 minutes.</li>
-          <li>A ±3-minute margin is allowed to complete a full lap before exchange.</li>
-          <li>Teams must submit a fixed running order before the registration deadline.</li>
-          <li>The same running order is used for both rounds.</li>
-          <li>The team covering the greatest total distance within 8 hours wins.</li>
-          <li>Only completed laps are counted.</li>
+          <li>15+ years old</li>
+          <li>No gender requirement</li>
+        </ul>
+      </div>
+      <div class="info_block">
+        <span>Mixed Division</span>
+        <ul class="inner_text">
+          <li>4 male and 4 female runners</li>
+          <li>15+ years old</li>
+        </ul>
+      </div>
+      <div class="info_block">
+        <span>Master Division</span>
+        <ul class="inner_text">
+
+          <li>All runners must be 50 years old or above.</li>
+          <li>Standard team: 4 male + 4 female.</li>
+          <li>Distance adjustment may apply if gender balance differs.</li>
         </ul>
       </div>
     </div>
+  </div>
+  <div class="gallery">
 
-    <div class="gallery">
+  </div>
 
-    </div>
-
-    <div class="flashes">
+  <div class="flashes">
     {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-        <p>{{ message }}</p>
-        {% endfor %}
-      {% endif %}
+    {% if messages %}
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
-    </div>
-  </body>
+  </div>
+</body>
+
 </html>

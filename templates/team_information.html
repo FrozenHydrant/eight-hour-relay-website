@@ -1,99 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <link rel="stylesheet" href="/static/css/title_then_list.css">
-  </head>
-  <body>
-      <div class="top_bar_info">
-        <div class="top_bar_insides">
-          <a href="{{ url_for('index') }}">Home Page</a>
-          {% if is_captain %}
-            <a href="{{ url_for('teams') }}">My Teams</a>
+
+<head>
+  <link rel="stylesheet" href="/static/css/title_then_list.css">
+</head>
+
+<body>
+  <div class="top_bar_info">
+    <div class="top_bar_insides">
+      <a href="{{ url_for('index') }}">Home Page</a>
+      {% if is_captain %}
+      <a href="{{ url_for('teams') }}">My Teams</a>
+      {% endif %}
+      <a href="{{ url_for('profile') }}">{{ user_email }}</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </div>
+  <div class="flashes">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+  </div>
+  <div class="top_info">
+    <h3>Team {{ team["team_name"] }}</h3>
+  </div>
+  <div class="team_info_box">
+    <p class="inner_text">Team ID: {{ team["id"] }}</p>
+    <p class="inner_text">Team Division: {{ team["division"] }}</p>
+    {% if team["paid"] %}
+    <p class="inner_text">Team Fee Paid: Yes</p>
+    {% else %}
+    <p class="inner_text">Team Fee Paid: No</p>
+    {% endif %}
+    <p class="inner_text">Team Captain Name: {{ team["captain_name"] }}</p>
+    <p class="inner_text">Team Email: {{ team["email"] }}</p>
+    {% if is_captain %}
+    <div class="token_regeneration">
+      <a class="top_button" href="{{ url_for('team_token_reset',team_id=team['id']) }}">Regenerate Team Token</a>
+      <p class="inner_note">Invalidate your old token and create a new one.</p>
+    </div>
+    {% if not team["paid"] %}
+    <div class="payment">
+      <a class="top_button" href="{{ url_for('team_payment',team_id=team['id'])}}">Team Payment</a>
+    </div>
+    {% endif %}
+    {% endif %}
+  </div>
+  <div class="bottom_info">
+    <h3>Members:</h3>
+  </div>
+  <div class="bottom_list">
+    <table class="members_table">
+      <thead>
+        <tr>
+          <th>Position</th>
+          <th>Name</th>
+          <th>Birthday</th>
+          <th>Gender</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Emergency Contact</th>
+          <th>Emergency Phone</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for member in members %}
+        <tr>
+          <td>{{ member["position"] }}</td>
+          <td>{{ member["first_name"] }} {{ member["last_name"] }}</td>
+          <td>{{ member["birthdate"] }}</td>
+          {% if member["gender"] and member["gender"] in genders_mapping %}
+          <td>{{ genders_mapping[member["gender"]] }}</td>
+          {% else %}
+          <td>None</td>
           {% endif %}
-          <a href="{{ url_for('profile') }}">Profile</a>
-        </div>
-      </div>
-      <div class="flashes">
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-              <p>{{ message }}</p>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-      </div>
-      <div class="top_info">
-        <h3>Team {{ team["team_name"] }}</h3>
-      </div>
-      <div class="team_info_box">
-        <p class="inner_text">Team ID: {{ team["id"] }}</p>
-        <p class="inner_text">Team Division: {{ team["division"] }}</p>
-        {% if team["paid"] %}
-          <p class="inner_text">Team Fee Paid: Yes</p>
-        {% else %}
-          <p class="inner_text">Team Fee Paid: No</p>
-        {% endif %}
-        <p class="inner_text">Team Captain Name: {{ team["captain_name"] }}</p>
-        <p class="inner_text">Team Email: {{ team["email"] }}</p>
-        {% if is_captain %}
-          <div class="token_regeneration">
-            <a class="top_button" href="{{ url_for('team_token_reset',team_id=team['id']) }}">Regenerate Team Token</a>
-            <p class="inner_note">Invalidate your old token and create a new one.</p>
-          </div>
-          {% if not team["paid"] %}
-          <div class="payment">
-            <a class="top_button" href="{{ url_for('team_payment',team_id=team['id'])}}">Team Payment</a>
-          </div>
-          {% endif %}
-        {% endif %}
-      </div>
-      <div class="bottom_info">
-        <h3>Members:</h3>
-      </div>
-      <div class="bottom_list">
-        <table class="members_table">
-          <thead>
-            <tr>
-              <th>Position</th>
-              <th>Name</th>
-              <th>Birthday</th>
-              <th>Gender</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Emergency Contact</th>
-              <th>Emergency Phone</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for member in members %}
-              <tr>
-                <td>{{ member["position"] }}</td>
-                <td>{{ member["first_name"] }} {{ member["last_name"] }}</td>
-                <td>{{ member["birthdate"] }}</td>
-                <td>{{ member["gender"] }}</td>
-                <td>{{ member["email"] }}</td>
-                <td>{{ member["phone_number"] }}</td>
-                <td>{{ member["emergency_name"] }}</td>
-                <td>{{ member["emergency_phone"] }}</td>
-                <td class="actions_cell">
-                  {% if is_captain %}
-                    <form method="POST" action="{{ url_for('delete_from_team') }}" class="right_form">
-                      <input type="hidden" name="team_id" value="{{ team['id'] }}">
-                      <input type="hidden" name="member_id" value="{{ member['user_id'] }}">
-                      <button class="button red_button">Remove</button>
-                    </form>
-                    <form method="POST" action="{{ url_for('move_team_member_up') }}" class="right_form">
-                      <input type="hidden" name="team_id" value="{{ team['id'] }}">
-                      <input type="hidden" name="member_id" value="{{ member['user_id'] }}">
-                      <button class="button">Move Up</button>
-                    </form>
-                  {% endif %}
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-  </body>
+          <td>{{ member["email"] }}</td>
+          <td>{{ member["phone_number"] }}</td>
+          <td>{{ member["emergency_name"] }}</td>
+          <td>{{ member["emergency_phone"] }}</td>
+          <td class="actions_cell">
+            {% if is_captain %}
+            <form method="POST" action="{{ url_for('delete_from_team') }}" class="right_form">
+              <input type="hidden" name="team_id" value="{{ team['id'] }}">
+              <input type="hidden" name="member_id" value="{{ member['user_id'] }}">
+              <button class="button red_button">Remove</button>
+            </form>
+            <form method="POST" action="{{ url_for('move_team_member_up') }}" class="right_form">
+              <input type="hidden" name="team_id" value="{{ team['id'] }}">
+              <input type="hidden" name="member_id" value="{{ member['user_id'] }}">
+              <button class="button">Move Up</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+
 </html>
