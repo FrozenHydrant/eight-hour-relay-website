@@ -173,6 +173,7 @@ class Data:
         try:
             _ = Data.client.table("runner_info").update(user_info).eq("user_id", user_id).execute()
         except Exception as e:
+            print("Update info exception", e)
             return False
         return True
     

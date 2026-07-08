@@ -74,6 +74,36 @@ form {
   appearance: none;
 }
 
+/* ── Birthdate row (year / month / day side by side) ── */
+.date_row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.short_dropdown {
+  flex: 1;
+  min-width: 0;
+  padding: 0.7rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #1E2235;
+  background: #FFFFFF;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.short_dropdown:focus {
+  border-color: #6C7AE0;
+  box-shadow: 0 0 0 3.5px rgba(108, 122, 224, 0.22);
+}
+
 /* Placeholder hints via attribute — browsers show name as placeholder */
 .text_input[name="email"]::placeholder    { content: "Email address"; }
 .text_input[name="username"]::placeholder { content: "Username"; }
@@ -204,7 +234,16 @@ form {
 
   .registration,
   .login {
-    max-width: 1%;
+    max-width: 100%;
     padding: 2rem 1.5rem;
+  }
+
+  .date_row {
+    gap: 0.4rem;
+  }
+
+  .short_dropdown {
+    padding: 0.7rem 0.35rem;
+    font-size: 0.82rem;
   }
 }

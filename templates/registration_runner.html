@@ -11,7 +11,26 @@
       <form method="POST">
         <input type="text" class="text_input" name="first_name" placeholder="First Name" value="{{ user_info['first_name'] }}" required>
         <input type="text" class="text_input" name="last_name" placeholder="Last Name" value="{{ user_info['last_name'] }}" required>
-        <input type="text" class="text_input" name="age" placeholder="Age" value="{{ user_info['age'] }}" required>
+        <div class="date_row">
+          <select name="birthyear" class="short_dropdown" required>
+            <option disabled selected value> -- birth year --</option>
+            {% for i in range(1900, 2011) %}
+              <option value="{{ i }}">{{i}}</option>
+            {% endfor %}
+          </select>
+          <select name="birthmonth" class="short_dropdown" required>
+            <option disabled selected value> -- birth month --</option>
+            {% for i in range(1, 12) %}
+              <option value="{{ i }}">{{i}}</option>
+            {% endfor %}
+          </select>
+          <select id="birthday" name="birthday" class="short_dropdown" required>
+            <option disabled selected value> -- birth day -- </option>
+            {% for i in range(1, 31) %}
+              <option value="{{ i }}">{{i}}</option> 
+            {% endfor %} 
+          </select>
+        </div>
         <input type="text" class="text_input" name="gender" placeholder="Gender" value="{{ user_info['gender'] }}" required>
         <input type="text" class="text_input" name="phone_number" placeholder="Phone Number" value="{{ user_info['phone_number'] }}" required>
         <input type="text" class="text_input" name="emergency_name" placeholder="Emergency Contact Name" value="{{ user_info['emergency_name'] }}" required>

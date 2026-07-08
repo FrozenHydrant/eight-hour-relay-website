@@ -9,6 +9,7 @@ import math
 import datetime as dt
 import secrets
 from data import Data
+from dateutil import relativedelta
 import stripe
 
 # App initialization happens here
@@ -315,7 +316,9 @@ def runner_registration_post():
     first_name = request.form.get("first_name")
     last_name = request.form.get("last_name")
     gender = request.form.get("gender")
-    age = request.form.get("age")
+    birthyear = request.form.get("birthyear")
+    birthmonth = request.form.get("birthmonth")
+    birthday = request.form.get("birthday")
     phone_number = request.form.get("phone_number")
     emergency_name = request.form.get("emergency_name")
     emergency_phone = request.form.get("emergency_phone")
@@ -340,15 +343,16 @@ def runner_registration_post():
         flash("You must open the waiver and agree to it before registering.")
         return redirect(url_for("runner_registration"))
     
+    birthdate = None
     try:
-        age = int(age)
+        birthdate = dt.datetime(int(birthyear), int(birthmonth), int(birthday))
     except Exception as e:
-        flash("A problem occured: " + str(e))
+        flash("Bad birthdate entered.")
         return redirect(url_for("runner_registration"))
     
-    if age < 1 or age > 100:
-        flash("Enter a valid age.")
-        return redirect(url_for("runner_registration"))
+    # Calculate age via birthdate
+    age = relativedelta.relativedelta(dt.datetime.now(), birthdate).years
+    #print(age)
 
     team_division = None
     team_basic_info = Data.get_team_basic_info(team_id)
@@ -385,7 +389,7 @@ def runner_registration_post():
         enr_resp = Data.enroll_user_in_team(user.id, team_id)
         #print("Enrollment response: ", enr_resp)
 
-        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
+        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "birthdate": birthdate.strftime("%m/%d/%Y"), "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
         #print("Update Runner Info Response: ", upd_resp)
         
         usr_resp = Data.setup_user_position(user.id, team_id)
@@ -445,7 +449,9 @@ def profile_post():
     first_name = request.form.get("first_name")
     last_name = request.form.get("last_name")
     gender = request.form.get("gender")
-    age = request.form.get("age")
+    birthyear = request.form.get("birthyear")
+    birthmonth = request.form.get("birthmonth")
+    birthday = request.form.get("birthday")
     phone_number = request.form.get("phone_number")
     emergency_name = request.form.get("emergency_name")
     emergency_phone = request.form.get("emergency_phone")
@@ -454,6 +460,16 @@ def profile_post():
     if not success:
         return redirect(url_for("profile"))
     
+    birthdate = None
+    try:
+        birthdate = dt.datetime(int(birthyear), int(birthmonth), int(birthday))
+    except Exception as e:
+        flash("Bad birthdate entered.")
+        return redirect(url_for("profile"))
+    
+    # Calculate age via birthdate
+    age = relativedelta.relativedelta(dt.datetime.now(), birthdate).years
+
     try:
         age = int(age)
     except Exception as e:
@@ -464,7 +480,7 @@ def profile_post():
         flash("Enter a valid age.")
         return redirect(url_for("profile"))
     
-    updated_info = {"first_name": first_name, "last_name": last_name, "gender": gender, "age": age, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone}
+    updated_info = {"first_name": first_name, "last_name": last_name, "gender": gender, "birthdate": birthdate.strftime("%m/%d/%Y"), "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone}
     success = Data.update_runner_info(user.id, updated_info)
     if not success:
         flash("Error occured while updating information.")
