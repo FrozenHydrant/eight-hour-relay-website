@@ -131,7 +131,7 @@ body {
 }
 
 /* The number */
-.countdown_insides_horizontal .countdown span:first-child {
+.countdown_insides_horizontal .countdown .countdown_num{
   font-size: clamp(4rem, 10vw, 7.5rem);
   font-weight: 800;
   color: #FFFFFF;
@@ -141,8 +141,8 @@ body {
 }
 
 /* The label (Days / Hours / Minutes) */
-.countdown_insides_horizontal .countdown span:last-child {
-  font-size: 0.72rem;
+.countdown_insides_horizontal .countdown {
+  font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -319,13 +319,21 @@ body {
    RESPONSIVE
 ══════════════════════════════════════ */
 @media (max-width: 640px) {
+  .countdown > h3 {
+    font-size: 2.6rem;
+  }
+  
   .countdown_insides_horizontal {
     gap: 0;
   }
 
   .countdown_insides_horizontal .countdown {
-    padding: 0 1rem;
+    padding: 0 0.6rem;
     min-width: unset;
+  }
+
+  .countdown_insides_horizontal .countdown .countdown_num {
+    font-size: 3rem;
   }
 
   .horizontal_info_panel {
@@ -350,6 +358,6 @@ body {
   }
 
   .bottom_block {
-    padding: 5rem 6rem;
+    padding: 5rem 4.5rem;
   }
 }
