@@ -269,27 +269,132 @@ body {
   color: #1E2235;
 }
 
-/* ABOUT
+/* ══════════════════════════════════════
+   BOTTOM CONTENT BLOCKS
+══════════════════════════════════════ */
 
-*/
-
-.about {
-  background:#b6bbc3;
-}
-
-.inner_text {
-  text-align: left;
-  padding: 1.2rem;
-}
-
-.bottom_block{
+.bottom_block {
   padding: 5rem 10rem;
   text-align: center;
-  align-items: center;
 }
 
-.divisions {
-  background: #b6bbc3;
+/* Alternating backgrounds */
+.about,
+.registration_process,
+.faq_section,
+.venue_info {
+  background: #F0F2F5;
+}
+
+.rules,
+.event_scheduling,
+.divisions,
+.awards {
+  background: #FFFFFF;
+}
+
+.bottommost_block {
+  text-align: center;
+  background: #1E2235;
+  padding: 3rem 10rem;
+}
+
+.bottommost_block .sub_title,
+.bottommost_block .inner_text,
+.bottommost_block .inside_list li {
+  color: #A0A8C8;
+}
+
+.bottommost_block .sub_title {
+  color: #FFFFFF;
+}
+
+.bottom_label {
+  margin-top: 2rem !important;
+  font-size: 0.78rem !important;
+  color: #6b7280 !important;
+}
+
+/* ── Shared text styles ── */
+.inner_text {
+  font-size: 0.95rem;
+  color: #4B5563;
+  line-height: 1.7;
+  text-align: left;
+  max-width: 680px;
+  margin: 0 auto 1rem;
+}
+
+.inner_bonus_text {
+  font-size: 0.88rem;
+  color: #9CA3AF;
+  line-height: 1.65;
+  text-align: left;
+  max-width: 680px;
+  margin: 0 auto 1rem;
+  font-style: italic;
+}
+
+/* ── Lists ── */
+.inside_list {
+  list-style: none;
+  max-width: 680px;
+  margin: 0 auto 1rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0;
+}
+
+.inside_list li {
+  font-size: 0.92rem;
+  color: #4B5563;
+  line-height: 1.6;
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.inside_list li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: #6C7AE0;
+  font-weight: 600;
+}
+
+/* ── Divisions horizontal panel ── */
+.divisions .horizontal_info_panel {
+  text-align: left;
+}
+
+.divisions .info_block {
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.divisions .info_block > span:first-child {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6C7AE0;
+  margin-bottom: 0.25rem;
+}
+
+.divisions .info_block .inside_list {
+  margin: 0;
+}
+
+/* ── FAQ ── */
+.faq_section .inner_text {
+  font-weight: 600;
+  color: #1E2235;
+  margin-bottom: 0.25rem;
+}
+
+.faq_section .inner_bonus_text {
+  margin-bottom: 1.25rem;
 }
 
 
@@ -358,6 +463,22 @@ body {
   }
 
   .bottom_block {
-    padding: 5rem 4.5rem;
+    padding: 4rem 2rem;
+  }
+
+  .bottommost_block {
+    padding: 3rem 2rem;
+  }
+
+  .divisions .horizontal_info_panel {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 1rem;
+  }
+
+  .divisions .info_block + .info_block {
+    border-left: none;
+    border-top: 1px solid #E5E7EB;
+    padding-top: 1.5rem;
   }
 }
