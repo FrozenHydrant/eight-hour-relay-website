@@ -37,7 +37,19 @@ body {
     margin-left: auto;
 }
 
-.top_bar_info a {
+.top_bar_info .top_bar_normal {
+  display: inline-block;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #A0A8C8;
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.top_bar_bonus {
+  display: inline-block;
   font-size: 0.88rem;
   font-weight: 500;
   color: #A0A8C8;
@@ -316,5 +328,9 @@ body {
   .short_dropdown {
     padding: 0.7rem 0.35rem;
     font-size: 0.82rem;
+  }
+
+  .top_bar_bonus {
+    display: none;
   }
 }

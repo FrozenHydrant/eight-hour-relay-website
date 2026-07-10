@@ -38,7 +38,8 @@ body {
     margin-left: auto;
 }
 
-.top_bar_info a {
+.top_bar_info .top_bar_normal {
+  display: inline-block;
   font-size: 0.88rem;
   font-weight: 500;
   color: #A0A8C8;
@@ -51,6 +52,17 @@ body {
 .top_bar_info a:hover {
   color: #FFFFFF;
   background: rgba(108, 122, 224, 0.18);
+}
+
+.top_bar_bonus {
+  display: inline-block;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #A0A8C8;
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
 /* ── Page header ── */
@@ -206,7 +218,7 @@ body {
 /* ── Members table ── */
 .members_table {
   width: 100%;
-  max-width: 1100px;
+  max-width: 90%;
   margin: 0 auto;
   border-collapse: collapse;
   background: #FFFFFF;
@@ -311,5 +323,9 @@ body {
 
   .bottom_list_item {
     padding: 0.75rem 1rem;
+  }
+
+  .top_bar_bonus {
+    display: none;
   }
 }

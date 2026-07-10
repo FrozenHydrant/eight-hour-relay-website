@@ -2,18 +2,19 @@
 <html lang="en">
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/static/css/title_then_list.css">
 </head>
 
 <body>
   <div class="top_bar_info">
     <div class="top_bar_insides">
-      <a href="{{ url_for('index') }}">Home Page</a>
+      <a class="top_bar_normal" href="{{ url_for('index') }}">Home Page</a>
       {% if is_captain %}
-      <a href="{{ url_for('teams') }}">My Teams</a>
+      <a class="top_bar_normal" href="{{ url_for('teams') }}">My Teams</a>
       {% endif %}
-      <a href="{{ url_for('profile') }}">{{ user_email }}</a>
-      <a href="{{ url_for('logout') }}">Logout</a>
+      <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_email }}</a>
+      <a class="top_bar_bonus" href="{{ url_for('logout') }}">Logout</a>
     </div>
   </div>
   <div class="flashes">
