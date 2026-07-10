@@ -4,6 +4,19 @@ const SLIDE_IMAGES = [
   '/static/img/gallery1.jpg',
   '/static/img/gallery2.jpg',
   '/static/img/gallery3.jpg',
+  '/static/img/gallery4.jpg',
+  '/static/img/gallery5.jpg',
+  '/static/img/gallery6.jpg',
+  '/static/img/gallery7.jpg',
+  '/static/img/gallery8.jpg',
+  '/static/img/gallery9.jpg',
+  '/static/img/gallery10.jpg',
+  '/static/img/gallery11.jpg',
+  '/static/img/gallery12.jpg',
+  '/static/img/gallery13.jpg',
+  '/static/img/gallery14.jpg',
+  '/static/img/gallery15.jpg',
+  '/static/img/gallery16.jpg',
 ];
 
 const SLIDE_DURATION = 8000; // ms — must match animation duration in CSS
