@@ -282,14 +282,22 @@ body {
 .about,
 .registration_process,
 .faq_section,
-.venue_info {
+.race_format,
+.open_division,
+.masters_division,
+.venue_info,
+.team_reg,
+.timing,
+.safety {
   background: #F0F2F5;
 }
 
 .rules,
 .event_scheduling,
 .divisions,
-.awards {
+.mixed_division,
+.awards
+.relay_leg_rules {
   background: #FFFFFF;
 }
 

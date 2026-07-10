@@ -807,6 +807,10 @@ def admin_panel():
     teams = Data.get_all_teams_info()
     return render_template("teams.html", username="Awesome Eighthourrelay Admin", teams=teams)
 
+@app.route("/rules")
+def rules():
+    return render_template("rules.html")
+
 
 if __name__ == '__main__':
     app.run()

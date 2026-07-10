@@ -16,6 +16,9 @@
     <div class="top_bar_info">
       <div class="top_bar_insides">
         <a href="#about">Mission</a>
+        <a href="{{ url_for('rules') }}">Rules</a>
+        <a href="#reg_proc">Registration Process</a>
+        <a href="#venue">Venue Info</a>
         {% if not not_logged_in %}
         <a href="{{ url_for('profile') }}">{{ user_email }}</a>
         <a href="{{ url_for('logout') }}">Logout</a>
@@ -132,6 +135,7 @@
         <li>The team covering the greatest total distance within 8 hours wins.</li>
         <li>Only completed laps are counted.</li>
       </ul>
+      <a href="{{ url_for('rules') }}">View more detailed rules here</a>
     </div>
   </div>
 
@@ -164,7 +168,7 @@
     </div>
   </div>
 
-  <div class="bottom_block registration_process">
+  <div class="bottom_block registration_process" id="reg_proc">
     <h3 class="sub_title">Registration Process</h3>
     <div class="inner_text">
       <p class="inner_text">Each team registration requires the following information:</p>
@@ -205,7 +209,7 @@
     </div>
   </div>
 
-  <div class="bottom_block venue_info">
+  <div class="bottom_block venue_info" id="venue">
     <h3 class="sub_title">Venue Information</h3>
     <p class="inner_text">
       Location:

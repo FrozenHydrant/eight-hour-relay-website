@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+
+<body>
+    <div class="top_bar_info">
+      <div class="top_bar_insides">
+        <a href="{{ url_for('index') }}">Home</a>
+      </div>
+    </div>
+
+    <div class="bottom_block race_format">
+        <h3 class="sub_title">Race Format</h3>
+        <p class="inner_text">The BMAI 8-Hour Relay is a team endurance relay race held on a 400-metre track.
+            The objective is for each team to cover the greatest total distance within eight (8) hours.
+            Each team consists of eight (8) runners.
+            Runners compete in a fixed running order. Each runner completes two (2) relay legs of approximately 30
+            minutes each, for a total running time of approximately one (1) hour.
+            After all eight runners complete their first relay leg, the team repeats the same running order for the
+            second relay leg.
+            The team with the greatest adjusted total distance at the end of eight (8) hours will be declared the winner
+            of its division.
+        </p>
+    </div>
+
+    <div class="bottom_block divisions">
+        <h3 class="sub_title">Divisions</h3>
+        <p class="inner_text">
+            The event consists of three divisions:
+        </p>
+        <ul class="inner_text inside_list">
+            <li>Open Division</li>
+            <li>Mixed Division</li>
+            <li>Masters Division</li>
+        </ul>
+        <p class="inner_text">Each team must consist of eight (8) registered runners. More details follow:</p>
+    </div>
+
+    <div class="bottom_block open_division">
+        <h3 class="sub_title">Open Division</h3>
+        <p class="inner_text">
+        <ul class="inner_text inside_list">
+            <li>All runners must be 15 years of age or older on Race Day.</li>
+            <li>Participants aged 15–17 must have a parent or legal guardian sign the event waiver prior to
+                participating.</li>
+            <li>No gender restrictions.</li>
+            <li>Teams may consist of any combination of male and female runners.</li>
+        </ul>
+        </p>
+    </div>
+
+    <div class="bottom_block mixed_division">
+        <h3 class="sub_title">Mixed Division</h3>
+        <p class="inner_text">
+        <ul class="inner_text inside_list">
+            <li>All runners must be 15 years of age or older on Race Day.</li>
+            <li>Participants aged 15–17 must have a parent or legal guardian sign the event waiver prior to
+                participating.</li>
+            <li>Each team must consist of 4 male runners and 4 female runners.</li>
+        </ul>
+        </p>
+    </div>
+
+    <div class="bottom_block masters_division">
+        <h3 class="sub_title">Masters Division</h3>
+        <p class="inner_text">
+        <ul class="inner_text inside_list">
+            <li>All runners must be 50 years of age or older on Race Day.</li>
+            <li> Standard team composition: 4 men and 4 women.</li>
+        </ul>
+        </p>
+        <p class="inner_text">
+            Distance Adjustment:
+        </p>
+        <p class="inner_text">
+            For every one (1) additional male runner above four (4), 1 kilometre will be deducted from the team's final
+            distance.
+            For every one (1) additional female runner above four (4), 1 kilometre will be added to the team's final
+            distance.
+            i.e 4M/4F = 0 km,
+            5M/3F = -1 km,
+            6M/2F = -2 km,
+            7M/1F = -3 km,
+            8M/0F = -4 km,
+            3M/5F = +1 km,
+            2M/6F = +2 km,
+            1M/7F = +3 km,
+            0M/8F = +4 km,
+        </p>
+    </div>
+
+    <div class="bottom_block relay_leg_rules">
+        <h3 class="sub_title">Relay Leg Rules</h3>
+        <p class="inner_text">
+            Each runner must complete exactly two (2) relay legs.
+            The official duration of each relay leg is 30 minutes.
+            Because the race is conducted on a 400-metre track, relay exchanges must take place only after the incoming
+            runner completes a full lap.
+            Each relay leg may vary by up to three (3) minutes (27–33 minutes) to allow exchanges after a full lap.
+            Each team will be provided with one official Relay Tag for timing purposes. The Relay Tag must be
+            transferred between teammates within the designated Exchange Zone. Teams are responsible for ensuring the
+            Relay Tag is transferred correctly. Failure to properly transfer or carry the Relay Tag may result in missed
+            lap records, penalties, or disqualification.
+            Each runner may complete only two relay legs unless otherwise approved by the Race Director under
+            exceptional circumstances.
+        </p>
+    </div>
+
+    <div class="bottom_block team_reg">
+        <h3 class="sub_title">Team Registration & Running Order</h3>
+        <p class="inner_text">
+            By the registration deadline, each team must submit its team name, team captain, eight registered runners,
+            division, and running order (Runners 1–8). The running order is considered final after registration closes
+            unless approved by the Race Director.
+        </p>
+    </div>
+
+    <div class="bottom_block scoring">
+        <h3 class="sub_title">Scoring</h3>
+        <p class="inner_text">
+            The official result is based on the total distance completed within eight (8) hours. Masters Division
+            adjustments will be applied after the race.
+        </p>
+    </div>
+
+    <div class="bottom_block awards">
+        <h3 class="sub_title">Awards</h3>
+        <p class="inner_text">
+            Championship awards will be presented to the winning team in each division: Open Division, Mixed Division,
+            and Masters Division.
+        </p>
+    </div>
+
+    <div class="bottom_block relay_exchange_zone">
+        <h3 class="sub_title">Relay Exchange Zone</h3>
+        <p class="inner_text">
+            All relay exchanges must take place within the designated Exchange Zone. Failure to do so may result in a
+            penalty.
+        </p>
+    </div>
+
+    <div class="bottom_block timing">
+
+        <h3 class="sub_title">Timing and Lap Counting</h3>
+        <p class="inner_text">
+            The official race time is eight (8) hours. Lap counting stops immediately when the official race time
+            expires. Only laps fully completed before the official finish time will be counted.
+        </p>
+    </div>
+
+    <div class="bottom_block general_rules">
+        <h3 class="sub_title">General Rules</h3>
+        <ul class="inner_text inside_list">
+            <li>Each participant may compete for one team only.</li>
+            <li>All runners must wear their official race bib while competing.</li>
+            <li>Teams must follow all instructions from race officials and volunteers.</li>
+            <li>Unsportsmanlike conduct, cheating, or rule violations may result in penalties or disqualification.</li>
+        </ul>
+    </div>
+
+
+    <div class="bottom_block safety">
+        <h3 class="sub_title">Safety and Conduct</h3>
+        <p class="inner_text">
+            Participants must compete safely and in a sportsmanlike manner. Obstructing or intentionally interfering
+            with another runner is prohibited.
+        </p>
+    </div>
+
+
+    <div class="bottom_block rule_interpretation">
+        <h3 class="sub_title">Rule Interpretation and Amendments</h3>
+        <p class="inner_text">
+            The Race Director reserves the right to interpret, amend, and enforce these rules. The Event Organizer may
+            modify these rules prior to Race Day if necessary to ensure safety, fairness, and the smooth operation of
+            the event. Any changes will be communicated to all registered teams before Race Day.
+        </p>
+    </div>
+</body>
+
+</html>
