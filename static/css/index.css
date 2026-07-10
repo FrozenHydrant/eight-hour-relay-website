@@ -88,11 +88,12 @@ body {
   animation: slide-drift 10s ease both, slide-fade 10s ease both;
   z-index: -1;
   pointer-events: none;
+  background-position-y: top;
 }
 
 @keyframes slide-drift {
-  from { background-position: 80% center; }
-  to   { background-position: 20% center; }
+  from { background-position-x: left 80%; }
+  to   { background-position-x: left 20%; }
 }
 
 @keyframes slide-fade {
