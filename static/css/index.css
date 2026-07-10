@@ -446,6 +446,19 @@ body {
   margin-bottom: 1.25rem;
 }
 
+/* IMAGES */
+.images_display_grid_awesomely {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 420px 420px 420px;
+  justify-items: center;
+}
+
+.images_display_grid_awesomely img {
+  max-width: 360px;
+  margin-top: 1rem;
+}
+
 
 .flashes {
   position: fixed;
@@ -472,8 +485,29 @@ body {
 /* ══════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════ */
+@media (max-width: 1420px) {
+  .images_display_grid_awesomely {
+    grid-template-columns: 420px 420px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .images_display_grid_awesomely {
+    grid-template-columns: 420px;
+  }
+}
+
 @media (max-width: 640px) {
 
+  .images_display_grid_awesomely img {
+    max-width: 240px;
+  }
+
+  .images_display_grid_awesomely {
+    grid-template-columns: 240px;
+  }
+
+  }
   .countdown > h3 {
     font-size: 2.3rem;
   }
