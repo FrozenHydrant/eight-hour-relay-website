@@ -1,3 +1,42 @@
+// ── Slideshow ──────────────────────────────────────────────
+// Add your image paths here. Use as many as you like.
+const SLIDE_IMAGES = [
+  '/static/img/gallery1.jpg',
+  '/static/img/gallery2.jpg',
+  '/static/img/gallery3.jpg',
+];
+
+const SLIDE_DURATION = 8000; // ms — must match animation duration in CSS
+
+function slideshow() {
+    
+  const container = document.querySelector('.main_page');
+  let current = 0;
+  console.log(container)
+
+  function showSlide(index) {
+    const old = container.querySelector('.done');
+    if (old) old.remove();
+
+    const prev = container.querySelector('.slide');
+    if (prev) prev.classList.add('done');
+
+    const slide = document.createElement('div');
+    slide.className = 'slide';
+    slide.style.backgroundImage = `url('${SLIDE_IMAGES[index]}')`;
+    container.prepend(slide);
+  }
+
+  showSlide(current);
+  setInterval(() => {
+    current = (current + 1) % SLIDE_IMAGES.length;
+    showSlide(current);
+  }, SLIDE_DURATION);
+}
+
+window.addEventListener('load', slideshow)
+
+// ── Countdown ──────────────────────────────────────────────
 setInterval(update, 1000)
 
 function update() {
