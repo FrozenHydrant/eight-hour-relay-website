@@ -78,7 +78,7 @@ body {
 }
 
 .logo img {
-  height: 38px;
+  height: 4.5rem;
   width: auto;
   display: block;
 }
@@ -468,6 +468,10 @@ body {
 
   .logo {
     left: 1.25rem;
+  }
+
+  .logo img {
+    height: 2.6rem;
   }
 
   .bottom_block {
