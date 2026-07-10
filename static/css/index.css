@@ -36,9 +36,22 @@ body {
 .top_bar_insides {
     margin-right: 0;
     margin-left: auto;
+    white-space: nowrap;
 }
 
-.top_bar_info a {
+.top_bar_info .top_bar_normal {
+  display: inline-block;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #A0A8C8;
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.top_bar_bonus {
+  display: inline-block;
   font-size: 0.88rem;
   font-weight: 500;
   color: #A0A8C8;
@@ -66,7 +79,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 64px 1.5rem 3rem; /* 64px offsets the fixed bar */
+  padding: 6.9rem 1.5rem 3rem; 
   overflow: hidden;
 }
 
@@ -432,8 +445,9 @@ body {
    RESPONSIVE
 ══════════════════════════════════════ */
 @media (max-width: 640px) {
+
   .countdown > h3 {
-    font-size: 2.6rem;
+    font-size: 2.3rem;
   }
   
   .countdown_insides_horizontal {
@@ -471,7 +485,7 @@ body {
   }
 
   .logo img {
-    height: 2.6rem;
+    height: 3rem;
   }
 
   .bottom_block {
@@ -480,6 +494,7 @@ body {
 
   .bottommost_block {
     padding: 3rem 2rem;
+    overflow-wrap: anywhere;
   }
 
   .divisions .horizontal_info_panel {
@@ -493,4 +508,9 @@ body {
     border-top: 1px solid #E5E7EB;
     padding-top: 1.5rem;
   }
+
+  .top_bar_bonus {
+    display: none;
+  }
+
 }
