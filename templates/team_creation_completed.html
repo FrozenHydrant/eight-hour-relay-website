@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/css/generic_information_page.css">
+</head>
+
+<body>
+    <div class="bottom_panel">
+        <div class="main_content">
+            <h3 class="inner_title">Your Team Is Registered!</h3>
+            <p class="inner_text">Your Team Code is:</p>
+
+            <p class="inner_codeblock"><b>{{ token }}</b></p>
+            <p class="inner_text">Share this Team Code with your team members. Each runner must use this code to complete their individual registration.</p>
+            <button class="button">Copy Team Code</button>
+            <p class="inner_warn">Please do not lose your token! Please do not share it publicly! You cannot view it after this page!</p>
+            {% if not in_team %}
+            <a class="button" href="{{ url_for('runner_registration',token=token,team_id=team_info['id']) }}">Register Myself as a Runner</a>
+            {% endif %}
+            <a href="{{ url_for('team_information', team_id=team_info['id']) }}" class="button">Continue</a>
+        </div>
+    </div>
+</body>
+
+</html>

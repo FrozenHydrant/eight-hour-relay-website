@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/css/generic_information_page.css">
+</head>
+
+<body>
+
+    <div class="bottom_panel">
+        <div class="main_content">
+            <h3 class="inner_title">
+                Perform Team Payment
+            </h3>
+            <p class="inner_text">You are about to pay for your team <b>{{team_info["team_name"]}}</b>
+                {{team_info["division"]}}. Please make sure this is correct before proceeding. Once you press the "Pay
+                Now" button below, you will be redirected to Stripe to complete the payment. </p>
+            <form method="POST">
+                <input type="hidden" name="team_id" value="{{ team_info['id'] }}">
+                <button class="button">Pay Now</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

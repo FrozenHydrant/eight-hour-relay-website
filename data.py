@@ -269,12 +269,11 @@ class Data:
         return True
     
 
-    def generate_new_team_token(team_id: str):
-        token = secrets.token_urlsafe(3)
+    def set_team_token(team_id: str, token: str):
         try:
             _ = Data.client.table("teams_public").update({"encrypted_token": generate_password_hash(token)}).eq("id", team_id).execute()
         except Exception as e:
-            print("Problem during generating new team token,", e)
+            print("Problem during setting new team token,", e)
             return None
         return token
     
@@ -291,7 +290,7 @@ class Data:
 
 
     # Creates a team and returns the ID. None if failure.
-    def create_team(team_name: str, user_id: str, token: str, division: str, email: str, captain_name: str) -> str:
+    def create_team(team_name: str, user_id: str, division: str, email: str, captain_name: str) -> str:
         try:
             if Data.team_name_exists(team_name):
                 return None
@@ -301,7 +300,7 @@ class Data:
             if len(response.data) < 1:
                 return None
             team_id = str(response.data[0]["id"])
-            _ = Data.client.table("teams_public").insert({"id": team_id, "owner_id": user_id, "team_name": team_name, "division": division, "encrypted_token": generate_password_hash(token)}).execute()
+            _ = Data.client.table("teams_public").insert({"id": team_id, "owner_id": user_id, "team_name": team_name, "division": division}).execute()
             return team_id
         except Exception as e:
             print("Create team exception", e)

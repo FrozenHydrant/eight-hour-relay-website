@@ -68,19 +68,47 @@ class EmailSender:
             print(e)
             return False
         
-    
-    def send_team_payment_email(to_email: str, team_id: str, transaction_ids: list[str]):
+
+    def send_code_email(to_email: str, team_info: dict, token: str):
         if not all([EmailSender.smtp_host, EmailSender.smtp_user, EmailSender.smtp_password, EmailSender.from_email]):
             return False
         
         message = EmailMessage()
-        message["Subject"] = "Your team payment has been completed"
+        message["Subject"] = "Team registration successful"
         message["From"] = EmailSender.from_email
         message["To"] = to_email
         message.set_content(
             f"Hello,\n\n"
-            f"We successfully received payment for your team with ID {team_id}.\n"
-            f"Your transaction ID(s) are: {'\n'.join(transaction_ids)}\n\n"
+            f"Your team {team_info["team_name"]} with ID {team_info["id"]} has been registered successfully.\n"
+            f"Your Team Code is: {token}\n\n"
+            f"The Team Code is required for individual runner registration. You should share the Team Code with all team members. Every runner must register individually. If you also plan to run, you must complete the individual runner registration process on the home page.\n"
+            f"Thank you for participating!\n\n\n"
+            f"This is an automated email. Please DO NOT reply to this email."
+        )
+
+        try:
+            with smtplib.SMTP(EmailSender.smtp_host, EmailSender.smtp_port) as smtp:
+                smtp.starttls()
+                smtp.login(EmailSender.smtp_user, EmailSender.smtp_password)
+                smtp.send_message(message)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    
+    def send_team_payment_completed_email(to_email: str, team_id: str, transaction_ids: list[str]):
+        if not all([EmailSender.smtp_host, EmailSender.smtp_user, EmailSender.smtp_password, EmailSender.from_email]):
+            return False
+        
+        message = EmailMessage()
+        message["Subject"] = "Team payment successful"
+        message["From"] = EmailSender.from_email
+        message["To"] = to_email
+        message.set_content(
+            f"Hello,\n\n"
+            f"We successfully received payment for your team with ID {team_id}, and your team has been registered successfully.\n"
+            f"Your transaction ID(s) are: {'\n'.join(transaction_ids)}\n"
             f"If you have any questions, please contact support at vancouverrun@gmail.com with the transaction ID(s).\n\n"
             f"Thank you for participating!\n\n\n"
             f"This is an automated email. Please DO NOT reply to this email."

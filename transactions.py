@@ -55,7 +55,7 @@ class Transactions:
                         
                     # Send verification email
                     #print(email, team_id, transaction_ids)
-                    EmailSender.send_team_payment_email(email, team_id, transaction_ids)
+                    EmailSender.send_team_payment_completed_email(email, team_id, transaction_ids)
 
                     # Fulfilled as long as both, no all, above succeeded
                     checkout_session.update({"metadata": {"fulfilled": True}})

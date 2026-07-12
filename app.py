@@ -48,12 +48,13 @@ def user_logout_status(access_token=None):
         return None
 
 
+# TODO: CSRF security
 def cookie_options():
     return {
         "path": "/",
         "httponly": True,
         "secure": not app.debug,
-        "samesite": "Strict",
+        "samesite": "Lax",
     }
 
 
@@ -223,13 +224,37 @@ def captain_registration_post():
         flash("You are already a Captain!")
         return redirect(url_for("teams"))
 
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+    gender = request.form.get("gender")
+    birthyear = request.form.get("birthyear")
+    birthmonth = request.form.get("birthmonth")
+    birthday = request.form.get("birthday")
+    phone_number = request.form.get("phone_number")
 
-    # Update
+    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number], [first_name, last_name], [gender])
+    if not success:
+        return redirect(url_for("captain_registration"))
+    
+    birthdate = None
     try:
+        birthdate = dt.datetime(int(birthyear), int(birthmonth), int(birthday))
+    except Exception as e:
+        flash("Bad birthdate entered.")
+        return redirect(url_for("captain_registration"))
+    
+    # Calculate age via birthdate
+    age = relativedelta.relativedelta(dt.datetime.now(), birthdate).years
+    #print(age)
+    
+    # Do captain enrollment
+    try:
+        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "birthdate": birthdate.strftime("%m/%d/%Y"), "phone_number": phone_number})
         _ = Data.upsert_captain_status(user.id, True)
     except Exception as e:
         flash(str(e))
         print(e, "captain reg failed")
+        return redirect(url_for("captain_registration"))
     return redirect(url_for("team_registration"))
 
 
@@ -283,7 +308,22 @@ def runner_registration():
     user = user_logout_status()
     if not user:
         return redirect(url_for("login", next_page="runner_registration"))
-    
+    # Autofill some information
+    token = request.args.get("token")
+    team_id = request.args.get("team_id")
+    team_name = None
+    team_division = None
+
+    #
+    if team_id is not None:
+        team_basic_info = Data.get_team_basic_info(team_id)
+        # Bad team id specified -> just don't give
+        if team_basic_info is None:
+            team_id = None
+        else: 
+            team_name = team_basic_info["team_name"]
+            team_division = team_basic_info["division"]
+
     # Make sure we are not in any teams beforehand
     enrolled_team = Data.get_enrolled_team(user.id)
     if enrolled_team is not None:
@@ -307,8 +347,10 @@ def runner_registration():
     for k in user_info:
         if user_info[k] is None:
             user_info[k] = ""
+    if token is None:
+        token = ""
 
-    return render_template("registration_runner.html", teams=teams, user_info=user_info, genders_mapping=GENDERS_MAPPING)
+    return render_template("registration_runner.html", teams=teams, user_info=user_info, token=token, team_id=team_id, team_name=team_name, team_division=team_division, genders_mapping=GENDERS_MAPPING)
 
 @app.route("/runner_registration", methods=["POST"])
 def runner_registration_post():
@@ -539,42 +581,113 @@ def team_registration_post():
         flash("A team with that name already exists. Please choose another name.")
         return redirect(url_for("team_registration"))
     
-    token = secrets.token_urlsafe(3)
-
     # Add table entry
-    team_id: str = Data.create_team(team_name, user.id, token, division, user.email, captain_name)
+    team_id: str = Data.create_team(team_name, user.id, division, user.email, captain_name)
     if team_id is None:
         return redirect(url_for("error_page"))
     
-    return redirect(url_for("team_created", team_token=token, team_id=team_id))
+    return redirect(url_for("team_payment_page", team_id=team_id))
 
 
-@app.route("/team_created")
-def team_created():
+@app.route("/team_payment_page")
+def team_payment_page():
     user = user_logout_status()
     if not user:
         return redirect(url_for("login"))
-
+    
     # Only captains
     if Data.get_captain_status(user.id) != 2:
         return redirect(url_for("index"))
     
+    # Get the team ID
     team_id = request.args.get("team_id")
-    team_token = request.args.get("team_token")
+    team_info = Data.get_team_basic_info(team_id)
+
+    if team_info is None:
+        flash("A problem occured when trying to pay for this team!")
+        return redirect(url_for("team_information", team_id=team_id))
     
-    if team_id is None or team_token is None:
+    if team_id not in Data.get_owned_teams(user.id):
+        flash("You don't own the team you are trying to pay for!")
+        return redirect(url_for("team_information", team_id=team_id))
+    
+    payment_state = Data.get_team_info(team_id)["paid"]
+    if payment_state:
         return redirect(url_for("error_page"))
     
-    # Then check if everything is correct (we didn't do anything silly like modify the url)
-    success = Data.check_team_table_credentials(team_id, team_token)
+    return render_template("team_payment_page.html", team_info=team_info)
+
+
+@app.route("/team_payment_page", methods=["POST"])
+def team_payment_page_post():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+
+    # Only captains are allowed!
+    if Data.get_captain_status(user.id) != 2:
+        return redirect(url_for("index"))
+
+    team_id = request.form.get("team_id")
+
+    if team_id is None:
+        return redirect(url_for("error_page"))
+    
+    # And we own the team which has not been paid
+    owned = Data.get_owned_teams(user.id)
+    if team_id not in owned:
+        return redirect(url_for("index"))
+    
+    payment_state = Data.get_team_info(team_id)["paid"]
+    if payment_state:
+        return redirect(url_for("error_page"))
+    
+    back_url = request.host_url + url_for("team_creation_completed", team_id=team_id)
+    print(back_url)
+    payment_link = s_client.v1.payment_links.create({
+        "line_items": [{"price": s_price_id, "quantity": 1}],
+        "metadata": {"team_id": team_id, "user_id": user.id},
+        "after_completion": {"type": "redirect", "redirect": {"url": back_url}}
+    })
+    
+    return redirect(payment_link.url)
+
+
+@app.route("/team_creation_completed")
+def team_creation_completed():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+    
     owned_teams = Data.get_owned_teams(user.id)
-
-    if not success or team_id not in owned_teams:
+    team_id = request.args.get("team_id")
+    if team_id not in owned_teams:
+        #print("Team nonexistent")
         return redirect(url_for("error_page"))
     
-    return render_template("team_created.html", team_id=team_id, team_token=team_token)
+    team_info = Data.get_team_info(team_id)
+    team_basic_info = Data.get_team_basic_info(team_id)
+    
+    if team_info is None or not team_info["paid"]:
+        #print("Unpaid")
+        return redirect(url_for("error_page"))
+
+    if team_basic_info is None or team_basic_info["encrypted_token"] is not None:
+        #print("Token already set")
+        return redirect(url_for("error_page"))
+    
+    token = secrets.token_hex(3)
+
+    in_team = False
+    if Data.get_enrolled_team(user.id) is not None:
+        in_team = True
+
+    _ = Data.set_team_token(team_id, token)
+    EmailSender.send_code_email(user.email, team_basic_info, token)
+    return render_template("team_creation_completed.html", token=token, team_info=team_basic_info, in_team=in_team)
 
 
+# TODO: update payments so page doesn't crash
 @app.route("/team_information")
 def team_information():
     user = user_logout_status()
@@ -645,29 +758,6 @@ def team_information():
     return render_template("team_information.html", user_email=user.email, team=team_info, is_captain=is_captain, members=combined_member_infos, genders_mapping=GENDERS_MAPPING)
 
 
-@app.route("/team_token_reset")
-def team_token_reset():
-    user = user_logout_status()
-    if not user:
-        return redirect(url_for("login"))
-
-    # Get team id
-    team_id = request.args.get("team_id")
-    if team_id is None:
-        return redirect(url_for("error_page"))
-    
-    # Check if we actually have permission to modify this team (i.e we own it)
-    owned_teams = Data.get_owned_teams(user.id)
-    if team_id not in owned_teams:
-        return redirect(url_for("error_page"))
-    
-    new_token = Data.generate_new_team_token(team_id)
-    if new_token is None:
-        return redirect(url_for("error_page"))
-    
-    return render_template("team_token_reset.html", team_token=new_token, team_id=team_id)
-
-
 @app.route("/teams")
 def teams():
     user = user_logout_status()
@@ -704,39 +794,6 @@ def delete_from_team():
     else:
         flash("Problem occured while deleting member.")
     return redirect(url_for("team_information", team_id=team_id))
-
-
-#TODO: critical actions should use post requests not get requests
-@app.route("/team_payment")
-def team_payment():
-    user = user_logout_status()
-    if not user:
-        return redirect(url_for("login"))
-
-    # Only captains are allowed!
-    if Data.get_captain_status(user.id) != 2:
-        return redirect(url_for("index"))
-
-    team_id = request.args.get("team_id")
-
-    if team_id is None:
-        return redirect(url_for("error_page"))
-    
-    # And we own the team which has not been paid
-    owned = Data.get_owned_teams(user.id)
-    if team_id not in owned:
-        return redirect(url_for("index"))
-    
-    payment_state = Data.get_team_info(team_id)["paid"]
-    if payment_state:
-        return redirect(url_for("error_page"))
-    
-    payment_link = s_client.v1.payment_links.create({
-        "line_items": [{"price": s_price_id, "quantity": 1}],
-        "metadata": {"team_id": team_id, "user_id": user.id}
-    })
-    
-    return redirect(payment_link.url)
 
 
 # https://docs.stripe.com/webhooks

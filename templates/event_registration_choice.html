@@ -2,29 +2,40 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="/static/css/generic_boxes.css">
+    <link rel="stylesheet" href="/static/css/generic_information_page.css">
 </head>
 
 <body>
     <div class="top_panel">
         <h1 class="main_title">Registration</h1>
-        <p class="inner_text">The Team Captain must register the team first. After the team has been successfully
-            registered, they will receive a Team Code. The Team Captain then shares this code with all team members so
-            that they can complete their individual runner registrations.</p>
+        <ul class="inner_text">The Team Captain must register the team before individual runners can join.
+            <li>Each team consists of 8 runners.</li>
+            <li>Each runner must complete their own individual registration.</li>
+            <li>Each runner must personally review and accept the Event Waiver.</li>
+            <li>The Team Captain cannot accept the Waiver on behalf of other runners.</li>
+            <li>If the Team Captain will participate as one of the 8 runners, the Captain must also complete an
+                individual
+                runner registration.</li>
+            <li>Only the Team Captain pays the team registration fee.</li>
+            <li>Individual runners do not make a separate registration payment.</li>
+            <li>A runner cannot join a team without a valid Team Code.</li>
+        </ul>
     </div>
     <div class="bottom_panel">
         <div class="main_content">
             <h3 class="inner_title">
                 Register a Team
             </h3>
-            <p class="inner_text">For Team Captains. Create your team, pay the registration free, and receive your Team Code.</p>
+            <p class="inner_text">For Team Captains. Create your team, pay the registration free, and receive your Team
+                Code.</p>
             <a class="button" href="{{ url_for('captain_registration') }}">REGISTER A TEAM</a>
         </div>
         <div class="main_content">
             <h3 class="inner_title">
                 Join my Team
             </h3>
-            <p class="inner_text">For individual runners. Before you proceed, you must have a valid Team Code and know the ID/Name of your team. Ask your captain for this information after they have made a team!</p>
+            <p class="inner_text">For individual runners. Before you proceed, you must have a valid Team Code and know
+                the ID/Name of your team. Ask your captain for this information after they have made a team!</p>
             <a class="button" href="{{ url_for('runner_registration') }}">JOIN MY TEAM</a>
         </div>
     </div>

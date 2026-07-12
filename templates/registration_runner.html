@@ -71,12 +71,17 @@
         value="{{ user_info['emergency_phone'] }}" required>
 
       <select name="team_id" class="dropdown" required>
+
+        {% if not team_id %}
         <option disabled selected value> -- select a team -- </option>
+        {% else %}
+        <option selected value="{{ team_id }}">{{ team_id }} {{ team_name }} {{ team_division }}</option>
+        {% endif %}
         {% for team in teams %}
         <option value="{{ team['id'] }}">{{ team['id'] }} {{ team["team_name"] }} ({{ team["division"] }})</option>
         {% endfor %}
       </select>
-      <input type="password" class="text_input" name="team_token" placeholder="Team Code" required>
+      <input type="password" class="text_input" name="team_token" placeholder="Team Code" value="{{ token }}" required>
       <div class="waiver_block">
         <a href="#" onclick="openWaiver(); return false;">Open waiver</a>
         <label class="waiver_label" for="waiverCheckbox">

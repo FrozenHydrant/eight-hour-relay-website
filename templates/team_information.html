@@ -40,14 +40,11 @@
     <p class="inner_text">Team Captain Name: {{ team["captain_name"] }}</p>
     <p class="inner_text">Team Email: {{ team["email"] }}</p>
     {% if is_captain %}
-    <div class="token_regeneration">
-      <a class="top_button" href="{{ url_for('team_token_reset',team_id=team['id']) }}">Regenerate Team Code</a>
-      <p class="inner_note">Invalidate your old token and create a new one.</p>
-    </div>
     {% if not team["paid"] %}
     <div class="payment">
-      <a class="top_button" href="{{ url_for('team_payment',team_id=team['id'])}}">Team Payment</a>
+      <a class="top_button" href="{{ url_for('team_payment_page',team_id=team['id'])}}">Team Payment</a>
     </div>
+    <p class="inner_warn"> You must make a payment for your team before you can obtain your Team Code to invite others.</p>
     {% endif %}
     {% endif %}
   </div>
