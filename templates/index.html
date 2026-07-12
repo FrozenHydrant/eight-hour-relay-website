@@ -52,13 +52,14 @@
     <div class="buttons">
       {% if not_logged_in or is_undecided or is_captain %}
       {% if not is_captain %}
-      <a href="{{ url_for('captain_registration') }}">
-        Register Team Now
+      <a href="{{ url_for('event_registration_choice') }}">
+        Register for Event
       </a>
-      {% endif %}
+      {% else %}
       <a href="{{ url_for('runner_registration') }}">
         Register as Runner
       </a>
+      {% endif %}
       {% endif %}
 
       {% if not is_undecided and not is_captain %}

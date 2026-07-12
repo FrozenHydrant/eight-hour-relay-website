@@ -81,13 +81,6 @@ def generate_uncookied_response(response, keys):
     return uncookied_response
 
 
-@app.after_request
-def add_no_cache_headers(response):
-    response.headers["Cache-Control"] = "private, no-store, no-cache, must-revalidate"
-    response.headers["Pragma"] = "no-cache"
-    return response
-
-
 # Routes <Main Page>
 @app.route('/')
 def index():
@@ -229,7 +222,7 @@ def captain_registration_post():
     except Exception as e:
         flash(str(e))
         print(e, "captain reg failed")
-    return redirect(url_for("teams"))
+    return redirect(url_for("team_registration"))
 
 
 # Login for the whole website
@@ -787,6 +780,16 @@ def move_team_member_up():
     else:
         flash("Unexpected failure while changing runner ordering.")
     return redirect(url_for("team_information", team_id=team_id))
+
+
+@app.route("/event_registration_choice")
+def event_registration_choice():
+    user = user_logout_status()
+    if not user:
+        flash("Login or create an account before registering for this event!")
+        return redirect(url_for("login"))
+    
+    return render_template("event_registration_choice.html")
 
 
 @app.route("/error_page")

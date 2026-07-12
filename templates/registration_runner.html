@@ -76,7 +76,7 @@
         <option value="{{ team['id'] }}">{{ team['id'] }} {{ team["team_name"] }} ({{ team["division"] }})</option>
         {% endfor %}
       </select>
-      <input type="password" class="text_input" name="team_token" placeholder="Team Token" required>
+      <input type="password" class="text_input" name="team_token" placeholder="Team Code" required>
       <div class="waiver_block">
         <a href="#" onclick="openWaiver(); return false;">Open waiver</a>
         <label class="waiver_label" for="waiverCheckbox">
@@ -88,7 +88,7 @@
     </form>
   </div>
   <div class="extra_text">
-    <p>If you don't know your Team ID / Team Token, ask your team captain.</p>
+    <p>If you don't know your Team ID / Team Code, ask your team captain.</p>
     <p>Have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
   </div>
   <div class="flashes">

@@ -41,7 +41,7 @@
     <p class="inner_text">Team Email: {{ team["email"] }}</p>
     {% if is_captain %}
     <div class="token_regeneration">
-      <a class="top_button" href="{{ url_for('team_token_reset',team_id=team['id']) }}">Regenerate Team Token</a>
+      <a class="top_button" href="{{ url_for('team_token_reset',team_id=team['id']) }}">Regenerate Team Code</a>
       <p class="inner_note">Invalidate your old token and create a new one.</p>
     </div>
     {% if not team["paid"] %}

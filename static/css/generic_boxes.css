@@ -14,7 +14,45 @@ body {
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
+  background-color: #e6e8eb;
+  gap: 2rem;
+}
+
+.top_panel {
+  width: 100%;
+  max-width: 920px;
+  text-align: center;
+  padding: 1.5rem;
+  background: #fffffe;
+  border-radius: 16px;
+  box-shadow:
+    0 4px 24px rgba(30, 34, 53, 0.18),
+    0 1px 4px rgba(30, 34, 53, 0.10);
+}
+
+.main_title {
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
   color: #1E2235;
+  margin: 0 0 0.75rem;
+}
+
+.top_panel .inner_text {
+  color: #4B5563;
+  line-height: 1.7;
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.bottom_panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 920px;
+  align-items: stretch;
 }
 
 .main_content {
@@ -22,10 +60,16 @@ body {
   border-radius: 16px;
   padding: 2.5rem 2.25rem;
   width: 100%;
-  max-width: 440px;
+  flex: 1;
   box-shadow:
     0 4px 24px rgba(30, 34, 53, 0.18),
     0 1px 4px rgba(30, 34, 53, 0.10);
+  display: flex;
+  flex-direction: column;
+}
+
+.main_content .button {
+  margin-top: auto;
 }
 
 .inner_title {
@@ -59,6 +103,8 @@ body {
     background 0.15s ease,
     transform 0.1s ease,
     box-shadow 0.15s ease;
+  text-decoration: none;
+  text-align: center;
 }
 
 .button:hover {
@@ -71,8 +117,16 @@ body {
   box-shadow: none;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
+  .bottom_panel {
+    flex-direction: column;
+  }
+
   .main_content {
     padding: 2rem 1.5rem;
+  }
+
+  .main_title {
+    font-size: 1.6rem;
   }
 }

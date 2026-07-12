@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/css/generic_boxes.css">
+</head>
+
+<body>
+    <div class="top_panel">
+        <h1 class="main_title">Registration</h1>
+        <p class="inner_text">The Team Captain must register the team first. After the team has been successfully
+            registered, they will receive a Team Code. The Team Captain then shares this code with all team members so
+            that they can complete their individual runner registrations.</p>
+    </div>
+    <div class="bottom_panel">
+        <div class="main_content">
+            <h3 class="inner_title">
+                Register a Team
+            </h3>
+            <p class="inner_text">For Team Captains. Create your team, pay the registration free, and receive your Team Code.</p>
+            <a class="button" href="{{ url_for('captain_registration') }}">REGISTER A TEAM</a>
+        </div>
+        <div class="main_content">
+            <h3 class="inner_title">
+                Join my Team
+            </h3>
+            <p class="inner_text">For individual runners. Before you proceed, you must have a valid Team Code and know the ID/Name of your team. Ask your captain for this information after they have made a team!</p>
+            <a class="button" href="{{ url_for('runner_registration') }}">JOIN MY TEAM</a>
+        </div>
+    </div>
+</body>
+
+</html>
