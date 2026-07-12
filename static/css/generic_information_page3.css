@@ -87,6 +87,34 @@ body {
   line-height: 1.6;
 }
 
+.inner_codeblock {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  background: rgba(108, 122, 224, 0.18);
+  border: 1px solid rgba(108, 122, 224, 0.4);
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.75rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+  word-break: break-all;
+}
+
+.inner_warn {
+  font-size: 0.8rem;
+  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .button {
   width: 100%;
   padding: 0.85rem 1rem;

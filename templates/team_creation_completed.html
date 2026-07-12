@@ -2,7 +2,8 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="/static/css/generic_information_page2.css">
+    <link rel="stylesheet" href="/static/css/generic_information_page3.css">
+    <script type="text/javascript" src="/static/js/team_creation_completed.js"></script>
 </head>
 
 <body>
@@ -11,9 +12,9 @@
             <h3 class="inner_title">Your Team Is Registered!</h3>
             <p class="inner_text">Your Team Code is:</p>
 
-            <p class="inner_codeblock"><b>{{ token }}</b></p>
+            <p class="inner_codeblock" id="token">{{ token }}</p>
             <p class="inner_text">Share this Team Code with your team members. Each runner must use this code to complete their individual registration.</p>
-            <button class="button">Copy Team Code</button>
+            <button class="button" onclick="copy_to_clipboard('token')">Copy Team Code</button>
             <p class="inner_warn">Please do not lose your token! Please do not share it publicly! You cannot view it after this page!</p>
             {% if not in_team %}
             <a class="button" href="{{ url_for('runner_registration',token=token,team_id=team_info['id']) }}">Register Myself as a Runner</a>
