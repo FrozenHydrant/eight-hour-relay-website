@@ -683,7 +683,9 @@ def team_creation_completed():
         in_team = True
 
     _ = Data.set_team_token(team_id, token)
-    EmailSender.send_code_email(user.email, team_basic_info, token)
+    code_s = EmailSender.send_code_email(user.email, team_basic_info, token)
+    if not code_s:
+        print("Problem sending team code email!")
     return render_template("team_creation_completed.html", token=token, team_info=team_basic_info, in_team=in_team)
 
 
