@@ -57,6 +57,14 @@ def cookie_options():
     }
 
 
+@app.after_request
+def add_cache_headers(response):
+    # Cache static assets for 31 days
+    if request.path.startswith('/static/'):
+        response.headers['Cache-Control'] = 'public, max-age=2678400, immutable'
+    return response
+
+
 def generate_cookied_response(response, key_value):
     cookied_response = make_response(response)
     cookied_response.set_cookie(
