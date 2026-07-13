@@ -77,8 +77,14 @@
         {% else %}
         <option selected value="{{ team_id }}">{{ team_id }} {{ team_name }} {{ team_division }}</option>
         {% endif %}
-        {% for team in teams %}
+
+        {% for team in owned_teams %}
         <option value="{{ team['id'] }}">{{ team['id'] }} {{ team["team_name"] }} ({{ team["division"] }})</option>
+        {% endfor %}
+
+        {% for team in teams %}
+        <option value="{{ team['id'] }}">{{ team['id'] }} {{
+          team["team_name"] }} ({{ team["division"] }})</option>
         {% endfor %}
       </select>
       <input type="password" class="text_input" name="team_token" placeholder="Team Code" value="{{ token }}" required>
@@ -96,14 +102,15 @@
         <input type="text" class="text_input" name="parent_relationship" placeholder="Relationship to Participant">
         <p class="inner_bonus_text">
           Parent/Guardian must read and complete the following:
-          By typing "I CONFIRM" in the box below, I confirm that I am the parent or legal guardian of the minor participant.
+          By typing "I CONFIRM" in the box below, I confirm that I am the parent or legal guardian of the minor
+          participant.
           I have reviewed the BMAI 8-Hour
           Relay Participant Waiver, Assumption of Risk, Release of Liability and Indemnity Agreement, understand the
           nature and risks of the Event, consent to the minor participant’s participation, authorize emergency medical
           treatment when reasonably necessary, and agree to the Parent/Legal Guardian Consent and Acknowledgement
           provisions contained in this Agreement.
         </p>
-        <input type="text" class="text_input" name="parent_signature" placeholder="I CONFIRM"> 
+        <input type="text" class="text_input" name="parent_signature" placeholder="I CONFIRM">
       </div>
       <button id="joinTeamButton" class="submit">Join this Team</button>
     </form>

@@ -333,11 +333,11 @@ def runner_registration():
         return redirect(url_for("index"))
 
     # And if we are a captain, only let us join our own team...
+    owned_teams = []
     if Data.get_captain_status(user.id) == 2:
         flash("Note: As a captain, you can only register into a team you own.")
-        teams = Data.get_owned_teams_info(user.id)
-    else:
-        teams = Data.get_all_teams_info()
+        owned_teams = Data.get_owned_teams_info(user.id)
+    teams = Data.get_all_teams_info()
 
     # Ensure runner record exists and pass existing info to the form so fields can be prefilled
     users_info = Data.get_members_info([user.id])
@@ -352,7 +352,7 @@ def runner_registration():
     if token is None:
         token = ""
 
-    return render_template("registration_runner.html", teams=teams, user_info=user_info, token=token, team_id=team_id, team_name=team_name, team_division=team_division, genders_mapping=GENDERS_MAPPING)
+    return render_template("registration_runner.html", teams=teams, owned_teams=owned_teams, user_info=user_info, token=token, team_id=team_id, team_name=team_name, team_division=team_division, genders_mapping=GENDERS_MAPPING)
 
 @app.route("/runner_registration", methods=["POST"])
 def runner_registration_post():
