@@ -4,7 +4,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/static/css/registration2.css">
-  <script src="/static/js/registration_runner3.js"></script>
+  <script src="/static/js/registration_runner4.js"></script>
 </head>
 
 <body>
@@ -83,7 +83,7 @@
         {% endfor %}
 
         {% for team in teams %}
-        <option value="{{ team['id'] }}" {% if owned_teams|length > 0 %}disabled{% endif %}>{{ team['id'] }} {{
+        <option value="{{ team['id'] }}" {% if owned_teams|length> 0 %}disabled{% endif %}>{{ team['id'] }} {{
           team["team_name"] }} ({{ team["division"] }})</option>
         {% endfor %}
       </select>
@@ -96,21 +96,25 @@
         </label>
       </div>
       <div class="parent_block">
-        <p class="inner_text">Parent/Guardian Information must be filled out because you will be under 19 years old when
-          the event happens..</p>
-        <input type="text" class="text_input" name="parent_name" placeholder="Parent/Guardian Full Name">
+        <h3 class="inner_title">Minor Participant Parent/Guardian Consent</h3>
+        <input type="text" class="text_input" name="parent_name" placeholder="Parent/Guardian Full Legal Name">
         <input type="text" class="text_input" name="parent_relationship" placeholder="Relationship to Participant">
         <p class="inner_bonus_text">
-          Parent/Guardian must read and complete the following:
-          By typing "I CONFIRM" in the box below, I confirm that I am the parent or legal guardian of the minor
-          participant.
-          I have reviewed the BMAI 8-Hour
-          Relay Participant Waiver, Assumption of Risk, Release of Liability and Indemnity Agreement, understand the
-          nature and risks of the Event, consent to the minor participant’s participation, authorize emergency medical
-          treatment when reasonably necessary, and agree to the Parent/Legal Guardian Consent and Acknowledgement
-          provisions contained in this Agreement.
+          I, the undersigned parent/legal guardian of the minor participant, hereby grant full permission for this
+          child to take part in the Vancouver Sun Run event. I acknowledge that I fully understand all event risks,
+          hazards and safety rules of the race. I agree to release the Vancouver Sun Run organizing committee, its
+          staff, sponsors and venue operators from any liability for injury, accident or loss occurring during the
+          event. I confirm I have the full legal authority to sign this consent on behalf of the minor.
         </p>
-        <input type="text" class="text_input" name="parent_signature" placeholder="I CONFIRM">
+        <label class="waiver_label" for="parentCheckbox">
+          <input type="checkbox" id="parentCheckbox" name="parent_agreed">
+          I have read, understood, and agree to the above parent/guardian consent statement.
+        </label>
+        <p class="inner_bonus_text">Please enter your full legal name below to act as your electronic signature. </p>
+        <input type="text" class="text_input" name="parent_confirm_name"
+          placeholder="Re-Enter Parent/Guardian Full Legal Name">
+        <p class="inner_bonus_text">Please only enter letters, spaces, and hyphens and apostrophes. No numbers or
+          special characters.</p>
       </div>
       <button id="joinTeamButton" class="submit">Join this Team</button>
     </form>

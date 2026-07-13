@@ -5,12 +5,18 @@ function openWaiver() {
 
 function updateSubmitButton() {
   const checkbox = document.getElementById('waiverCheckbox');
+  const parentCheckbox = document.getElementById('parentCheckbox');
   const submitButton = document.getElementById('joinTeamButton');
   const inputs = Array.from(document.querySelectorAll('input:not([type="checkbox"]), select'));
   const allFieldsValid = inputs.every(function (input) {
     return validateField(input);
   });
-  const canSubmit = checkbox.checked && allFieldsValid;
+
+  const parentBlock = document.querySelector('.parent_block');
+  const parentBlockVisible = parentBlock && parentBlock.style.display !== 'none';
+  const parentCheckboxOk = !parentBlockVisible || (parentCheckbox && parentCheckbox.checked);
+
+  const canSubmit = checkbox.checked && parentCheckboxOk && allFieldsValid;
 
   submitButton.disabled = !canSubmit;
   submitButton.classList.toggle('disabled_button', !canSubmit);
@@ -109,9 +115,15 @@ function validateField(input) {
         ? true
         : isValidName(value);
       break;
-    case 'parent_signature':
-      isValid = !parentBlockVisible ? true : value === 'I CONFIRM';
+    case 'parent_confirm_name': {
+      if (!parentBlockVisible) {
+        isValid = true;
+      } else {
+        const parentName = document.querySelector('input[name="parent_name"]');
+        isValid = isValidName(value) && parentName && value === parentName.value.trim();
+      }
       break;
+    }
     case 'age':
       isValid = isValidAge(value);
       break;
@@ -138,16 +150,29 @@ function validateField(input) {
 
 document.addEventListener('DOMContentLoaded', function () {
   const checkbox = document.getElementById('waiverCheckbox');
+  const parentCheckbox = document.getElementById('parentCheckbox');
   const submitButton = document.getElementById('joinTeamButton');
   const inputs = Array.from(document.querySelectorAll('input:not([type="checkbox"]), select'));
 
   submitButton.disabled = true;
   submitButton.classList.add('disabled_button');
   checkbox.addEventListener('change', updateSubmitButton);
+  if (parentCheckbox) {
+    parentCheckbox.addEventListener('change', updateSubmitButton);
+  }
 
   inputs.forEach(function (input) {
     input.addEventListener('input', function () {
       validateField(input);
+      // Re-validate parent_confirm_name whenever parent_name changes, and vice versa
+      if (input.name === 'parent_name') {
+        const confirmInput = document.querySelector('input[name="parent_confirm_name"]');
+        if (confirmInput) validateField(confirmInput);
+      }
+      if (input.name === 'parent_confirm_name') {
+        const nameInput = document.querySelector('input[name="parent_name"]');
+        if (nameInput) validateField(nameInput);
+      }
       updateSubmitButton();
     });
     input.addEventListener('change', function () {
@@ -155,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
       updateSubmitButton();
       if (['birthyear', 'birthmonth', 'birthday'].includes(input.name)) {
         updateParentBlock();
+        updateSubmitButton();
       }
     });
   });

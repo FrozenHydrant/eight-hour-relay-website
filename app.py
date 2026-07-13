@@ -412,18 +412,23 @@ def runner_registration_post():
     parent_relationship = None
     if age < 19:
         # Now get them from the form
+        parent_agreed = request.form.get("parent_agreed") == "on"
         parent_name = request.form.get("parent_name")
         parent_relationship = request.form.get("parent_relationship")
-        parent_signature = request.form.get("parent_signature")
 
         if not Sanitization.verify_all_lists_and_create_response([], [], [], [], [parent_name, parent_relationship], []):
             flash("Check your parent information and try again!")
             return redirect(url_for("runner_registration"))
         
-        if parent_signature != "I CONFIRM":
-            flash("Parent must type 'I CONFIRM' in the box!")
+        parent_confirm_name = request.form.get("parent_confirm_name")
+
+        if parent_confirm_name != parent_name:
+            flash("Parent Name and Confirm Parent Name do not match")
             return redirect(url_for("runner_registration"))
         
+        if not parent_agreed:
+            flash("Parent must agree to the parent consent statemet!")
+            return redirect(url_for("runner_registration"))
 
     team_division = None
     team_basic_info = Data.get_team_basic_info(team_id)
