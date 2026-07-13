@@ -62,6 +62,27 @@ function isValidAge(value) {
   return true;
 }
 
+function updateParentBlock() {
+  const year = parseInt(document.querySelector('select[name="birthyear"]').value, 10);
+  const month = parseInt(document.querySelector('select[name="birthmonth"]').value, 10);
+  const day = parseInt(document.querySelector('select[name="birthday"]').value, 10);
+  const parentBlock = document.querySelector('.parent_block');
+
+  if (!parentBlock) return;
+
+  if (isNaN(year) || isNaN(month) || isNaN(day)) {
+    parentBlock.style.display = 'none';
+    return;
+  }
+
+  const eventDate = new Date(2026, 8, 12); // September 12, 2026 (month is 0-indexed)
+  const birthDate = new Date(year, month - 1, day);
+  const ageOnEventDate = new Date(eventDate - birthDate);
+  const age = Math.abs(ageOnEventDate.getUTCFullYear() - 1970);
+
+  parentBlock.style.display = age >= 19 ? 'none' : 'flex';
+}
+
 function isValidTeamSelection(value) {
   return value !== '' && value !== 'undefined';
 }
@@ -75,11 +96,21 @@ function validateField(input) {
   const value = input.value.trim();
   let isValid = true;
 
+  const parentBlock = document.querySelector('.parent_block');
+  const parentBlockVisible = parentBlock && parentBlock.style.display !== 'none';
+
   switch (name) {
     case 'first_name':
     case 'last_name':
     case 'emergency_name':
-      isValid = isValidName(value);
+    case 'parent_name':
+    case 'parent_relationship':
+      isValid = !parentBlockVisible && (name === 'parent_name' || name === 'parent_relationship')
+        ? true
+        : isValidName(value);
+      break;
+    case 'parent_signature':
+      isValid = !parentBlockVisible ? true : value === 'I CONFIRM';
       break;
     case 'age':
       isValid = isValidAge(value);
@@ -122,8 +153,12 @@ document.addEventListener('DOMContentLoaded', function () {
     input.addEventListener('change', function () {
       validateField(input);
       updateSubmitButton();
+      if (['birthyear', 'birthmonth', 'birthday'].includes(input.name)) {
+        updateParentBlock();
+      }
     });
   });
 
   updateSubmitButton();
+  updateParentBlock();
 });

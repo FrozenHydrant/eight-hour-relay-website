@@ -122,6 +122,22 @@ form {
   line-height: 1.6;
 }
 
+.inner_bonus_text {
+  color: #d6dbe1;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Parent/Guardian block ── */
+.parent_block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
 /* ── Waiver block ── */
 .waiver_block {
   display: flex;

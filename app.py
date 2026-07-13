@@ -13,8 +13,10 @@ from dateutil import relativedelta
 import stripe
 
 # App initialization happens here
+# CONSTANTS TOO
 load_dotenv()
 EVENT_DATE = dt.datetime(2026, 9, 12)
+WAIVER_VERSION = 1
 GENDERS_MAPPING = {"male": "Male", "female": "Female", "non-binary": "Non-Binary"}
 app = Flask(__name__)
 auth_client: Client = create_client(
@@ -244,7 +246,7 @@ def captain_registration_post():
         return redirect(url_for("captain_registration"))
     
     # Calculate age via birthdate
-    age = relativedelta.relativedelta(dt.datetime.now(), birthdate).years
+    age = relativedelta.relativedelta(EVENT_DATE, birthdate).years
     #print(age)
     
     # Do captain enrollment
@@ -402,8 +404,26 @@ def runner_registration_post():
         return redirect(url_for("runner_registration"))
     
     # Calculate age via birthdate
-    age = relativedelta.relativedelta(dt.datetime.now(), birthdate).years
-    #print(age)
+    age = relativedelta.relativedelta(EVENT_DATE, birthdate).years
+
+    # If younger than 19 on event date must handle parent fields
+    # Otherwise we don't store those
+    parent_name = None
+    parent_relationship = None
+    if age < 19:
+        # Now get them from the form
+        parent_name = request.form.get("parent_name")
+        parent_relationship = request.form.get("parent_relationship")
+        parent_signature = request.form.get("parent_signature")
+
+        if not Sanitization.verify_all_lists_and_create_response([], [], [], [], [parent_name, parent_relationship], []):
+            flash("Check your parent information and try again!")
+            return redirect(url_for("runner_registration"))
+        
+        if parent_signature != "I CONFIRM":
+            flash("Parent must type 'I CONFIRM' in the box!")
+            return redirect(url_for("runner_registration"))
+        
 
     team_division = None
     team_basic_info = Data.get_team_basic_info(team_id)
@@ -440,7 +460,7 @@ def runner_registration_post():
         enr_resp = Data.enroll_user_in_team(user.id, team_id)
         #print("Enrollment response: ", enr_resp)
 
-        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "birthdate": birthdate.strftime("%m/%d/%Y"), "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone})
+        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "birthdate": birthdate.strftime("%m/%d/%Y"), "waiver_agreement": WAIVER_VERSION, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone, "parent_name": parent_name, "parent_relationship": parent_relationship})
         #print("Update Runner Info Response: ", upd_resp)
         
         usr_resp = Data.setup_user_position(user.id, team_id)
@@ -519,14 +539,8 @@ def profile_post():
         return redirect(url_for("profile"))
     
     # Calculate age via birthdate
-    age = relativedelta.relativedelta(dt.datetime.now(), birthdate).years
+    age = relativedelta.relativedelta(EVENT_DATE, birthdate).years
 
-    try:
-        age = int(age)
-    except Exception as e:
-        flash("A problem occured: " + str(e))
-        return redirect(url_for("profile"))
-    
     if age < 1 or age > 100:
         flash("Enter a valid age.")
         return redirect(url_for("profile"))

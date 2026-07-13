@@ -2,9 +2,9 @@
 <html lang="en">
 
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="/static/css/registration.css">
-  <script src="/static/js/registration_runner.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/static/css/registration2.css">
+  <script src="/static/js/registration_runner3.js"></script>
 </head>
 
 <body>
@@ -88,6 +88,22 @@
           <input type="checkbox" id="waiverCheckbox" name="waiver_agreed" disabled>
           By clicking this checkbox, I indicate that I have read and understand the waiver
         </label>
+      </div>
+      <div class="parent_block">
+        <p class="inner_text">Parent/Guardian Information must be filled out because you will be under 19 years old when
+          the event happens..</p>
+        <input type="text" class="text_input" name="parent_name" placeholder="Parent/Guardian Full Name">
+        <input type="text" class="text_input" name="parent_relationship" placeholder="Relationship to Participant">
+        <p class="inner_bonus_text">
+          Parent/Guardian must read and complete the following:
+          By typing "I CONFIRM" in the box below, I confirm that I am the parent or legal guardian of the minor participant.
+          I have reviewed the BMAI 8-Hour
+          Relay Participant Waiver, Assumption of Risk, Release of Liability and Indemnity Agreement, understand the
+          nature and risks of the Event, consent to the minor participant’s participation, authorize emergency medical
+          treatment when reasonably necessary, and agree to the Parent/Legal Guardian Consent and Acknowledgement
+          provisions contained in this Agreement.
+        </p>
+        <input type="text" class="text_input" name="parent_signature" placeholder="I CONFIRM"> 
       </div>
       <button id="joinTeamButton" class="submit">Join this Team</button>
     </form>

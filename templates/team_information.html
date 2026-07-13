@@ -44,7 +44,8 @@
     <div class="payment">
       <a class="top_button" href="{{ url_for('team_payment_page',team_id=team['id'])}}">Team Payment</a>
     </div>
-    <p class="inner_warn"> You must make a payment for your team before you can obtain your Team Code to invite others.</p>
+    <p class="inner_warn"> You must make a payment for your team before you can obtain your Team Code to invite others.
+    </p>
     {% endif %}
     {% endif %}
   </div>
@@ -88,11 +89,13 @@
               <input type="hidden" name="member_id" value="{{ member['user_id'] }}">
               <button class="button red_button">Remove</button>
             </form>
+            {% if loop.index0 != 0 %}
             <form method="POST" action="{{ url_for('move_team_member_up') }}" class="right_form">
               <input type="hidden" name="team_id" value="{{ team['id'] }}">
               <input type="hidden" name="member_id" value="{{ member['user_id'] }}">
               <button class="button">Move Up</button>
             </form>
+            {% endif %}
             {% endif %}
           </td>
         </tr>

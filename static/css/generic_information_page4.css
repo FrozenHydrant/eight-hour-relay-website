@@ -140,6 +140,10 @@ body {
   box-shadow: 0 4px 14px rgba(108, 122, 224, 0.38);
 }
 
+.button + .button {
+  margin-top: 0.5rem;
+}
+
 .button:active {
   transform: translateY(1px);
   box-shadow: none;
