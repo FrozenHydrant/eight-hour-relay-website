@@ -83,7 +83,7 @@
         {% endfor %}
 
         {% for team in teams %}
-        <option value="{{ team['id'] }}">{{ team['id'] }} {{
+        <option value="{{ team['id'] }}" {% if owned_teams|length > 0 %}disabled{% endif %}>{{ team['id'] }} {{
           team["team_name"] }} ({{ team["division"] }})</option>
         {% endfor %}
       </select>

@@ -1,5 +1,5 @@
 from supabase import Client, create_client
-from werkzeug.security import check_password_hash, generate_password_hash
+#from werkzeug.security import check_password_hash, generate_password_hash
 import secrets
 import uuid
 from dotenv import load_dotenv
@@ -18,14 +18,16 @@ class Data:
 
     # Verify if token is right for the id
     def check_team_table_credentials(team_id: str, token: str) -> bool:
-        response = Data.client.table("teams_public").select("encrypted_token").eq("id", team_id).execute()
+        response = Data.client.table("teams_public").select("token").eq("id", team_id).execute()
 
         if response is None:
             return False
         if len(response.data) < 1:
             return False
-        encrypted_token = response.data[0]["encrypted_token"]
-        if not check_password_hash(encrypted_token, token):
+        my_token = response.data[0]["token"]
+        if my_token is None:
+            return False
+        if not token == my_token:
             return False
         return True
     
@@ -271,7 +273,7 @@ class Data:
 
     def set_team_token(team_id: str, token: str):
         try:
-            _ = Data.client.table("teams_public").update({"encrypted_token": generate_password_hash(token)}).eq("id", team_id).execute()
+            _ = Data.client.table("teams_public").update({"token": token}).eq("id", team_id).execute()
         except Exception as e:
             print("Problem during setting new team token,", e)
             return None

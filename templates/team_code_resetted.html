@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/css/generic_information_page4.css">
+</head>
+
+<body>
+    <div class="bottom_panel">
+        <div class="main_content">
+            <h3 class="inner_title">
+                Team Code Reset
+            </h3>
+            <p class="inner_text">Your team code has been reset successfully.</p>
+            <p class="inner_codeblock">{{ token }}</p>
+            <a href="{{ url_for('team_information',team_id=team_id) }}" class="button">Continue</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

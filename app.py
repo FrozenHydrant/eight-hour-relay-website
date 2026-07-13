@@ -686,7 +686,7 @@ def team_creation_completed():
         #print("Unpaid")
         return redirect(url_for("error_page"))
 
-    if team_basic_info is None or team_basic_info["encrypted_token"] is not None:
+    if team_basic_info is None or team_basic_info["token"] is not None:
         #print("Token already set")
         return redirect(url_for("error_page"))
     
@@ -703,7 +703,6 @@ def team_creation_completed():
     return render_template("team_creation_completed.html", token=token, team_info=team_basic_info, in_team=in_team)
 
 
-# TODO: update payments so page doesn't crash
 @app.route("/team_information")
 def team_information():
     user = user_logout_status()
@@ -730,7 +729,7 @@ def team_information():
 
     if team_info.get("captain_name") is None:
         team_info["captain_name"] = "Unknown"
-
+    team_info["token"] = team_basic_info.get("token")
     team_info["division"] = team_basic_info.get("division")
     team_info["team_name"] = team_basic_info.get("team_name")
     
@@ -772,6 +771,45 @@ def team_information():
     if Data.get_captain_status(user.id) == 2:
         is_captain = True
     return render_template("team_information.html", user_email=user.email, team=team_info, is_captain=is_captain, members=combined_member_infos, genders_mapping=GENDERS_MAPPING)
+
+
+@app.route("/reset_team_code")
+def reset_team_code():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+    
+    team_id = request.args.get("team_id")
+
+    if Data.get_captain_status(user.id) != 2:
+        return redirect(url_for("error_page"))
+    
+    if team_id is None or team_id not in Data.get_owned_teams(user.id):
+        return redirect(url_for("error_page"))
+    
+    team_info = Data.get_team_basic_info(team_id)
+
+    return render_template("reset_team_code.html", team_info=team_info)
+
+
+@app.route("/reset_team_code", methods=["POST"])
+def reset_team_code_post():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+    
+    team_id = request.form.get("team_id")
+
+    if Data.get_captain_status(user.id) != 2:
+        return redirect(url_for("error_page"))
+    
+    if team_id is None or team_id not in Data.get_owned_teams(user.id):
+        return redirect(url_for("error_page"))
+    
+    token = secrets.token_hex(3)
+
+    _ = Data.set_team_token(team_id, token)
+    return render_template("team_code_resetted.html", token=token, team_id=team_id)
 
 
 @app.route("/teams")
