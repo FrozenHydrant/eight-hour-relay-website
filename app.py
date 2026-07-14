@@ -18,12 +18,16 @@ load_dotenv()
 EVENT_DATE = dt.datetime(2026, 9, 12)
 WAIVER_VERSION = 1
 GENDERS_MAPPING = {"male": "Male", "female": "Female", "non-binary": "Non-Binary"}
+
+# App setup
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY")
+# Supabase
 auth_client: Client = create_client(
         os.environ.get("SUPABASE_URL"),
         os.environ.get("SUPABASE_KEY")
     )
-app.secret_key = os.environ.get("SECRET_KEY")
+# App
 Data.initialize()
 
 # Stripe
@@ -96,6 +100,7 @@ def generate_uncookied_response(response, keys):
 @app.route('/')
 def index():
     user = user_logout_status()
+    user_name = None
     team_id = -1
     is_captain = False
     not_logged_in = True
@@ -122,6 +127,13 @@ def index():
         # Also set the email
         user_email = user.email
 
+        # And name
+        self_data = Data.get_members_info([user.id])
+        if len(self_data) > 0:
+            user_info = self_data[0]
+            if "first_name" in user_info:
+                user_name = user_info["first_name"]
+
         # Properly populate "is_captain"
         if captain_status == 0:
             if len(Data.get_owned_teams(user.id)) > 0:
@@ -144,7 +156,7 @@ def index():
     if team_id is None:
         team_id = "no_team"
 
-    return render_template("index.html", user_email=user_email, team_id=team_id, not_logged_in=not_logged_in, is_admin=is_admin, is_undecided=is_undecided, is_captain=is_captain, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
+    return render_template("index.html", user_name=user_name, user_email=user_email, team_id=team_id, not_logged_in=not_logged_in, is_admin=is_admin, is_undecided=is_undecided, is_captain=is_captain, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
 
 
 # Registration for the whole website
@@ -594,7 +606,10 @@ def team_registration_post():
         return redirect(url_for("index"))
     
     team_name = request.form.get("team_name")
-    captain_name = request.form.get("captain_name")
+
+    # Generate captain name from existing data
+    captain_info = Data.get_members_info([user.id])[0]
+    captain_name = captain_info["first_name"] + " " + captain_info["last_name"]
     division = request.form.get("division")
 
     # Verify names

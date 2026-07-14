@@ -20,7 +20,7 @@
         <a class="top_bar_bonus" href="#reg_proc">Registration Process</a>
         <a class="top_bar_bonus" href="#venue">Venue Info</a>
         {% if not not_logged_in %}
-        <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_email }}</a>
+        <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
         <a class="top_bar_bonus" href="{{ url_for('logout') }}">Logout</a>
         {% else %}
         <a class="top_bar_normal" href="{{ url_for('login')}}">Sign In</a>
