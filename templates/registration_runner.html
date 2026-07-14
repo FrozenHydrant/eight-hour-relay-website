@@ -70,6 +70,19 @@
       <input type="text" class="text_input" name="emergency_phone" placeholder="Emergency Phone"
         value="{{ user_info['emergency_phone'] }}" required>
 
+      <select name="shirt_size" class="dropdown" required>
+        {% if not user_info['shirt_size'] %}
+        <option disabled selected value> -- shirt size -- </option>
+        {% else %}
+        <option selected value="{{ user_info['shirt_size']}}">{{ user_info['shirt_size'] }}</option>
+        {% endif %}
+        {% for size in ("S", "M", "L", "XL", "XXL") %}
+          {% if not user_info['shirt_size'] or size != user_info['shirt_size'] %}
+          <option value="{{ size }}">{{ size }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+
       <select name="team_id" class="dropdown" required>
 
         {% if not team_id %}

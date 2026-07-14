@@ -382,9 +382,15 @@ def runner_registration_post():
     team_id = request.form.get("team_id")
     team_token = request.form.get("team_token")
     waiver_agreed = request.form.get("waiver_agreed") == "on"
+    shirt_size = request.form.get("shirt_size")
 
     success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number, emergency_phone], [first_name, last_name, emergency_name], [gender])
+
     if not success:
+        return redirect(url_for("runner_registration"))
+    
+    if shirt_size not in ("S", "M", "L", "XL", "XXL"):
+        flash("Invalid shirt size!")
         return redirect(url_for("runner_registration"))
     
     if team_id is None or team_token is None:
@@ -469,7 +475,7 @@ def runner_registration_post():
         enr_resp = Data.enroll_user_in_team(user.id, team_id)
         #print("Enrollment response: ", enr_resp)
 
-        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "birthdate": birthdate.strftime("%m/%d/%Y"), "waiver_agreement": WAIVER_VERSION, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone, "parent_name": parent_name, "parent_relationship": parent_relationship})
+        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "birthdate": birthdate.strftime("%m/%d/%Y"), "shirt_size": shirt_size, "waiver_agreement": WAIVER_VERSION, "phone_number": phone_number, "emergency_name": emergency_name, "emergency_phone": emergency_phone, "parent_name": parent_name, "parent_relationship": parent_relationship})
         #print("Update Runner Info Response: ", upd_resp)
         
         usr_resp = Data.setup_user_position(user.id, team_id)
