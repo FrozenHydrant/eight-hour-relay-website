@@ -925,11 +925,116 @@ def event_registration_choice():
     
     return render_template("event_registration_choice.html")
 
+# TODO: rate limit
+# Password reset
+@app.route("/forgot_password")
+def forgot_password():
+    user = user_logout_status()
+    if user:
+        return redirect(url_for("index"))
+    
+    return render_template("forgot_password.html")
+
+@app.route("/forgot_password", methods=["POST"])
+def forgot_password_post():
+
+    user = user_logout_status()
+    if user:
+        return redirect(url_for("index"))
+    
+    email = request.form.get("email")
+
+    if not Sanitization.verify_all_and_create_response(email, "ValidUname", "ValidPass01@"):
+        return redirect(url_for("forgot_password"))
+    # Check email
+    email_to = Data.get_member_by_email(email)
+    if email_to is None:
+        flash("No user exists with this email.")
+        return redirect(url_for("forgot_password"))
+    
+    to_url = request.url_root + url_for("reset_my_password")
+    emailed_link = None
+    try:
+        emailed_link = auth_client.auth.admin.generate_link({"type": "recovery", "email": email, "options": {"redirect_to": to_url}}).model_dump()#reset_password_for_email(email, {"redirect_to": request.url_root + url_for("reset_my_password")})
+    except Exception as e:
+        flash("An error occured when sending password reset link. Please try again in a bit!")
+        return redirect(url_for("forgot_password"))
+    
+    hashed_token = emailed_link["properties"]["hashed_token"]
+
+    # Build the link yourself pointing to the verify endpoint
+    link = (
+        f"{to_url}?token={hashed_token}"
+    )
+
+    s = EmailSender.send_password_reset_email(email, link)
+    if not s:
+        flash("Sorry, something went wrong when sending the password reset request")
+        return redirect(url_for("forgot_password"))
+    
+    return render_template("sent_password_reset.html")
+
+
+@app.route("/reset_my_password")
+def reset_my_password():
+    user = user_logout_status()
+    if user:
+        return redirect(url_for("index"))
+    
+    token = request.args.get("token")
+
+    if not Sanitization.verify_all_lists_and_create_response([], [], [token], [], [], []):
+        return redirect(url_for("error_page"))
+
+    # Check the token is valid!
+    authresp = None
+    try:
+        authresp = auth_client.auth.verify_otp({"token_hash": token, "type": "recovery"})
+    except Exception as e:
+        pass
+    if not authresp:
+        flash("Invalid password reset link used.")
+        return redirect(url_for("index"))
+    
+    # Get the user again
+    user = user_logout_status(access_token=authresp.session.access_token)
+    if not user:
+        print("no user available")
+        return redirect(url_for("error_page"))
+
+    return render_template("reset_my_password.html", token=token, auth_token=authresp.session.access_token)
+
+@app.route("/reset_my_password", methods=["POST"])
+def reset_my_password_post():
+    
+    #user_id = user.id
+    #token = request.form.get("token")
+    auth_token = request.form.get("auth_token")
+    password = request.form.get("password")
+
+    #print(token, auth_token, password)
+    if not Sanitization.verify_all_lists_and_create_response([], [], [password], [], [], []):
+        #print("can't validate")
+        return redirect(url_for("error_page"))
+        
+    user = user_logout_status(access_token=auth_token)
+    if not user:
+        #print("bad auth token")
+        return redirect(url_for("error_page"))
+    #Data.invalidate_pwreset(user_id)
+    #auth_client.auth.reset_password_email
+    auth_client.auth.update_user({"password": password})
+
+    # Then logout
+    auth_client.auth.admin.sign_out(auth_token)
+
+    flash("Successfully updated password.")
+    return redirect(url_for("login"))
+    
 
 @app.route("/error_page")
 def error_page():
-    return "TODO: error page"
-
+    return render_template("error_page.html")
 
 @app.route("/admin_panel")
 def admin_panel():
@@ -943,6 +1048,7 @@ def admin_panel():
 
     teams = Data.get_all_teams_info()
     return render_template("teams.html", username="Awesome Eighthourrelay Admin", teams=teams)
+
 
 @app.route("/rules")
 def rules():

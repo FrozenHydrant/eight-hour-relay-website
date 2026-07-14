@@ -1,9 +1,10 @@
 from supabase import Client, create_client
-#from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 import secrets
 import uuid
 from dotenv import load_dotenv
 import os
+import datetime as dt
 
 class Data:
     client: Client = None
@@ -372,6 +373,59 @@ class Data:
         if len(response.data) < 1:
             return None
         return response.data[0]
+    
+
+    def get_member_by_email(email: str):
+        try:
+            response = Data.client.table("runner_info").select("*").eq("email", email).execute()
+        except Exception as e:
+            return None
+        if response is None:
+            return None
+        if len(response.data) < 1:
+            return None
+        return response.data[0]
+    
+
+    #def generate_password_reset(user_id: str):
+    #    
+    #    existing_data = Data._get_pwreset_data(user_id)
+    #    if existing_data is not None and dt.datetime.now() < existing_data["expires_at"]:
+    #        return None
+    #    my_token = secrets.token_urlsafe()
+    #    expiry = dt.datetime.now() + dt.timedelta(minutes=10)
+    #    try:
+    #        Data.client.table("password_resets").upsert({"user_id": user_id, "encrypted_token": generate_password_hash(my_token), "expires_at": expiry}).execute()
+    #    except Exception as e:
+    #        print(e)
+    #        return None
+    #    return my_token
+    
+
+    #def validate_pwreset_token(user_id: str, token: str):
+    #    existing_data = Data._get_pwreset_data(user_id)
+    #    if existing_data is None:
+    #        return False
+        
+    #    expiry = existing_data["expires_at"]
+    #    if expiry < dt.datetime.now():
+    #        return False
+        
+    #    encrypted_token = existing_data["encrypted_token"]
+    #    return check_password_hash(encrypted_token, token)
+    
+
+    #def _get_pwreset_data(user_id: str):
+    #    try:
+    #        response = Data.client.table("password_resets").select("*").eq("user_id", user_id).execute()
+    #    except Exception as e:
+    #        return None
+    #    if response is None:
+    #        return None
+    #    if len(response.data) < 1:
+    #        return None
+    #    return response.data[0]
+
 
     # ADMIN
     def is_user_admin(member_id: str) -> bool:
