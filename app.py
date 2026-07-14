@@ -796,11 +796,18 @@ def team_information():
     for member_info in combined_member_infos:
         if member_info["user_id"] == user.id and member_info["first_name"] is None:
             flash("You have not filled in your Runner Info yet! Please go to your Profile and finish adding your information. You must do this before the deadline! ")
-
+    # Get self info
+    user_name = None
+    users_data = Data.get_members_info([user.id])
+    if len(users_data) > 0:
+        self_info = users_data[0]
+        if "first_name" in self_info:
+            user_name = self_info["first_name"]
+     
     is_captain = False
     if Data.get_captain_status(user.id) == 2:
         is_captain = True
-    return render_template("team_information.html", user_email=user.email, team=team_info, is_captain=is_captain, members=combined_member_infos, genders_mapping=GENDERS_MAPPING)
+    return render_template("team_information.html", user_email=user.email, user_name=user_name, team=team_info, is_captain=is_captain, members=combined_member_infos, genders_mapping=GENDERS_MAPPING)
 
 
 @app.route("/reset_team_code")
@@ -972,6 +979,7 @@ def forgot_password_post():
     try:
         emailed_link = auth_client.auth.admin.generate_link({"type": "recovery", "email": email, "options": {"redirect_to": to_url}}).model_dump()#reset_password_for_email(email, {"redirect_to": request.url_root + url_for("reset_my_password")})
     except Exception as e:
+        print("passforgot problem", e)
         flash("An error occured when sending password reset link. Please try again in a bit!")
         return redirect(url_for("forgot_password"))
     
