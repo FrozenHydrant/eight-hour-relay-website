@@ -339,6 +339,10 @@ def runner_registration():
         owned_teams = Data.get_owned_teams_info(user.id)
     teams = Data.get_all_teams_info()
 
+    for owned_team in owned_teams:
+        if owned_team in teams:
+            teams.remove(owned_team)
+
     # Ensure runner record exists and pass existing info to the form so fields can be prefilled
     users_info = Data.get_members_info([user.id])
     if len(users_info) < 1:

@@ -338,7 +338,7 @@ class Data:
     # Gets list of info from teams
     def get_owned_teams_info(user_id: str) -> list:
         try: 
-            response = Data.client.table("teams_public").select("id,team_name").eq("owner_id", user_id).execute()
+            response = Data.client.table("teams_public").select("*").eq("owner_id", user_id).execute()
         except Exception as e:
             return []
         if response is None:
