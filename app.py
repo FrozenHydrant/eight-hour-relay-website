@@ -779,7 +779,7 @@ def team_information():
     # If runner, only get own info
     combined_member_infos = []
     member_positions = []
-    if team_id in owned_teams:
+    if team_id in owned_teams or is_admin:
         combined_member_infos = Data.get_members_info(team_members)
         member_positions = Data.get_positions_info(team_members)
     else:
