@@ -2,10 +2,14 @@
 <html>
 
 <head>
-
+    <link rel="stylesheet" href="/static/css/generic_information_page4.css">
 </head>
 
 <body>
+    <div class="top_panel">
+        <h3 class="main_title">Oops...</h3>
+        <p class="inner_text">Something went wrong. We're sorry!</p>
+    </div>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     {% for message in messages %}
