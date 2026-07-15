@@ -37,7 +37,7 @@ s_price_id = os.getenv("STRIPE_PRICE_ID")
 s_endpoint_secret = os.getenv("STRIPE_ENDPOINT_SECRET")
 
 
-# Helpers
+# Helpers Functions
 def user_logout_status(access_token=None):
     if access_token is None:
         access_token = request.cookies.get("access_token")
@@ -53,7 +53,6 @@ def user_logout_status(access_token=None):
     except:
         return None
 
-
 # TODO: CSRF security
 def cookie_options():
     return {
@@ -63,7 +62,7 @@ def cookie_options():
         "samesite": "Lax",
     }
 
-
+# Static Cache
 @app.after_request
 def add_cache_headers(response):
     # Cache static assets for 31 days
@@ -71,7 +70,7 @@ def add_cache_headers(response):
         response.headers['Cache-Control'] = 'public, max-age=2678400, immutable'
     return response
 
-
+# Adding cookies for login
 def generate_cookied_response(response, key_value):
     cookied_response = make_response(response)
     cookied_response.set_cookie(
@@ -82,7 +81,7 @@ def generate_cookied_response(response, key_value):
     )
     return cookied_response
 
-
+# Deleting cookies after logout
 def generate_uncookied_response(response, keys):
     uncookied_response = make_response(response)
     for key in keys:
@@ -96,6 +95,7 @@ def generate_uncookied_response(response, keys):
     return uncookied_response
 
 
+#
 # Routes <Main Page>
 @app.route('/')
 def index():
@@ -188,7 +188,7 @@ def registration_post():
             "password": password,
         })
         user = response.user
-        Data.create_new_basic_runner(user.id, email)
+        Data.create_new_basic_runner(user.id, user.email)
     except Exception as e:
         flash(str(e))
         return redirect(url_for("registration"))
@@ -272,7 +272,7 @@ def captain_registration_post():
     return redirect(url_for("team_registration"))
 
 
-# Login for the whole website
+# Login for the whole website / Logout
 @app.route("/login")
 def login():
     logged_in = user_logout_status()
@@ -314,6 +314,20 @@ def login_post():
         redirect(url_for(next_page)),
         {"key": "access_token", "value": response.session.access_token},
     )
+
+@app.route("/logout")
+def logout():
+    logged_in = user_logout_status()
+    if not logged_in:
+        return redirect(url_for("index"))
+    
+    access_token = request.cookies.get("access_token")
+    try:
+        auth_client.auth.admin.sign_out(access_token)
+    except Exception:
+        pass
+
+    return generate_uncookied_response(redirect(url_for("index")), ["access_token"])
 
 
 # Runner registration
@@ -503,6 +517,7 @@ def runner_registration_post():
     return redirect(url_for("team_information", team_id=team_id))
 
 
+# Profile management
 @app.route("/profile")
 def profile():
     user = user_logout_status()
@@ -520,22 +535,7 @@ def profile():
         if info[k] is None:
             info[k] = ""
 
-    return render_template("profile.html", user_info=info, email=info["email"], username=user.email, genders_mapping=GENDERS_MAPPING)
-
-
-@app.route("/logout")
-def logout():
-    logged_in = user_logout_status()
-    if not logged_in:
-        return redirect(url_for("index"))
-    
-    access_token = request.cookies.get("access_token")
-    try:
-        auth_client.auth.admin.sign_out(access_token)
-    except Exception:
-        pass
-
-    return generate_uncookied_response(redirect(url_for("index")), ["access_token"])
+    return render_template("profile.html", user_info=info, email=info["email"], genders_mapping=GENDERS_MAPPING)
 
 
 @app.route("/profile", methods=["POST"])
@@ -729,7 +729,7 @@ def team_creation_completed():
     _ = Data.set_team_token(team_id, token)
     code_s = EmailSender.send_code_email(user.email, team_basic_info, token)
     if not code_s:
-        print("Problem sending team code email!")
+        pass
     return render_template("team_creation_completed.html", token=token, team_info=team_basic_info, in_team=in_team)
 
 
@@ -969,6 +969,7 @@ def forgot_password_post():
     if not Sanitization.verify_all_and_create_response(email, "ValidUname", "ValidPass01@"):
         return redirect(url_for("forgot_password"))
     # Check email
+    email = email.lower()
     email_to = Data.get_member_by_email(email)
     if email_to is None:
         flash("No user exists with this email.")
