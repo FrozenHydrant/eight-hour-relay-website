@@ -248,6 +248,22 @@ body {
   box-shadow: none;
 }
 
+.info_form .invalid_input {
+  border-color: #C53030 !important;
+  box-shadow: 0 0 0 3px rgba(245, 100, 100, 0.2) !important;
+}
+
+.info_form .disabled_button {
+  background: #9CA3AF;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.info_form .disabled_button:hover {
+  background: #9CA3AF;
+  box-shadow: none;
+}
+
 /* ── Logout button ── */
 .main_button {
   display: block;

@@ -786,8 +786,6 @@ def team_information():
         combined_member_infos = Data.get_members_info([user.id])
         member_positions = Data.get_positions_info([user.id])
     
-    #print("Member info / position", combined_member_infos, member_positions, len(combined_member_infos), len(member_positions))
-
     for i in combined_member_infos:
         for j in member_positions:
             if i["user_id"] == j["user_id"]:
