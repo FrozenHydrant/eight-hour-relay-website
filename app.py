@@ -27,6 +27,10 @@ auth_client: Client = create_client(
         os.environ.get("SUPABASE_URL"),
         os.environ.get("SUPABASE_KEY")
     )
+admin_client: Client = create_client(
+        os.environ.get("SUPABASE_URL"),
+        os.environ.get("SUPABASE_KEY")
+)
 # App
 Data.initialize()
 
@@ -323,7 +327,7 @@ def logout():
     
     access_token = request.cookies.get("access_token")
     try:
-        auth_client.auth.admin.sign_out(access_token)
+        admin_client.auth.admin.sign_out(access_token)
     except Exception:
         pass
 
@@ -978,7 +982,7 @@ def forgot_password_post():
     to_url = request.url_root + url_for("reset_my_password")
     emailed_link = None
     try:
-        emailed_link = auth_client.auth.admin.generate_link({"type": "recovery", "email": email, "options": {"redirect_to": to_url}}).model_dump()#reset_password_for_email(email, {"redirect_to": request.url_root + url_for("reset_my_password")})
+        emailed_link = admin_client.auth.admin.generate_link({"type": "recovery", "email": email, "options": {"redirect_to": to_url}}).model_dump()#reset_password_for_email(email, {"redirect_to": request.url_root + url_for("reset_my_password")})
     except Exception as e:
         print("passforgot problem", e)
         flash("An error occured when sending password reset link. Please try again in a bit!")
@@ -1006,6 +1010,10 @@ def reset_my_password():
         return redirect(url_for("index"))
     
     token = request.args.get("token")
+
+    if not token:
+        flash("Password reset link was bad! Try with a different one?")
+        return redirect(url_for("error_page"))
 
     if not Sanitization.verify_all_lists_and_create_response([], [], [token], [], [], []):
         return redirect(url_for("error_page"))
@@ -1046,13 +1054,18 @@ def reset_my_password_post():
         #print("bad auth token")
         return redirect(url_for("error_page"))
     #Data.invalidate_pwreset(user_id)
-    #auth_client.auth.reset_password_email
-    auth_client.auth.update_user({"password": password})
-
+    exception = None
+    try:
+        auth_client.auth.update_user({"password": password})
+    except Exception as e:
+        exception = e
     # Then logout
-    auth_client.auth.admin.sign_out(auth_token)
+    admin_client.auth.admin.sign_out(auth_token)
 
-    flash("Successfully updated password.")
+    if exception is None:
+        flash("Successfully changed password")
+    else:
+        flash(str(exception))
     return redirect(url_for("login"))
     
 
