@@ -16,7 +16,7 @@ import stripe
 # CONSTANTS TOO
 load_dotenv()
 EVENT_DATE = dt.datetime(2026, 9, 12)
-WAIVER_VERSION = 1
+WAIVER_VERSION = 2
 GENDERS_MAPPING = {"male": "Male", "female": "Female", "non-binary": "Non-Binary"}
 
 # App setup

@@ -1,6 +1,6 @@
 function openWaiver() {
   document.getElementById('waiverCheckbox').disabled = false;
-  window.open('/static/waiver.pdf', '_blank');
+  window.open('/static/BMAI VANCOUVER RUNAHOLICS 8-Hour Relay Waiver.pdf', '_blank');
 }
 
 function updateSubmitButton() {
