@@ -95,6 +95,34 @@ class EmailSender:
         except Exception as e:
             print(e)
             return False
+        
+
+    def send_team_creation_email(to_email: str, team_info: dict):
+        if not all([EmailSender.smtp_host, EmailSender.smtp_user, EmailSender.smtp_password, EmailSender.from_email]):
+            return False
+        
+        message = EmailMessage()
+        message["Subject"] = "Team created!"
+        message["From"] = EmailSender.from_email
+        message["To"] = to_email
+        message.set_content(
+            f"Hello,\n\n"
+            f"Your team {team_info["team_name"]} with ID {team_info["id"]} has been created!\n"
+            f"You must pay the registration fee before you can invite runners to your team.\n"
+            f"Check how to do this by viewing your team information on the webiste.\n"
+            f"Thank you for participating!\n\n\n"
+            f"This is an automated email. Please DO NOT reply to this email."
+        )
+
+        try:
+            with smtplib.SMTP(EmailSender.smtp_host, EmailSender.smtp_port) as smtp:
+                smtp.starttls()
+                smtp.login(EmailSender.smtp_user, EmailSender.smtp_password)
+                smtp.send_message(message)
+            return True
+        except Exception as e:
+            print(e)
+            return False
 
     
     def send_team_payment_completed_email(to_email: str, team_id: str, transaction_ids: list[str]):

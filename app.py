@@ -634,6 +634,11 @@ def team_registration_post():
     if team_id is None:
         return redirect(url_for("error_page"))
     
+    team_info = Data.get_team_basic_info(team_id)
+    if team_info is None:
+        return redirect(url_for("error_page"))
+    EmailSender.send_team_creation_email(user.email, team_info)
+    
     return redirect(url_for("team_payment_page", team_id=team_id))
 
 
