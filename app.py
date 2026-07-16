@@ -809,7 +809,7 @@ def team_information():
     is_captain = False
     if Data.get_captain_status(user.id) == 2:
         is_captain = True
-    return render_template("team_information.html", user_email=user.email, user_name=user_name, team=team_info, is_captain=is_captain, members=combined_member_infos, genders_mapping=GENDERS_MAPPING)
+    return render_template("team_information.html", user_email=user.email, user_name=user_name, team=team_info, is_admin=is_admin, is_captain=is_captain, members=combined_member_infos, genders_mapping=GENDERS_MAPPING)
 
 
 @app.route("/reset_team_code")
@@ -1098,6 +1098,12 @@ def reset_my_password_post():
 def error_page():
     return render_template("error_page.html")
 
+
+@app.route("/rules")
+def rules():
+    return render_template("rules.html")
+
+
 @app.route("/admin_panel")
 def admin_panel():
     user = user_logout_status()
@@ -1112,9 +1118,105 @@ def admin_panel():
     return render_template("teams.html", username="Awesome Eighthourrelay Admin", teams=teams)
 
 
-@app.route("/rules")
-def rules():
-    return render_template("rules.html")
+# Admin Delete
+@app.route("/admin_delete_team")
+def admin_delete_team():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+    
+    # Then check admin
+    is_admin = Data.is_user_admin(user.id)
+    if not is_admin:
+        flash("You do not have authority to view this page!")
+        return redirect(url_for("index"))
+    
+    team_id = request.args.get("team_id")
+    team_info = Data.get_team_basic_info(team_id)
+    if team_info is None:
+        flash("Team does not exist!")
+        return redirect(url_for("index"))
+    
+    return render_template("admin_delete_team.html", team_info=team_info)
+
+@app.route("/admin_delete_team", methods=["POST"])
+def admin_delete_team_post():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+    
+    # Then check admin
+    is_admin = Data.is_user_admin(user.id)
+    if not is_admin:
+        flash("You do not have authority to view this page!")
+        return redirect(url_for("index"))
+    
+    team_id = request.form.get("team_id")
+    team_info = Data.get_team_basic_info(team_id)
+    if team_info is None:
+        flash("Team does not exist!")
+        return redirect(url_for("index"))
+
+    s = Data.delete_team(team_id)
+    if s:
+        flash("Successfully deleted team.")
+    return redirect(url_for("index"))
+
+
+@app.route("/admin_edit_team_payment")
+def admin_edit_team_payment():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+    
+    # Then check admin
+    is_admin = Data.is_user_admin(user.id)
+    if not is_admin:
+        flash("You do not have authority to view this page!")
+        return redirect(url_for("index"))
+    
+    team_id = request.args.get("team_id")
+    team_info = Data.get_team_info(team_id)
+    if team_info is None:
+        flash("Team does not exist!")
+        return redirect(url_for("index"))
+    
+    return render_template("admin_edit_team_payment.html", team_info=team_info)
+
+@app.route("/admin_edit_team_payment", methods=["POST"])
+def admin_edit_team_payment_post():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+    
+    # Then check admin
+    is_admin = Data.is_user_admin(user.id)
+    if not is_admin:
+        flash("You do not have authority to view this page!")
+        return redirect(url_for("index"))
+    
+    team_id = request.args.get("team_id")
+    team_info = Data.get_team_info(team_id)
+    if team_info is None:
+        flash("Team does not exist!")
+        return redirect(url_for("index"))
+    
+    new_payment_status = request.form.get("paid_status")
+    if new_payment_status not in ("False", "True"):
+        flash("Invalid team payment status entered.")
+        return redirect(url_for("index"))
+    
+    if new_payment_status == "True":
+        new_payment_status = True
+    else:
+        new_payment_status = False
+
+    success = Data.set_team_payment_status(team_id, new_payment_status)
+    if success:
+        flash("Successfully changed payment status.")
+        return redirect(url_for("team_information", team_id=team_id))
+
+
 
 
 if __name__ == '__main__':

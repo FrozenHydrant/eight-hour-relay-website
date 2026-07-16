@@ -387,6 +387,14 @@ class Data:
         return response.data[0]
     
 
+    def delete_team(team_id: str):
+        try:
+            _ = Data.client.table("teams").delete().eq("id", team_id).execute()
+        except Exception as e:
+            return False
+        return True
+    
+
     #def generate_password_reset(user_id: str):
     #    
     #    existing_data = Data._get_pwreset_data(user_id)
@@ -437,3 +445,4 @@ class Data:
         if response is None or len(response.data) < 1:
             return False
         return response.data[0]["is_admin"]
+    

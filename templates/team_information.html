@@ -38,6 +38,12 @@
     {% endif %}
     <p class="inner_text">Team Captain Name: {{ team["captain_name"] }}</p>
     <p class="inner_text">Team Email: {{ team["email"] }}</p>
+    
+    {% if is_admin %}
+        <a class="button" href="{{ url_for('admin_edit_team_payment', team_id=team['id']) }}">Update Team Payment Status</a>
+        <a class="button red_button" href="{{ url_for('admin_delete_team', team_id=team['id']) }}">Delete This Team</a>
+      {% endif %}
+    
     {% if is_captain %}
       <p class="inner_text">Team Code: {{ team["token"] }}</p>
       {% if not team["paid"] %}

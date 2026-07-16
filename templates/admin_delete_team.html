@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/css/generic_information_page4.css">
+</head>
+
+<body>
+    <div class="bottom_panel">
+        <div class="main_content">
+            <h3 class="inner_title">Admin Delete Team</h3>
+            <p class="inner_text">You are about to delete the team <b>{{ team_info["team_name"] }} ({{
+                    team_info["division"]}})</b>. This action is irreversible. Continue? </p>
+            <form method="POST">
+                <input type="hidden" name="team_id" value="{{ team_info['id'] }}">
+                <button class="button red_button">Delete Team</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

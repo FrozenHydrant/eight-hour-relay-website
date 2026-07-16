@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/css/registration2.css">
+</head>
+
+<body>
+    <div class="login">
+        <h3>Edit Team Information</h3>
+        <form method="POST">
+            <label for="paid_status" class="inner_text">Team Fee Has Been Paid?</label>
+            <select class="dropdown" id="paid_status" name="paid_status" required>
+
+
+                <option selected value="{{ team_info['paid'] }}">{{ team_info["paid"] }}</option>
+                <option value="{{ not team_info['paid'] }}">{{ not team_info["paid"] }}</option>
+            </select>
+            <button class="submit">Update Information</button>
+        </form>
+    </div>
+</body>
+
+</html>
