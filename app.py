@@ -1031,39 +1031,66 @@ def reset_my_password():
     if not user:
         print("no user available")
         return redirect(url_for("error_page"))
+    
+    # Creaate a new token to validate the post
+    emailed_link = None
+    try:
+        emailed_link = admin_client.auth.admin.generate_link({"type": "recovery", "email": user.email}).model_dump()
+    except Exception as e:
+        print("Unexpected problem with new token", e)
+        return redirect(url_for("error_page"))
+    
+    hashed_token = emailed_link["properties"]["hashed_token"]
 
-    return render_template("reset_my_password.html", token=token, auth_token=authresp.session.access_token)
+    return render_template("reset_my_password.html", token=hashed_token)
 
 @app.route("/reset_my_password", methods=["POST"])
 def reset_my_password_post():
     
     #user_id = user.id
-    #token = request.form.get("token")
-    auth_token = request.form.get("auth_token")
+    token = request.form.get("token")
+    #auth_token = request.form.get("auth_token")
     password = request.form.get("password")
 
+    if not token:
+        return redirect(url_for("error_page"))
+
     #print(token, auth_token, password)
-    if not Sanitization.verify_all_lists_and_create_response([], [], [password], [], [], []):
+    if not Sanitization.verify_all_lists_and_create_response([], [], [token, password], [], [], []):
         #print("can't validate")
         return redirect(url_for("error_page"))
         
+    authresp = None
+    try:
+        authresp = auth_client.auth.verify_otp({"token_hash": token, "type": "recovery"})
+    except Exception as e:
+        flash(str(e))
+        return redirect(url_for("error_page"))
+    
+    if not authresp:
+        flash("Invalid password reset link used!")
+        return redirect(url_for("error_page"))
+    
+    auth_token = authresp.session.access_token
     user = user_logout_status(access_token=auth_token)
     if not user:
-        #print("bad auth token")
+        flash("Invalid password reset link used!")
         return redirect(url_for("error_page"))
-    #Data.invalidate_pwreset(user_id)
-    exception = None
+    
+    success = False
+    problem = None
     try:
         auth_client.auth.update_user({"password": password})
+        success = True
     except Exception as e:
-        exception = e
+        problem = str(e)
     # Then logout
     admin_client.auth.admin.sign_out(auth_token)
 
-    if exception is None:
+    if success:
         flash("Successfully changed password")
     else:
-        flash(str(exception))
+        flash("There was a problem resetting your password: " + problem)
     return redirect(url_for("login"))
     
 
