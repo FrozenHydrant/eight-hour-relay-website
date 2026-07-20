@@ -19,6 +19,9 @@
       <p>The teams you currently manage are below:</p>
     </div>
     <a href="{{ url_for('team_registration') }}" class="top_button">Create Team</a>
+    {% if is_admin %}
+    <a href="{{ url_for('admin_teams_sheet') }}" class="top_button">Download Teams as .csv</a>
+    {% endif %}
   </div>
   <div class="bottom_list">
     {% for team in teams %}

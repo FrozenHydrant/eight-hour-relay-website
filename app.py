@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, flash, redirect, url_for, make_response
+from flask import Flask, render_template, request, flash, redirect, url_for, make_response, send_file
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from sanitization import Sanitization
@@ -11,6 +11,7 @@ import secrets
 from data import Data
 from dateutil import relativedelta
 import stripe
+from io import BytesIO
 
 # App initialization happens here
 # CONSTANTS TOO
@@ -97,7 +98,31 @@ def generate_uncookied_response(response, keys):
             **cookie_options(),
         )
     return uncookied_response
+    
+def create_csv(data: list[dict]):
+    all_info = ""
 
+    # As long as data not empty, put columns as first heading
+    if len(data) > 0:
+        my_line = ""
+        for heading in data[0]:
+            my_line += heading
+            my_line += ","
+        my_line = my_line[:-1:]
+        my_line += "\n"
+        all_info += my_line
+
+    # Similar op for all other data
+    for line in data:
+        my_line = ""
+        for info in line.values():
+            my_line += str(info)
+            my_line += ","
+        my_line = my_line[:-1:]
+        my_line += "\n"
+        all_info += my_line
+
+    return all_info
 
 #
 # Routes <Main Page>
@@ -117,7 +142,7 @@ def index():
         is_admin = Data.is_user_admin(user.id)
         not_logged_in = False
         captain_status = Data.get_captain_status(user.id)
-        print("Captain status;", captain_status)
+        #print("Captain status;", captain_status)
         if captain_status != 0:
             if captain_status == 1:
                 is_captain = False
@@ -864,9 +889,10 @@ def teams():
     # Don't do it if I'm not a captain (we should not see this page)
     if Data.get_captain_status(user.id) != 2:
         return redirect(url_for("index"))
+    
 
     teams = Data.get_owned_teams_info(user.id)
-    return render_template("teams.html", username=user.email, teams=teams)
+    return render_template("teams.html", is_admin=False, username=user.email, teams=teams)
 
 
 @app.route("/delete_from_team", methods=["POST"])
@@ -1120,8 +1146,26 @@ def admin_panel():
         return redirect(url_for("index"))
 
     teams = Data.get_all_teams_info()
-    return render_template("teams.html", username="Awesome Eighthourrelay Admin", teams=teams)
+    return render_template("teams.html", is_admin=is_admin, username="Awesome Eighthourrelay Admin", teams=teams)
 
+
+@app.route("/admin_teams_sheet")
+def admin_teams_sheet():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+
+    is_admin = Data.is_user_admin(user.id)
+
+    if not is_admin:
+        flash("You don't have authority to do that!")
+        return redirect(url_for("index"))
+
+    teams = Data.get_all_teams_combined_info()
+    csv_data = create_csv(teams)
+
+    return send_file(BytesIO(csv_data.encode()),as_attachment=True,download_name="teams.csv")
+    
 
 # Admin Delete
 @app.route("/admin_delete_team")

@@ -446,3 +446,36 @@ class Data:
             return False
         return response.data[0]["is_admin"]
     
+    def get_all_teams_advanced_info():
+        try:
+            response = Data.client.table("teams").select("*").execute()
+        except Exception as e:
+            return []
+        if response is None or len(response.data) < 1:
+            return []
+        return response.data
+    
+    def get_all_teams_combined_info():
+        try: 
+            teams_info = Data.client.table("teams").select("*, teams_public!id(*)").execute()
+        except Exception as e:
+            print("c", e)
+            return []
+        if teams_info is None or len(teams_info.data) < 1:
+            return []
+        team_info_result = teams_info.data
+        # Idea: now team_public data is nested inside each dict but we want it all on same level
+        for team_info in team_info_result:
+            public_data = team_info["teams_public"]
+            for tidbit in public_data:
+                if tidbit not in team_info:
+                    team_info[tidbit] = public_data[tidbit]
+
+            # After unnesting
+            team_info.pop("teams_public")
+            # Clean token info away as well
+            team_info.pop("token")
+        return team_info_result
+
+        
+    
