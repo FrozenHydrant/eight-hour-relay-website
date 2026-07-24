@@ -234,7 +234,7 @@ def captain_registration():
 
     # And also not a captain
     if Data.get_captain_status(user.id) == 2:
-        flash("You cannot sign up as a Captain!")
+        flash("You are already a Captain!")
         return redirect(url_for("teams"))
     
     users_info = Data.get_members_info([user.id])  
@@ -264,7 +264,7 @@ def captain_registration_post():
 
     # And also not a captain
     if Data.get_captain_status(user.id) == 2:
-        flash("You cannot sign up as a Captain!")
+        flash("You care already a Captain!")
         return redirect(url_for("teams"))
 
     first_name = request.form.get("first_name")

@@ -297,19 +297,22 @@ body {
 
 /* ── Flash messages ── */
 .flashes {
-  margin-top: 3.6rem;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 5rem;
   width: 100%;
   max-width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 .flashes p {
   background: #FFF5F5;
   color: #C53030;
   border: 1px solid #FEB2B2;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0.65rem 1rem;
   font-size: 0.82rem;
   font-weight: 500;
