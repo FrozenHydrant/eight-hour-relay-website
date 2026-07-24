@@ -50,25 +50,25 @@
       </div>
     </div>
     <div class="buttons">
-      {% if not_logged_in or is_undecided or is_captain %}
-      {% if not is_captain %}
+      {% if captain_status == 0 %}
       <a href="{{ url_for('event_registration_choice') }}">
         Register for Event
       </a>
-      {% else %}
+      {% endif %}
+
+      {% if captain_status == 2 %}
       <a href="{{ url_for('runner_registration') }}">
         Register as Runner
       </a>
       {% endif %}
-      {% endif %}
 
-      {% if not is_undecided and not is_captain %}
+      {% if captain_status == 1 %}
       <a href="{{ url_for('team_information', team_id=team_id) }}">
         View my Team
       </a>
       {% endif %}
 
-      {% if is_captain %}
+      {% if captain_status == 2 %}
       <a href="{{ url_for('teams') }}">
         Manage my Teams
       </a>

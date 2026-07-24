@@ -129,26 +129,16 @@ def create_csv(data: list[dict]):
 @app.route('/')
 def index():
     user = user_logout_status()
-    user_name = None
     team_id = -1
-    is_captain = False
-    not_logged_in = True
-    is_undecided = True
+    captain_status = 0
+    is_admin = False
     user_email = None
+    user_name = None
 
     # User exists
-    is_admin = False
     if user is not None:
         is_admin = Data.is_user_admin(user.id)
-        not_logged_in = False
         captain_status = Data.get_captain_status(user.id)
-        #print("Captain status;", captain_status)
-        if captain_status != 0:
-            if captain_status == 1:
-                is_captain = False
-            elif captain_status == 2:
-                is_captain = True
-            is_undecided=False
         
         # Get more team info
         team_id = Data.get_enrolled_team(user.id)
@@ -185,7 +175,7 @@ def index():
     if team_id is None:
         team_id = "no_team"
 
-    return render_template("index.html", user_name=user_name, user_email=user_email, team_id=team_id, not_logged_in=not_logged_in, is_admin=is_admin, is_undecided=is_undecided, is_captain=is_captain, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
+    return render_template("index.html", user_name=user_name, user_email=user_email, team_id=team_id, is_admin=is_admin, captain_status=captain_status, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
 
 
 # Registration for the whole website
