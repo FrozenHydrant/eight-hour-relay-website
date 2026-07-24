@@ -7,14 +7,13 @@
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: #F0F2F5;
+  background-color: #e0e3e8;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  background-color: #e6e8eb;
   gap: 2rem;
 }
 
@@ -26,8 +25,8 @@ body {
   background: #fffffe;
   border-radius: 16px;
   box-shadow:
-    0 4px 24px rgba(30, 34, 53, 0.18),
-    0 1px 4px rgba(30, 34, 53, 0.10);
+    0 4px 24px #1E2235,
+    0 1px 4px #1E2235;
 }
 
 .main_title {
@@ -35,7 +34,7 @@ body {
   font-weight: 600;
   letter-spacing: -0.03em;
   color: #1E2235;
-  margin: 0 0 0.75rem;
+  margin-top: 0.5rem;
 }
 
 .top_panel .inner_text {
@@ -62,8 +61,8 @@ body {
   width: 100%;
   flex: 1;
   box-shadow:
-    0 4px 24px rgba(30, 34, 53, 0.18),
-    0 1px 4px rgba(30, 34, 53, 0.10);
+    0 4px 24px #1E2235,
+    0 1px 4px #1E2235;
   display: flex;
   flex-direction: column;
 }
@@ -81,9 +80,9 @@ body {
   margin-bottom: 1.25rem;
 }
 
-.inner_text {
+.main_content .inner_text {
   margin-bottom: 1.75rem;
-  color: #D1D5DB;
+  color: #e0e3e8;
   line-height: 1.6;
 }
 
@@ -136,7 +135,7 @@ body {
 }
 
 .button:hover {
-  background: #5A67D8;
+  background: #7b8afc;
   box-shadow: 0 4px 14px rgba(108, 122, 224, 0.38);
 }
 

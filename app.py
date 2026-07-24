@@ -71,7 +71,7 @@ def cookie_options():
 @app.after_request
 def add_cache_headers(response):
     # Cache static assets for 31 days
-    if request.path.startswith('/static/'):
+    if request.path.startswith('/static/img'):
         response.headers['Cache-Control'] = 'public, max-age=2678400, immutable'
     return response
 
@@ -146,7 +146,7 @@ def index():
         if captain_status != 0:
             if captain_status == 1:
                 is_captain = False
-            else:
+            elif captain_status == 2:
                 is_captain = True
             is_undecided=False
         
@@ -244,10 +244,20 @@ def captain_registration():
 
     # And also not a captain
     if Data.get_captain_status(user.id) == 2:
-        flash("You are already a Captain!")
+        flash("You cannot sign up as a Captain!")
         return redirect(url_for("teams"))
     
-    user_info = Data.get_members_info([user.id])    
+    users_info = Data.get_members_info([user.id])  
+    
+    if len(users_info) < 1:
+        flash("An unknown problem occured")
+        return redirect(url_for("index"))
+    user_info = users_info[0]
+
+    for k in user_info:
+        if user_info[k] is None:
+            user_info[k] = "" 
+
     return render_template("registration_captain.html", user_info=user_info, genders_mapping=GENDERS_MAPPING)
 
 @app.route("/captain_registration", methods=["POST"])
@@ -264,7 +274,7 @@ def captain_registration_post():
 
     # And also not a captain
     if Data.get_captain_status(user.id) == 2:
-        flash("You are already a Captain!")
+        flash("You cannot sign up as a Captain!")
         return redirect(url_for("teams"))
 
     first_name = request.form.get("first_name")
@@ -299,6 +309,61 @@ def captain_registration_post():
         print(e, "captain reg failed")
         return redirect(url_for("captain_registration"))
     return redirect(url_for("team_registration"))
+
+
+# Volunteering registration
+@app.route("/volunteer_registration")
+def volunteer_registration():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login",next_page="volunteer_registration"))
+
+    # And also not already volunteering
+    if Data.get_volunteer_status(user.id) != 0:
+        flash("You are already signed up as a volunteer!")
+        return redirect(url_for("index"))
+    
+    users_info = Data.get_members_info([user.id])  
+        
+    if len(users_info) < 1:
+        flash("An unknown problem occured")
+        return redirect(url_for("index"))
+    user_info = users_info[0]
+    
+    for k in user_info:
+        if user_info[k] is None:
+            user_info[k] = "" 
+
+    return render_template("registration_volunteer.html", user_info=user_info)
+
+@app.route("/volunteer_registration", methods=["POST"])
+def volunteer_registration_post():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+
+
+    # And also not already volunteering
+    if Data.get_volunteer_status(user.id) != 0:
+        flash("You are already signed up as a volunteer!")
+        return redirect(url_for("index"))
+
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+    address = request.form.get("address")
+    volunteer_type = request.form.get("volunteer_type")
+    phone_number = request.form.get("phone_number")
+
+    success = Sanitization.verify_all_lists_and_create_response([], [address], [], [phone_number], [volunteer_type, first_name, last_name], [])
+    if not success:
+        return redirect(url_for("volunteer_registration"))
+    
+    try:
+        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "phone_number": phone_number, "address": address, "volunteer_type": volunteer_type})
+        _ = Data.upsert_volunteer_status(user.id, 1)
+    except Exception as e:
+        return redirect(url_for("volunteer_registration"))
+    return redirect(url_for("index"))
 
 
 # Login for the whole website / Logout

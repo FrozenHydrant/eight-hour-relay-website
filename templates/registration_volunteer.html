@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/css/registration2.css">
+</head>
+
+<body>
+    <div class="registration">
+        <h3>Register as Volunteer</h3>
+        <p class="inner_text">Please fill in the following information to become a volunteer</p>
+        <form method="POST">
+            <input type="text" class="text_input" name="first_name" placeholder="First Name"
+                value="{{ user_info['first_name'] }}" required>
+            <input type="text" class="text_input" name="last_name" placeholder="Last Name"
+                value="{{ user_info['last_name'] }}" required>
+            <input type="text" class="text_input" name="phone_number" placeholder="Phone Number"
+                value="{{ user_info['phone_number'] }}" required>
+            <input type="text" class="text_input" name="address" placeholder="Address"
+                value="{{ user_info['address'] }}" required>
+            <input type="text" class="text_input" name="volunteer_type" placeholder="Volunteer Type"
+                value="{{ user_info['volunteer_type'] }}" required>
+            <button id="joinTeamButton" class="submit">Become a Volunteer</button>
+        </form>
+    </div>
+    <div class="extra_text">
+        <p>Have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
+    </div>
+    <div class="flashes">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+</body>
+
+</html>

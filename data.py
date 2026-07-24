@@ -35,24 +35,49 @@ class Data:
 
     # Runners
     def get_captain_status(user_id: str) -> int:
+        response = None
         try:
             response = Data.client.table("captain").select("is_captain").eq("user_id", user_id).execute()
         except Exception as e:
             print("Problem getting captain status", e)
-            return 0
+
         if response is None or len(response.data) < 1:
             return 0
+
         status = response.data[0]["is_captain"]
         if status:
-            return 2
-        return 1
-    
+            return 2 # captain
+        else:
+            return 1 # runner
+
+
+    def get_volunteer_status(user_id: str) -> int:
+        try:
+            response = Data.client.table("volunteer").select("volunteer_status").eq("user_id", user_id).execute()
+        except Exception as e:
+            print("Problem getting volunteering status", e)
+
+        if response is None or len(response.data) < 1:
+            return 0
+
+        status = response.data[0]["volunteer_status"]
+        return status
+        
 
     def upsert_captain_status(user_id: str, is_captain: bool) -> bool:
         try:
             _ = Data.client.table("captain").upsert({"user_id": user_id, "is_captain": is_captain}).execute()
         except Exception as e:
             print("Problem setting captain status", e)
+            return False
+        return True
+
+
+    def upsert_volunteer_status(user_id: str, volunteer_status: int) -> bool:
+        try:
+            _ = Data.client.table("volunteer").upsert({"user_id": user_id, "volunteer_status": volunteer_status}).execute()
+        except Exception as e:
+            print("Problem setting volunteer status", e)
             return False
         return True
 
@@ -174,6 +199,7 @@ class Data:
     # Update user info with the provided dict
     def update_runner_info(user_id: str, user_info: dict) -> bool:
         try:
+            #user_info["user_id"] = user_id
             _ = Data.client.table("runner_info").update(user_info).eq("user_id", user_id).execute()
         except Exception as e:
             print("Update info exception", e)

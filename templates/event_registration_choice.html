@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="/static/css/generic_information_page4.css">
+    <link rel="stylesheet" href="/static/css/generic_information_page.css">
 </head>
 
 <body>
@@ -37,6 +37,13 @@
             <p class="inner_text">For individual runners. Before you proceed, you must have a valid Team Code and know
                 the ID/Name of your team. Ask your captain for this information after they have made a team!</p>
             <a class="button" href="{{ url_for('runner_registration') }}">JOIN MY TEAM</a>
+        </div>
+        <div class="main_content">
+            <h3 class="inner_title">
+                Become a Volunteer
+            </h3>
+            <p class="inner_text">For those who are interested in volunteering for the event!</p>
+            <a class="button" href="{{ url_for('volunteer_registration') }}">BECOME A VOLUNTEER</a>
         </div>
     </div>
 </body>
