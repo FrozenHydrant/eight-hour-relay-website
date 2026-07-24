@@ -63,6 +63,7 @@
         {% endif %}
         {% endfor %}
       </select>
+
       <input type="text" class="text_input" name="phone_number" placeholder="Phone Number"
         value="{{ user_info['phone_number'] }}" required>
       <input type="text" class="text_input" name="emergency_name" placeholder="Emergency Contact Name"
@@ -83,6 +84,8 @@
         {% endfor %}
       </select>
 
+      <p class="inner_text">Note: Requested shirt sizes are not guaranteed and depend on current stock availability.</p>
+      
       <select name="team_id" class="dropdown" required>
 
         {% if not team_id %}

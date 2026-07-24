@@ -69,15 +69,18 @@ class Data:
 
     def get_volunteer_status(user_id: str) -> int:
         try:
-            response = Data.client.table("volunteer").select("volunteer_status").eq("user_id", user_id).execute()
+            response = Data.client.table("volunteer").select("is_volunteer").eq("user_id", user_id).execute()
         except Exception as e:
             print("Problem getting volunteering status", e)
 
         if response is None or len(response.data) < 1:
             return 0
 
-        status = response.data[0]["volunteer_status"]
-        return status
+        status = response.data[0]["is_volunteer"]
+        if status:
+            return 2
+        else:
+            return 1
         
 
     def upsert_sponsor_status(user_id: str, is_sponsor: bool) -> bool:
@@ -98,9 +101,9 @@ class Data:
         return True
 
 
-    def upsert_volunteer_status(user_id: str, volunteer_status: int) -> bool:
+    def upsert_volunteer_status(user_id: str, is_volunteer: bool) -> bool:
         try:
-            _ = Data.client.table("volunteer").upsert({"user_id": user_id, "volunteer_status": volunteer_status}).execute()
+            _ = Data.client.table("volunteer").upsert({"user_id": user_id, "is_volunteer": is_volunteer}).execute()
         except Exception as e:
             print("Problem setting volunteer status", e)
             return False

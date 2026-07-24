@@ -38,6 +38,8 @@
                 the ID/Name of your team. Ask your captain for this information after they have made a team!</p>
             <a class="button" href="{{ url_for('runner_registration') }}">JOIN MY TEAM</a>
         </div>
+
+        {% if not is_volunteer %}
         <div class="main_content">
             <h3 class="inner_title">
                 Become a Volunteer
@@ -45,6 +47,18 @@
             <p class="inner_text">For those who are interested in volunteering for the event!</p>
             <a class="button" href="{{ url_for('volunteer_registration') }}">BECOME A VOLUNTEER</a>
         </div>
+        {% endif %}
+
+        {% if not is_sponsor %}
+        <div class="main_content">
+            <h3 class="inner_title">
+                Become a Sponsor
+            </h3>
+            <p class="inner_text">For those who are interested in sponsoring the event!</p>
+            <a class="button" href="{{ url_for('sponsor_registration') }}">BECOME A SPONSOR</a>
+        </div>
+        {% endif %}
+        
     </div>
 </body>
 

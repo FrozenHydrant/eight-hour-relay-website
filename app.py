@@ -309,7 +309,7 @@ def volunteer_registration():
         return redirect(url_for("login",next_page="volunteer_registration"))
 
     # And also not already volunteering
-    if Data.get_volunteer_status(user.id) != 0:
+    if Data.get_volunteer_status(user.id) == 2:
         flash("You are already signed up as a volunteer!")
         return redirect(url_for("index"))
     
@@ -334,7 +334,7 @@ def volunteer_registration_post():
 
 
     # And also not already volunteering
-    if Data.get_volunteer_status(user.id) != 0:
+    if Data.get_volunteer_status(user.id) == 2:
         flash("You are already signed up as a volunteer!")
         return redirect(url_for("index"))
 
@@ -350,7 +350,7 @@ def volunteer_registration_post():
     
     try:
         upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "phone_number": phone_number, "address": address, "volunteer_type": volunteer_type})
-        _ = Data.upsert_volunteer_status(user.id, 1)
+        _ = Data.upsert_volunteer_status(user.id, True)
     except Exception as e:
         return redirect(url_for("volunteer_registration"))
     return redirect(url_for("index"))
@@ -413,7 +413,7 @@ def sponsor_registration_post():
     # Do captain enrollment
     try:
         upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "address": address, "sponsor_type": sponsor_type, "sponsor_organization": sponsor_organization, "phone_number": phone_number})
-        _ = Data.upsert_sponsor_status(user.id, 1)
+        _ = Data.upsert_sponsor_status(user.id, True)
     except Exception as e:
         flash(str(e))
         print(e, "sponsor reg failed")
@@ -1097,8 +1097,11 @@ def event_registration_choice():
     if not user:
         flash("Login or create an account before registering for this event!")
         return redirect(url_for("login"))
+
+    is_sponsor = Data.get_sponsor_status(user.id) == 2
+    is_volunteer = Data.get_volunteer_status(user.id) == 2
     
-    return render_template("event_registration_choice.html")
+    return render_template("event_registration_choice.html", is_sponsor=is_sponsor, is_volunteer=is_volunteer)
 
 # TODO: rate limit
 # Password reset
