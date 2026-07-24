@@ -31,8 +31,24 @@ class Data:
         if not token == my_token:
             return False
         return True
-    
 
+    
+    def get_sponsor_status(user_id: str) -> int:
+        try:
+            response = Data.client.table("sponsor").select("is_sponsor").eq("user_id", user_id).execute()
+        except Exception as e:
+            print("Problem getting sponsor status", e)
+
+        if response is None or len(response.data) < 1:
+            return 0
+
+        status = response.data[0]["is_sponsor"]
+        if status:
+            return 2
+        else:
+            return 1
+
+    
     # Runners
     def get_captain_status(user_id: str) -> int:
         response = None
@@ -63,6 +79,15 @@ class Data:
         status = response.data[0]["volunteer_status"]
         return status
         
+
+    def upsert_sponsor_status(user_id: str, is_sponsor: bool) -> bool:
+        try:
+            _ = Data.client.table("sponsor").upsert({"user_id": user_id, "is_sponsor": is_sponsor}).execute()
+        except Exception as e:
+            print("Problem setting sponsor status", e)
+            return False
+        return True
+
 
     def upsert_captain_status(user_id: str, is_captain: bool) -> bool:
         try:

@@ -264,7 +264,7 @@ def captain_registration_post():
 
     # And also not a captain
     if Data.get_captain_status(user.id) == 2:
-        flash("You care already a Captain!")
+        flash("You are already a Captain!")
         return redirect(url_for("teams"))
 
     first_name = request.form.get("first_name")
@@ -353,6 +353,71 @@ def volunteer_registration_post():
         _ = Data.upsert_volunteer_status(user.id, 1)
     except Exception as e:
         return redirect(url_for("volunteer_registration"))
+    return redirect(url_for("index"))
+
+
+# Sponsor registration
+@app.route("/sponsor_registration")
+def sponsor_registration():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login",next_page="sponsor_registration"))
+    #user = client.auth.get_user().user
+    
+    # Make sure we are not a sponsor
+    if Data.get_sponsor_status(user.id) == 2:
+        flash("You are already a sponsor!")
+        return redirect(url_for("index"))
+    
+    users_info = Data.get_members_info([user.id])  
+    
+    if len(users_info) < 1:
+        flash("An unknown problem occured")
+        return redirect(url_for("index"))
+    user_info = users_info[0]
+
+    for k in user_info:
+        if user_info[k] is None:
+            user_info[k] = "" 
+
+    return render_template("registration_sponsor.html", user_info=user_info)
+
+@app.route("/sponsor_registration", methods=["POST"])
+def sponsor_registration_post():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+
+    # Make sure we are not in any teams beforehand
+    enrolled_team = Data.get_enrolled_team(user.id)
+    if enrolled_team is not None:
+        flash("Leave your team first before becoming a Captain!")
+        return redirect(url_for("sponsor_registration"))
+
+    # And also not 
+    if Data.get_sponsor_status(user.id) == 2:
+        flash("You are already a Sponsor!")
+        return redirect(url_for("index"))
+
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+    address = request.form.get("address")
+    sponsor_type = request.form.get("sponsor_type")
+    sponsor_organization = request.form.get("sponsor_organization")
+    phone_number = request.form.get("phone_number")
+
+    success = Sanitization.verify_all_lists_and_create_response([], [address, sponsor_organization], [], [phone_number], [first_name, last_name, sponsor_type], [])
+    if not success:
+        return redirect(url_for("sponsor_registration"))
+    
+    # Do captain enrollment
+    try:
+        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "address": address, "sponsor_type": sponsor_type, "sponsor_organization": sponsor_organization, "phone_number": phone_number})
+        _ = Data.upsert_sponsor_status(user.id, 1)
+    except Exception as e:
+        flash(str(e))
+        print(e, "sponsor reg failed")
+        return redirect(url_for("sponsor_registration"))
     return redirect(url_for("index"))
 
 
