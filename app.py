@@ -1255,7 +1255,9 @@ def error_page():
 
 @app.route("/rules")
 def rules():
-    return render_template("rules.html")
+    user = user_logout_status()
+    captain_status = Data.get_captain_status(user)
+    return render_template("rules.html", captain_status=captain_status)
 
 
 @app.route("/admin_panel")

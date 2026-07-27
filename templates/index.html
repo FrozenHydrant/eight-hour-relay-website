@@ -15,10 +15,9 @@
     </div>
     <div class="top_bar_info">
       <div class="top_bar_insides">
-        <a class="top_bar_bonus" href="#about">Mission</a>
         <a class="top_bar_normal" href="{{ url_for('rules') }}">Rules</a>
         <a class="top_bar_bonus" href="#reg_proc">Registration Process</a>
-        <a class="top_bar_bonus" href="#venue">Venue Info</a>
+        <a class="top_bar_bonus" href="#gallery">Gallery</a>
 
         {% if captain_status != 0 %}
         <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
@@ -258,7 +257,7 @@
     <p class="inner_bonus_text">Yes.</p>
   </div> 
 
-  <div class="bottom_block gallery">
+  <div class="bottom_block gallery" id="gallery">
     <h3 class="sub_title">Gallery</h3>
     <div class="images_display_grid_awesomely">
       <img src="/static/img/gallery1.webp">
