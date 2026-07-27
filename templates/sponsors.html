@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/css/generic_information_page.css">
+</head>
+
+<body>
+    <div class="top_bar_info">
+      <div class="top_bar_insides">
+        <a class="top_bar_normal" href="{{ url_for('index') }}">Home</a>
+        <a class="top_bar_normal" href="{{ url_for('rules') }}">Rules</a>
+        <a class="top_bar_bonus" href="#reg_proc">Registration Process</a>
+        <a class="top_bar_bonus" href="#gallery">Gallery</a>
+
+        {% if captain_status != 0 %}
+        <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
+        <a class="top_bar_bonus" href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+
+        <a class="top_bar_normal" href="{{ url_for('login')}}">Sign In</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="top_panel">
+        <h1 class="main_title">Eight Hour Relay Sponsors</h1>
+        <p class="inner_text">These are the sponsors for this event</p>
+    </div>
+    <div class="bottom_panel">
+        <div class="main_content">
+            <p class="inner_text">Sponsored by</p>
+            <h3 class="inner_title">
+                BMAI
+            </h3>
+            <img class="single_icon" src="/static/logo3.png">
+            <a class="button" href="https://bmai.ca/">LEARN MORE</a>
+        </div>
+        <div class="main_content">
+            <h3 class="inner_title">Other Sponsors:</h3>
+        </div>
+    </div>
+</body>
+
+</html>

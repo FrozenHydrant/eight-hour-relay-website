@@ -18,6 +18,7 @@ body {
 }
 
 .top_panel {
+  margin-top: 65px;
   width: 100%;
   max-width: 920px;
   text-align: center;
@@ -27,6 +28,55 @@ body {
   box-shadow:
     0 4px 24px #1E2235,
     0 1px 4px #1E2235;
+}
+
+/* TOP BAR INFO */
+.top_bar_info {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  height: 60px;
+  background: #1E2235;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.top_bar_insides {
+    margin-right: 0;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.top_bar_info .top_bar_normal {
+  display: inline-block;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #A0A8C8;
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.top_bar_bonus {
+  display: inline-block;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #A0A8C8;
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.top_bar_info a:hover {
+  color: #FFFFFF;
+  background: rgba(108, 122, 224, 0.18);
 }
 
 .main_title {
