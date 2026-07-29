@@ -315,6 +315,12 @@ def volunteer_registration():
     if opportunity_info is None:
         return redirect(url_for("volunteer_info"))
 
+    # We aren't already in it
+
+    if user.id in Data.get_enrolled_volunteers_list(opportunity_id):
+        flash("You are already volunteering for this position!")
+        return redirect(url_for("volunteer_info"))
+
     users_info = Data.get_members_info([user.id])  
         
     if len(users_info) < 1:
@@ -345,6 +351,10 @@ def volunteer_registration_post():
     if Data.get_opportunity_info(opportunity_id) is None:
         return redirect(url_for("volunteer_info"))
 
+    if user.id in Data.get_enrolled_volunteers_list(opportunity_id):
+        flash("You are already volunteering for this position!")
+        return redirect(url_for("volunteer_info"))
+    
     success = Sanitization.verify_all_lists_and_create_response([], [address], [], [phone_number], [volunteer_type, first_name, last_name], [])
     if not success:
         return redirect(url_for("volunteer_info"))
@@ -1292,12 +1302,12 @@ def sponsors():
 @app.route("/volunteer_info")
 def volunteer_info():
     user = user_logout_status()
-    captain_status = 0
     user_email = None
     user_name = None
+    is_logged_in = False
     if user:
             user_email = user.email
-            captain_status = Data.get_captain_status(user.id)
+            is_logged_in = True
             self_data = Data.get_members_info([user.id])
             if len(self_data) > 0:
                 user_info = self_data[0]
@@ -1308,15 +1318,43 @@ def volunteer_info():
 
     # Handling teams we already in
     in_opportunities = []
-    enrolled_opportunities_ids = Data.get_enrolled_opportunities(user.id)
-    for opportunity in opportunities:
-        if opportunity["id"] in enrolled_opportunities_ids:
-            in_opportunities.append(opportunity)
-            opportunity["id"] = None # marked
+    if user:
+        enrolled_opportunities_ids = Data.get_enrolled_opportunities(user.id)
+        for opportunity in opportunities:
+            if opportunity["id"] in enrolled_opportunities_ids:
+                in_opportunities.append(opportunity)
+                opportunity["enrollable"] = False # marked
 
     # Now remove
         
-    return render_template("volunteer_info.html", captain_status=captain_status, user_email=user_email, user_name=user_name, opportunities=opportunities, in_opportunities=in_opportunities)
+    return render_template("volunteer_info.html", is_logged_in=is_logged_in, user_email=user_email, user_name=user_name, opportunities=opportunities, in_opportunities=in_opportunities)
+
+
+@app.route("/volunteer_info", methods=["POST"])
+def volunteer_info_post():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+
+    opportunity_id = request.form.get("opportunity_id")
+    action = request.form.get("action")
+
+    # Make sure opportunity exists
+    if Data.get_opportunity_info(opportunity_id) is None:
+        return redirect(url_for("volunteer_info"))
+
+    try:
+        opportunity_id = int(opportunity_id)
+    except:
+        return redirect(url_for("volunteer_info"))
+
+    if action == "withdraw":
+        # Check if we are enrolled 
+        if opportunity_id not in Data.get_enrolled_opportunities(user.id):
+            return redirect(url_for("volunteer_info"))
+
+        Data.unenroll_member_from_opportunity(user.id, opportunity_id)
+    return redirect(url_for("volunteer_info"))
 
 
 @app.route("/admin_panel")

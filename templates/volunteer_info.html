@@ -27,12 +27,17 @@
                 <p class="muted">{{ opportunity["start_time"] }} - {{ opportunity["end_time"] }}</p>
                 <p class="title">{{ opportunity["capacity"] }} Spots Left</p>
             </div>
-            <a href="" class="button red_button">Withdraw my Volunteer Registration</a>
+
+            <form method="POST">
+                <input type="hidden" name="opportunity_id" value="{{ opportunity['id'] }}">
+                <input type="hidden" name="action" value="withdraw">
+                <button class="button red_button">Withdraw my Volunteer Registration</a>
+            </form>
         </div>
         {% endfor %}
 
         {% for opportunity in opportunities %}
-        {% if opportunity["id"] %}
+        {% if "enrollable" not in opportunity or opportunity["enrollable"] %}
         <div class="bottom_list_item">
             <p class="title">{{ opportunity["name"] }}</p>
             <div class="info_box">

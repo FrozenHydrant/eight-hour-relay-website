@@ -318,6 +318,14 @@ class Data:
         except Exception as e:
             print("Error occurred while moving member position:", e)
         return False
+
+    
+    def unenroll_member_from_opportunity(member_id: str, opportunity_id: str) -> bool:
+        try:
+            _ = Data.client.table("enrollment_volunteer").delete().match({"user_id": member_id, "opportunity_id": opportunity_id}).execute()
+        except Exception as e:
+            return False
+        return True
     
 
     def unenroll_member_from_team(member_id: str, team_id: str) -> bool:
