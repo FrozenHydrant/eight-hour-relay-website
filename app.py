@@ -134,11 +134,13 @@ def index():
     is_admin = False
     user_email = None
     user_name = None
+    is_logged_in = False
 
     # User exists
     if user is not None:
         is_admin = Data.is_user_admin(user.id)
         captain_status = Data.get_captain_status(user.id)
+        is_logged_in = True
         
         # Get more team info
         team_id = Data.get_enrolled_team(user.id)
@@ -175,7 +177,7 @@ def index():
     if team_id is None:
         team_id = "no_team"
 
-    return render_template("index.html", user_name=user_name, user_email=user_email, team_id=team_id, is_admin=is_admin, captain_status=captain_status, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
+    return render_template("index.html", is_logged_in=is_logged_in, user_name=user_name, user_email=user_email, team_id=team_id, is_admin=is_admin, captain_status=captain_status, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
 
 
 # Registration for the whole website
@@ -308,11 +310,11 @@ def volunteer_registration():
     if not user:
         return redirect(url_for("login",next_page="volunteer_registration"))
 
-    # And also not already volunteering
-    if Data.get_volunteer_status(user.id) == 2:
-        flash("You are already signed up as a volunteer!")
-        return redirect(url_for("index"))
-    
+    opportunity_id = request.args.get("opportunity_id")
+    opportunity_info = Data.get_opportunity_info(opportunity_id)
+    if opportunity_info is None:
+        return redirect(url_for("volunteer_info"))
+
     users_info = Data.get_members_info([user.id])  
         
     if len(users_info) < 1:
@@ -324,7 +326,7 @@ def volunteer_registration():
         if user_info[k] is None:
             user_info[k] = "" 
 
-    return render_template("registration_volunteer.html", user_info=user_info)
+    return render_template("registration_volunteer.html", user_info=user_info, opportunity=opportunity_info)
 
 @app.route("/volunteer_registration", methods=["POST"])
 def volunteer_registration_post():
@@ -332,27 +334,27 @@ def volunteer_registration_post():
     if not user:
         return redirect(url_for("login"))
 
-
-    # And also not already volunteering
-    if Data.get_volunteer_status(user.id) == 2:
-        flash("You are already signed up as a volunteer!")
-        return redirect(url_for("index"))
-
     first_name = request.form.get("first_name")
     last_name = request.form.get("last_name")
     address = request.form.get("address")
     volunteer_type = request.form.get("volunteer_type")
     phone_number = request.form.get("phone_number")
+    opportunity_id = request.form.get("opportunity_id")
+
+    # Make sure opportunity is right
+    if Data.get_opportunity_info(opportunity_id) is None:
+        return redirect(url_for("volunteer_info"))
 
     success = Sanitization.verify_all_lists_and_create_response([], [address], [], [phone_number], [volunteer_type, first_name, last_name], [])
     if not success:
-        return redirect(url_for("volunteer_registration"))
+        return redirect(url_for("volunteer_info"))
     
     try:
         upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "phone_number": phone_number, "address": address, "volunteer_type": volunteer_type})
-        _ = Data.upsert_volunteer_status(user.id, True)
+        _ = Data.enroll_user_as_volunteer(user.id, opportunity_id)
     except Exception as e:
-        return redirect(url_for("volunteer_registration"))
+        print("Volunteer registration problem", e)
+        return redirect(url_for("volunteer_info"))
     return redirect(url_for("index"))
 
 
@@ -1099,7 +1101,7 @@ def event_registration_choice():
         return redirect(url_for("login"))
 
     is_sponsor = Data.get_sponsor_status(user.id) == 2
-    is_volunteer = Data.get_volunteer_status(user.id) == 2
+    is_volunteer = True # TODO: disable
     
     return render_template("event_registration_choice.html", is_sponsor=is_sponsor, is_volunteer=is_volunteer)
 
@@ -1285,6 +1287,36 @@ def sponsors():
             if "first_name" in user_info:
                 user_name = user_info["first_name"]
     return render_template("sponsors.html", captain_status=captain_status, user_email=user_email, user_name=user_name)
+
+
+@app.route("/volunteer_info")
+def volunteer_info():
+    user = user_logout_status()
+    captain_status = 0
+    user_email = None
+    user_name = None
+    if user:
+            user_email = user.email
+            captain_status = Data.get_captain_status(user.id)
+            self_data = Data.get_members_info([user.id])
+            if len(self_data) > 0:
+                user_info = self_data[0]
+                if "first_name" in user_info:
+                    user_name = user_info["first_name"]
+
+    opportunities = Data.get_opportunities()
+
+    # Handling teams we already in
+    in_opportunities = []
+    enrolled_opportunities_ids = Data.get_enrolled_opportunities(user.id)
+    for opportunity in opportunities:
+        if opportunity["id"] in enrolled_opportunities_ids:
+            in_opportunities.append(opportunity)
+            opportunity["id"] = None # marked
+
+    # Now remove
+        
+    return render_template("volunteer_info.html", captain_status=captain_status, user_email=user_email, user_name=user_name, opportunities=opportunities, in_opportunities=in_opportunities)
 
 
 @app.route("/admin_panel")

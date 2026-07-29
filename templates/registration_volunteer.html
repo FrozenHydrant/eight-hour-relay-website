@@ -8,9 +8,10 @@
 
 <body>
     <div class="registration">
-        <h3>Register as Volunteer</h3>
-        <p class="inner_text">Please fill in the following information to become a volunteer</p>
+        <h3>Register as Volunteer for {{ opportunity["name"] }}</h3>
+        <p class="inner_text">{{ opportunity["description"] }}</p>
         <form method="POST">
+            <input type="hidden" class="text_input" name="opportunity_id" value="{{ opportunity['id'] }}">
             <input type="text" class="text_input" name="first_name" placeholder="First Name"
                 value="{{ user_info['first_name'] }}" required>
             <input type="text" class="text_input" name="last_name" placeholder="Last Name"

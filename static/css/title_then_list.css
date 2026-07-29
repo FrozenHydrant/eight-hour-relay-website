@@ -215,6 +215,11 @@ body {
   color: #1E2235;
 }
 
+.bottom_list_item .info_box {
+  display: flex;
+  flex-direction: column;
+}
+
 /* ── Members table ── */
 .members_table {
   width: 100%;

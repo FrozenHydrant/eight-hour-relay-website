@@ -32,7 +32,32 @@ class Data:
             return False
         return True
 
+
+    def get_opportunity_info(opportunity_id: str):
+        #print("Opportunity with", opportunity_id)
+        try:
+            response = Data.client.table("opportunities").select("*").eq("id", opportunity_id).execute()
+        except Exception as e:
+            return None
+
+        if response is None or len(response.data) < 1:
+            return None
+        return response.data[0]
+
+
+    def get_opportunities():
+        # Get all opportunities
+        try:
+            response = Data.client.table("opportunities").select("id,name,date,start_time,end_time,capacity").execute()
+        except Exception as e:
+            return None
+
+        if response is None:
+            return None
+        return [i for i in response.data]
+
     
+    # Runners
     def get_sponsor_status(user_id: str) -> int:
         try:
             response = Data.client.table("sponsor").select("is_sponsor").eq("user_id", user_id).execute()
@@ -49,7 +74,6 @@ class Data:
             return 1
 
     
-    # Runners
     def get_captain_status(user_id: str) -> int:
         response = None
         try:
@@ -66,23 +90,7 @@ class Data:
         else:
             return 1 # runner
 
-
-    def get_volunteer_status(user_id: str) -> int:
-        try:
-            response = Data.client.table("volunteer").select("is_volunteer").eq("user_id", user_id).execute()
-        except Exception as e:
-            print("Problem getting volunteering status", e)
-
-        if response is None or len(response.data) < 1:
-            return 0
-
-        status = response.data[0]["is_volunteer"]
-        if status:
-            return 2
-        else:
-            return 1
         
-
     def upsert_sponsor_status(user_id: str, is_sponsor: bool) -> bool:
         try:
             _ = Data.client.table("sponsor").upsert({"user_id": user_id, "is_sponsor": is_sponsor}).execute()
@@ -101,15 +109,6 @@ class Data:
         return True
 
 
-    def upsert_volunteer_status(user_id: str, is_volunteer: bool) -> bool:
-        try:
-            _ = Data.client.table("volunteer").upsert({"user_id": user_id, "is_volunteer": is_volunteer}).execute()
-        except Exception as e:
-            print("Problem setting volunteer status", e)
-            return False
-        return True
-
-
     def enroll_user_in_team(user_id: str, team_id: str):
         try:
             response = Data.client.table("enrollment").insert({"user_id": user_id, "team_id": team_id}).execute()
@@ -121,6 +120,15 @@ class Data:
         if len(response.data) < 1:
             return None
         return response.data[0]
+
+
+    def enroll_user_as_volunteer(user_id: str, opportunity_id: str):
+        try:
+            _ = Data.client.table("enrollment_volunteer").insert({"user_id": user_id, "opportunity_id": opportunity_id}).execute()
+        except Exception as e:
+            print("Error occured while enrolling a user as a volunteer:", e)
+            return False
+        return True
     
 
     def setup_user_position(user_id: str, team_id: str):
@@ -150,6 +158,18 @@ class Data:
         if len(response.data) < 1:
             return []
         return [item["user_id"] for item in response.data]
+
+
+    def get_enrolled_volunteers_list(opportunity_id: str):
+        try:
+            response = Data.client.table("enrollment_volunteer").select("user_id").eq("opportunity_id", opportunity_id).execute()
+        except Exception as e:
+            return []
+        if response is None:
+            return []
+        if len(response.data) < 1:
+            return []
+        return [item["user_id"] for item in response.data]
     
 
     def get_enrolled_team(user_id: str):
@@ -162,7 +182,20 @@ class Data:
         if len(response.data) < 1:
             return None
         return response.data[0]["team_id"]
-        
+
+
+    # Get a list of opportunities this user is enrolled for
+    def get_enrolled_opportunities(user_id: str):
+        try:
+            response = Data.client.table("enrollment_volunteer").select("opportunity_id").eq("user_id", user_id).execute()
+        except Exception as e:
+            return []
+        if response is None:
+            return []
+        if len(response.data) < 1:
+            return []
+        return [item["opportunity_id"] for item in response.data]
+
 
     # Given a list of member_ids, give their info from the member_info table
     def get_members_info(member_ids: list):
@@ -209,21 +242,8 @@ class Data:
             print("Error creating new runner:", e)
             return False
         return True
+
         
-
-    def has_authority_over_member(user_id: str, target_id: str, team_id: str) -> bool:
-        if target_id is None or team_id is None:
-            return False
-    
-        # Then check if the member is in a team we own
-        user_owned_teams = Data.get_owned_teams(user_id)
-        members = Data.get_members_list(team_id)
-        if team_id not in user_owned_teams or target_id not in members:
-            return False
-        
-        return True
-
-
     # Update user info with the provided dict
     def update_runner_info(user_id: str, user_info: dict) -> bool:
         try:
@@ -344,6 +364,19 @@ class Data:
         if response is None:
             return False
         return len(response.data) > 0
+
+
+    def has_authority_over_member(user_id: str, target_id: str, team_id: str) -> bool:
+            if target_id is None or team_id is None:
+                return False
+        
+            # Then check if the member is in a team we own
+            user_owned_teams = Data.get_owned_teams(user_id)
+            members = Data.get_members_list(team_id)
+            if team_id not in user_owned_teams or target_id not in members:
+                return False
+            
+            return True
 
 
     # Creates a team and returns the ID. None if failure.
