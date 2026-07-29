@@ -1258,35 +1258,35 @@ def error_page():
 @app.route("/rules")
 def rules():
     user = user_logout_status()
-    captain_status = 0
+    is_logged_in = False
     user_email = None
     user_name = None
     if user:
+        is_logged_in = True
         user_email = user.email
-        captain_status = Data.get_captain_status(user.id)
         self_data = Data.get_members_info([user.id])
         if len(self_data) > 0:
             user_info = self_data[0]
             if "first_name" in user_info:
                 user_name = user_info["first_name"]
-    return render_template("rules.html", captain_status=captain_status, user_email=user_email, user_name=user_name)
+    return render_template("rules.html", is_logged_in=is_logged_in, user_email=user_email, user_name=user_name)
 
 
 @app.route("/sponsors")
 def sponsors():
     user = user_logout_status()
-    captain_status = 0
+    is_logged_in = False
     user_email = None
     user_name = None
     if user:
+        is_logged_in = True
         user_email = user.email
-        captain_status = Data.get_captain_status(user.id)
         self_data = Data.get_members_info([user.id])
         if len(self_data) > 0:
             user_info = self_data[0]
             if "first_name" in user_info:
                 user_name = user_info["first_name"]
-    return render_template("sponsors.html", captain_status=captain_status, user_email=user_email, user_name=user_name)
+    return render_template("sponsors.html", is_logged_in=is_logged_in, user_email=user_email, user_name=user_name)
 
 
 @app.route("/volunteer_info")
