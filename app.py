@@ -306,9 +306,6 @@ def captain_registration_post():
 # Volunteering registration
 @app.route("/volunteer_registration")
 def volunteer_registration():
-    # TESTING ONLY
-    if __name__ != "__main__":
-        return ""
     
     user = user_logout_status()
     if not user:
@@ -340,9 +337,6 @@ def volunteer_registration():
 
 @app.route("/volunteer_registration", methods=["POST"])
 def volunteer_registration_post():
-    #TESTING ONLY
-    if __name__ != "__main__":
-        return ""
     
     user = user_logout_status()
     if not user:
@@ -1309,9 +1303,6 @@ def sponsors():
 
 @app.route("/volunteer_info")
 def volunteer_info():
-    #TESTING ONLY
-    if __name__ != "__main__":
-        return ""
         
     user = user_logout_status()
     user_email = None
@@ -1344,9 +1335,6 @@ def volunteer_info():
 
 @app.route("/volunteer_info", methods=["POST"])
 def volunteer_info_post():
-    #TESTING ONLY
-    if __name__ != "__main__":
-        return ""
         
     user = user_logout_status()
     if not user:
