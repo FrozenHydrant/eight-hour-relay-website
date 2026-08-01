@@ -47,7 +47,7 @@ function slideshow() {
   }, SLIDE_DURATION);
 }
 
-window.addEventListener('load', slideshow)
+// window.addEventListener('load', slideshow)
 
 // ── Countdown ──────────────────────────────────────────────
 setInterval(update, 1000)
