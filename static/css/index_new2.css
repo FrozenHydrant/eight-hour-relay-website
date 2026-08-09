@@ -330,6 +330,12 @@ body {
   text-align: center;
 }
 
+.video {
+  display: block;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
 /* Alternating backgrounds */
 .about,
 .registration_process,
@@ -585,4 +591,8 @@ body {
     display: none;
   }
 
+  .video {
+    width: 350px;
+    height: 200px;
+  }
 }
