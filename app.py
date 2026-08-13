@@ -859,7 +859,8 @@ def team_payment_page_post():
     payment_link = s_client.v1.payment_links.create({
         "line_items": [{"price": s_price_id, "quantity": 1}],
         "metadata": {"team_id": team_id, "user_id": user.id},
-        "after_completion": {"type": "redirect", "redirect": {"url": back_url}}
+        "after_completion": {"type": "redirect", "redirect": {"url": back_url}},
+        "payment_method_types": ["card"]
     })
     
     return redirect(payment_link.url)

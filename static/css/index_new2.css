@@ -81,11 +81,12 @@ body {
 }
 
 /* ── Slideshow ── */
-.slide {
+.slide_img {
   position: absolute;
   inset: 0;
   background-size: cover;
-  animation: slide-drift 10s ease both, slide-fade 10s ease both;
+  background-image: url("/static/img/gallery1.webp");
+  opacity: 90%;
   z-index: -1;
   pointer-events: none;
   background-position-y: top;
@@ -131,22 +132,31 @@ body {
 }
 
 /* Date label */
-.countdown > h3 {
+.date_target {
   font-size: 3.5rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #6C7AE0;
   margin-bottom: 0.5rem;
+  text-shadow: 0.2rem 0.2rem 0.2rem #1E2235;
+}
+
+.date_subtext {
+  font-size: 1rem;
+  color: #A0A8C8;
+  text-transform: uppercase;
+  text-shadow: 0.2rem 0.2rem 0.2rem #1E2235;
 }
 
 /* "COUNTDOWN TO THE EVENT" subtitle */
-.countdown > p {
-  font-size: 0.72rem;
-  letter-spacing: 0.22em;
+.countdown .countdown_subtext {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: #8B90A8;
   margin-bottom: 3.5rem;
+  text-shadow: 0.1rem 0.1rem 0.1rem #4B5563;
 }
 
 /* Horizontal units row */
@@ -320,8 +330,15 @@ body {
   text-align: center;
 }
 
+.video {
+  display: block;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
 /* Alternating backgrounds */
 .about,
+.poster_block,
 .registration_process,
 .faq_section,
 .race_format,
@@ -508,8 +525,8 @@ body {
     grid-template-columns: 240px;
   }
 
-  .countdown > h3 {
-    font-size: 2.3rem;
+  .date_target {
+    font-size: 2.5rem;
   }
   
   .countdown_insides_horizontal {
@@ -575,4 +592,8 @@ body {
     display: none;
   }
 
+  .video {
+    width: 350px;
+    height: 200px;
+  }
 }
