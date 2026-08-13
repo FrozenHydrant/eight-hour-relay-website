@@ -11,8 +11,8 @@
         <a class="top_bar_normal" href="{{ url_for('index') }}">Home</a>
         <a class="top_bar_bonus" href="{{ url_for('volunteer_info') }}">Volunteers</a>
         <a class="top_bar_normal" href="{{ url_for('rules') }}">Rules</a>
-        <a class="top_bar_bonus" href="#reg_proc">Registration Process</a>
-        <a class="top_bar_bonus" href="#gallery">Gallery</a>
+        <a class="top_bar_bonus" href="{{ url_for('index') + '#reg_proc' }}">Registration Process</a>
+        <a class="top_bar_bonus" href="{{ url_for('index') + '#gallery' }}">Gallery</a>
 
         {% if is_logged_in %}
         <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
