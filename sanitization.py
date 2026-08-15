@@ -6,6 +6,7 @@ class Sanitization:
     valid_name_characters = string.ascii_letters + "'- "
     valid_characters = string.ascii_letters + string.digits + string.punctuation
     valid_username_characters = string.ascii_letters + string.digits + "._ " 
+    valid_teamname_characters = string.ascii_letters + string.digits + "._∞ "
 
     def verify_name_characters(name: str) -> bool:
         if all(c in Sanitization.valid_name_characters for c in name):
@@ -33,6 +34,11 @@ class Sanitization:
         if all(c in Sanitization.valid_characters for c in password):
             return True
         return False
+
+    def verify_teamname_characters(teamname: str) -> bool:
+        if all(c in Sanitization.valid_teamname_characters for c in teamname):
+            return True
+        return False
     
     def verify_name_length(name: str) -> bool:
         if name is not None and len(name) > 0 and len(name) < 129:
@@ -56,6 +62,11 @@ class Sanitization:
     
     def verify_username_length(username: str) -> bool:
         if username is not None and len(username) < 17 and len(username) > 2:
+            return True
+        return False
+
+    def verify_teamname_length(teamname: str) -> bool:
+        if teamname is not None and len(teamname) < 32 and len(teamname) > 2:
             return True
         return False
     
@@ -101,7 +112,7 @@ class Sanitization:
             return False
         return True
 
-    def verify_all_lists_and_create_response(emails: list[str], usernames: list[str], passwords: list[str], phones: list[str], names: list[str], genders: list[str]):
+    def verify_all_lists_and_create_response(emails: list[str], usernames: list[str], passwords: list[str], phones: list[str], names: list[str], genders: list[str], teamnames: list[str]):
         for email in emails:
             if not Sanitization.verify_email_length(email):
                 flash("Bad email length.")
@@ -152,5 +163,14 @@ class Sanitization:
             if not gender in ("male", "female", "non-binary"):
                 flash("Please ensure your gender is either: male, female, or non-binary.")
                 return False
+
+        for teamname in teamnames:
+            if not Sanitization.verify_teamname_length(teamname):
+                flash("Please ensure your teamname is between 3-31 characters")
+                return False
+            if not Sanitization.verify_teamname_characters(teamname):
+                flash("Teamname contains invalid characters.")
+                return False
+            
             
         return True

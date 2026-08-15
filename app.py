@@ -277,7 +277,7 @@ def captain_registration_post():
     birthday = request.form.get("birthday")
     phone_number = request.form.get("phone_number")
 
-    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number], [first_name, last_name], [gender])
+    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number], [first_name, last_name], [gender], [])
     if not success:
         return redirect(url_for("captain_registration"))
     
@@ -363,7 +363,7 @@ def volunteer_registration_post():
         flash("You are already volunteering for this position!")
         return redirect(url_for("volunteer_info"))
     
-    success = Sanitization.verify_all_lists_and_create_response([], [address], [], [phone_number], [volunteer_type, first_name, last_name], [])
+    success = Sanitization.verify_all_lists_and_create_response([], [address], [], [phone_number], [volunteer_type, first_name, last_name], [], [])
     if not success:
         return redirect(url_for("volunteer_info"))
     
@@ -426,7 +426,7 @@ def sponsor_registration_post():
     sponsor_organization = request.form.get("sponsor_organization")
     phone_number = request.form.get("phone_number")
 
-    success = Sanitization.verify_all_lists_and_create_response([], [address, sponsor_organization], [], [phone_number], [first_name, last_name, sponsor_type], [])
+    success = Sanitization.verify_all_lists_and_create_response([], [address, sponsor_organization], [], [phone_number], [first_name, last_name, sponsor_type], [], [])
     if not success:
         return redirect(url_for("sponsor_registration"))
     
@@ -579,7 +579,7 @@ def runner_registration_post():
     waiver_agreed = request.form.get("waiver_agreed") == "on"
     shirt_size = request.form.get("shirt_size")
 
-    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number, emergency_phone], [first_name, last_name, emergency_name], [gender])
+    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number, emergency_phone], [first_name, last_name, emergency_name], [gender], [])
 
     if not success:
         return redirect(url_for("runner_registration"))
@@ -621,7 +621,7 @@ def runner_registration_post():
         parent_name = request.form.get("parent_name")
         parent_relationship = request.form.get("parent_relationship")
 
-        if not Sanitization.verify_all_lists_and_create_response([], [], [], [], [parent_name, parent_relationship], []):
+        if not Sanitization.verify_all_lists_and_create_response([], [], [], [], [parent_name, parent_relationship], [], []):
             flash("Check your parent information and try again!")
             return redirect(url_for("runner_registration"))
         
@@ -723,7 +723,7 @@ def profile_post():
     emergency_name = request.form.get("emergency_name")
     emergency_phone = request.form.get("emergency_phone")
 
-    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number, emergency_phone], [first_name, last_name, emergency_name], [gender])
+    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number, emergency_phone], [first_name, last_name, emergency_name], [gender], [])
     if not success:
         return redirect(url_for("profile"))
     
@@ -782,7 +782,7 @@ def team_registration_post():
     division = request.form.get("division")
 
     # Verify names
-    if not Sanitization.verify_all_lists_and_create_response([], [team_name], [], [], [captain_name], []):
+    if not Sanitization.verify_all_lists_and_create_response([], [], [], [], [captain_name], [], [team_name]):
         return redirect(url_for("team_registration"))
         
     # Verify division correctness
@@ -1188,7 +1188,7 @@ def reset_my_password():
         flash("Password reset link was bad! Try with a different one?")
         return redirect(url_for("error_page"))
 
-    if not Sanitization.verify_all_lists_and_create_response([], [], [token], [], [], []):
+    if not Sanitization.verify_all_lists_and_create_response([], [], [token], [], [], [], []):
         return redirect(url_for("error_page"))
 
     # Check the token is valid!
@@ -1231,7 +1231,7 @@ def reset_my_password_post():
         return redirect(url_for("error_page"))
 
     #print(token, auth_token, password)
-    if not Sanitization.verify_all_lists_and_create_response([], [], [token, password], [], [], []):
+    if not Sanitization.verify_all_lists_and_create_response([], [], [token, password], [], [], [], []):
         #print("can't validate")
         return redirect(url_for("error_page"))
         
