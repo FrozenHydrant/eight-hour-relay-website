@@ -144,6 +144,7 @@ body {
 /* ── Create Team button / top actions ── */
 .top_button,
 .button {
+  width: 99%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -196,10 +197,9 @@ body {
 }
 
 .bottom_list_item {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
   padding: 1rem 1.25rem;
   background: #FFFFFF;
   border-radius: 12px;

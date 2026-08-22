@@ -306,9 +306,6 @@ def captain_registration_post():
 # Volunteering registration
 @app.route("/volunteer_registration")
 def volunteer_registration():
-    # TESTING ONLY
-    if __name__ != "__main__":
-        return ""
     
     user = user_logout_status()
     if not user:
@@ -323,6 +320,12 @@ def volunteer_registration():
 
     if user.id in Data.get_enrolled_volunteers_list(opportunity_id):
         flash("You are already volunteering for this position!")
+        return redirect(url_for("volunteer_info"))
+
+    # Count
+    #print(len(Data.get_enrolled_volunteers_list(opportunity_id)), opportunity_info["capacity"])
+    if len(Data.get_enrolled_volunteers_list(opportunity_id)) >= opportunity_info["capacity"]:
+        flash("This opportunity is already filled!")
         return redirect(url_for("volunteer_info"))
 
     users_info = Data.get_members_info([user.id])  
@@ -340,9 +343,6 @@ def volunteer_registration():
 
 @app.route("/volunteer_registration", methods=["POST"])
 def volunteer_registration_post():
-    #TESTING ONLY
-    if __name__ != "__main__":
-        return ""
     
     user = user_logout_status()
     if not user:
@@ -354,13 +354,20 @@ def volunteer_registration_post():
     volunteer_type = request.form.get("volunteer_type")
     phone_number = request.form.get("phone_number")
     opportunity_id = request.form.get("opportunity_id")
+    opportunity_info = Data.get_opportunity_info(opportunity_id)
 
     # Make sure opportunity is right
-    if Data.get_opportunity_info(opportunity_id) is None:
+    if opportunity_info is None:
         return redirect(url_for("volunteer_info"))
 
     if user.id in Data.get_enrolled_volunteers_list(opportunity_id):
         flash("You are already volunteering for this position!")
+        return redirect(url_for("volunteer_info"))
+
+    # Count
+    #print(len(Data.get_enrolled_volunteers_list(opportunity_id)), opportunity_info["capacity"])
+    if len(Data.get_enrolled_volunteers_list(opportunity_id)) >= opportunity_info["capacity"]:
+        flash("This opportunity is already filled!")
         return redirect(url_for("volunteer_info"))
     
     success = Sanitization.verify_all_lists_and_create_response([], [address], [], [phone_number], [volunteer_type, first_name, last_name], [], [])
@@ -1310,9 +1317,6 @@ def sponsors():
 
 @app.route("/volunteer_info")
 def volunteer_info():
-    #TESTING ONLY
-    if __name__ != "__main__":
-        return ""
         
     user = user_logout_status()
     user_email = None
@@ -1338,16 +1342,16 @@ def volunteer_info():
                 in_opportunities.append(opportunity)
                 opportunity["enrollable"] = False # marked
 
-    # Now remove
-        
+    # Signup count
+    for opportunity in in_opportunities:
+        volunteers_list = Data.get_enrolled_volunteers_list(opportunity["id"])
+        opportunity["remaining_capacity"] = opportunity["capacity"] - len(volunteers_list)
+
     return render_template("volunteer_info.html", is_logged_in=is_logged_in, user_email=user_email, user_name=user_name, opportunities=opportunities, in_opportunities=in_opportunities)
 
 
 @app.route("/volunteer_info", methods=["POST"])
 def volunteer_info_post():
-    #TESTING ONLY
-    if __name__ != "__main__":
-        return ""
         
     user = user_logout_status()
     if not user:
