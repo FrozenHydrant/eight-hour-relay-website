@@ -5,28 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/static/css/index_new2.css">
 </head>
+
 <body>
-    <div class="top_bar_info">
-      <div class="top_bar_insides">
-        <a class="top_bar_normal" href="{{ url_for('index') }}">Home</a>
-        <a class="top_bar_bonus" href="{{ url_for('volunteer_info') }}">Volunteers</a>
-        <a class="top_bar_bonus" href="{{ url_for('sponsors') }}">Sponsors</a>
-        <a class="top_bar_bonus" href="{{ url_for('index') + '#reg_proc' }}">Registration Process</a>
-        <a class="top_bar_bonus" href="{{ url_for('index') + '#gallery' }}">Gallery</a>
+    <!-- ══════════════ NAV ══════════════ -->
+    <header class="site-header">
+        <div class="container-x">
+            <a href="{{ url_for('index') }}" class="brand">
+                <img src="/static/logo3.png" alt="8 Hours Relay" />
+                <span class="brand-name">8 Hours Relay</span>
+            </a>
 
-        {% if is_logged_in %}
-        <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
-        <a class="top_bar_bonus" href="{{ url_for('logout') }}">Logout</a>
-        {% else %}
+            <nav class="nav-links">
+                <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                <a class="nav-link" href="{{ url_for('volunteer_info') }}">Volunteers</a>
+                <a class="nav-link" href="{{ url_for('sponsors') }}">Sponsors</a>
+                <a class="nav-link" href="{{ url_for('index') + '#reg_proc' }}">Registration Process</a>
+                <a class="nav-link" href="{{ url_for('index') + '#gallery' }}">Gallery</a>
+            </nav>
 
-        <a class="top_bar_normal" href="{{ url_for('login')}}">Sign In</a>
-        {% endif %}
-      </div>
-    </div>
+            <div class="nav-actions">
+                {% if is_logged_in %}
+                <a class="nav-link" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
+                <a class="btn btn-outline btn-outline-small" href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                <a class="btn btn-outline btn-outline-small" href="{{ url_for('login') }}">Sign In</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
 
-    <div class="bottom_block race_format">
-        <h3 class="sub_title">Race Format</h3>
-        <p class="inner_text">The BMAI VANCOUVER RUNAHOLICS 8-Hour Relay is a team endurance relay race held on a 400-metre track.
+    <section class="section bg-white race_format container-x">
+        <h3 class="h-section">Race Format</h3>
+        <p class="text-body text-left">The BMAI VANCOUVER RUNAHOLICS 8-Hour Relay is a team endurance relay race held on
+            a 400-metre track.
             The objective is for each team to cover the greatest total distance within eight (8) hours.
             Each team consists of eight (8) runners.
             Runners compete in a fixed running order. Each runner completes two (2) relay legs of approximately 30
@@ -36,25 +47,25 @@
             The team with the greatest adjusted total distance at the end of eight (8) hours will be declared the winner
             of its division.
         </p>
-    </div>
+    </section>
 
-    <div class="bottom_block divisions">
-        <h3 class="sub_title">Divisions</h3>
-        <p class="inner_text">
+    <section class="section bg-alt divisions container-x">
+        <h3 class="h-section">Divisions</h3>
+        <p class="text-body text-left">
             The event consists of three divisions:
         </p>
-        <ul class="inner_text inside_list">
+        <ul class="dash-list">
             <li>Open Division</li>
             <li>Mixed Division</li>
             <li>Masters Division</li>
         </ul>
-        <p class="inner_text">Each team must consist of eight (8) registered runners. More details follow:</p>
-    </div>
+        <p class="text-body">Each team must consist of eight (8) registered runners. More details follow:</p>
+    </section>
 
-    <div class="bottom_block open_division">
-        <h3 class="sub_title">Open Division</h3>
-        <p class="inner_text">
-        <ul class="inner_text inside_list">
+    <section class="section bg-white open_division container-x">
+        <h3 class="h-section">Open Division</h3>
+        <p class="text-body">
+        <ul class="inner_text dash-list">
             <li>All runners must be 15 years of age or older on Race Day.</li>
             <li>Participants aged 15–18 must have a parent or legal guardian sign the event waiver prior to
                 participating.</li>
@@ -62,32 +73,32 @@
             <li>Teams may consist of any combination of male and female runners.</li>
         </ul>
         </p>
-    </div>
+    </section>
 
-    <div class="bottom_block mixed_division">
-        <h3 class="sub_title">Mixed Division</h3>
-        <p class="inner_text">
-        <ul class="inner_text inside_list">
+    <section class="section bg-alt mixed_division container-x">
+        <h3 class="h-section">Mixed Division</h3>
+        <p class="text-body">
+        <ul class="inner_text dash-list">
             <li>All runners must be 15 years of age or older on Race Day.</li>
             <li>Participants aged 15–18 must have a parent or legal guardian sign the event waiver prior to
                 participating.</li>
             <li>Each team must consist of 4 male runners and 4 female runners.</li>
         </ul>
         </p>
-    </div>
+    </section>
 
-    <div class="bottom_block masters_division">
-        <h3 class="sub_title">Masters Division</h3>
-        <p class="inner_text">
-        <ul class="inner_text inside_list">
-            <li>All runners must be 50 years of age or older on Race Day.</li>
-            <li> Standard team composition: 4 men and 4 women.</li>
-        </ul>
+    <section class="section bg-white masters_division container-x">
+        <h3 class="h-section">Masters Division</h3>
+        <p class="text-body text-left">
+            <ul class="inner_text dash-list">
+                <li>All runners must be 50 years of age or older on Race Day.</li>
+                <li> Standard team composition: 4 men and 4 women.</li>
+            </ul>
         </p>
-        <p class="inner_text">
+        <p class="text-body text-left">
             Distance Adjustment:
         </p>
-        <p class="inner_text">
+        <p class="text-body text-left">
             For every one (1) additional male runner above four (4), 1 kilometre will be deducted from the team's final
             distance.
             For every one (1) additional female runner above four (4), 1 kilometre will be added to the team's final
@@ -102,11 +113,11 @@
             1M/7F = +3 km,
             0M/8F = +4 km,
         </p>
-    </div>
+    </section>
 
-    <div class="bottom_block relay_leg_rules">
-        <h3 class="sub_title">Relay Leg Rules</h3>
-        <p class="inner_text">
+    <section class="section bg-alt relay_leg_rules container-x">
+        <h3 class="h-section">Relay Leg Rules</h3>
+        <p class="text-body text-left">
             Each runner must complete exactly two (2) relay legs.
             The official duration of each relay leg is 30 minutes.
             Because the race is conducted on a 400-metre track, relay exchanges must take place only after the incoming
@@ -119,78 +130,78 @@
             Each runner may complete only two relay legs unless otherwise approved by the Race Director under
             exceptional circumstances.
         </p>
-    </div>
+    </section>
 
-    <div class="bottom_block team_reg">
-        <h3 class="sub_title">Team Registration & Running Order</h3>
-        <p class="inner_text">
+    <section class="section bg-white team_reg container-x">
+        <h3 class="h-section">Team Registration & Running Order</h3>
+        <p class="text-body text-left">
             By the registration deadline, each team must submit its team name, team captain, eight registered runners,
             division, and running order (Runners 1–8). The running order is considered final after registration closes
             unless approved by the Race Director.
         </p>
-    </div>
+    </section>
 
-    <div class="bottom_block scoring">
-        <h3 class="sub_title">Scoring</h3>
-        <p class="inner_text">
+    <div class="section bg-alt scoring container-x">
+        <h3 class="h-section">Scoring</h3>
+        <p class="text-body text-left">
             The official result is based on the total distance completed within eight (8) hours. Masters Division
             adjustments will be applied after the race.
         </p>
     </div>
 
-    <div class="bottom_block awards">
-        <h3 class="sub_title">Awards</h3>
-        <p class="inner_text">
+    <section class="section bg-white awards container-x">
+        <h3 class="h-section">Awards</h3>
+        <p class="text-body text-left">
             Championship awards will be presented to the winning team in each division: Open Division, Mixed Division,
             and Masters Division.
         </p>
-    </div>
+    </section>
 
-    <div class="bottom_block relay_exchange_zone">
-        <h3 class="sub_title">Relay Exchange Zone</h3>
-        <p class="inner_text">
+    <section class="section bg-alt relay_exchange_zone container-x">
+        <h3 class="h-section">Relay Exchange Zone</h3>
+        <p class="text-body text-left">
             All relay exchanges must take place within the designated Exchange Zone. Failure to do so may result in a
             penalty.
         </p>
-    </div>
+    </section>
 
-    <div class="bottom_block timing">
+    <section class="section bg-white timing container-x">
 
-        <h3 class="sub_title">Timing and Lap Counting</h3>
-        <p class="inner_text">
+        <h3 class="h-section">Timing and Lap Counting</h3>
+        <p class="text-body text-left">
             The official race time is eight (8) hours. Lap counting stops immediately when the official race time
             expires. Only laps fully completed before the official finish time will be counted.
         </p>
-    </div>
+    </section>
 
-    <div class="bottom_block general_rules">
-        <h3 class="sub_title">General Rules</h3>
-        <ul class="inner_text inside_list">
+    <section class="section bg-alt general_rules container-x">
+        <h3 class="h-section">General Rules</h3>
+        <ul class="inner_text dash-list text-body">
             <li>Each participant may compete for one team only.</li>
             <li>All runners must wear their official race bib while competing.</li>
             <li>Teams must follow all instructions from race officials and volunteers.</li>
             <li>Unsportsmanlike conduct, cheating, or rule violations may result in penalties or disqualification.</li>
         </ul>
-    </div>
+    </section>
 
 
-    <div class="bottom_block safety">
-        <h3 class="sub_title">Safety and Conduct</h3>
-        <p class="inner_text">
+    <section class="section bg-white safety container-x">
+        <h3 class="h-section">Safety and Conduct</h3>
+        <p class="text-body text-left">
             Participants must compete safely and in a sportsmanlike manner. Obstructing or intentionally interfering
             with another runner is prohibited.
         </p>
-    </div>
+    </section>
 
 
-    <div class="bottom_block rule_interpretation">
-        <h3 class="sub_title">Rule Interpretation and Amendments</h3>
-        <p class="inner_text">
+    <section class="section bg-alt rule_interpretation container-x">
+        <h3 class="h-section">Rule Interpretation and Amendments</h3>
+        <p class="text-body text-left">
             The Race Director reserves the right to interpret, amend, and enforce these rules. The Event Organizer may
             modify these rules prior to Race Day if necessary to ensure safety, fairness, and the smooth operation of
             the event. Any changes will be communicated to all registered teams before Race Day.
         </p>
-    </div>
+    </section>
 </body>
 
 </html>
