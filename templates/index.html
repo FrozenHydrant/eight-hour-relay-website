@@ -2,217 +2,249 @@
 <html lang="en">
 
 <head>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/static/css/index_new2.css">
-  <script type="text/javascript" src="/static/js/index2.js"></script>
+  <title>8 Hours Relay — Eight hours. One team. Endless laps.</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/static/css/index_new2.css" />
+  <script type="text/javascript" src="/static/js/index2.js" defer></script>
 </head>
 
 <body>
-  <div class="slide_img"></div>
-  <div class="main_page">
-    <div class="logo">
-      <img src="/static/logo3.png">
-    </div>
-    <div class="top_bar_info">
-      <div class="top_bar_insides">
-        <a class="top_bar_normal" href="{{ url_for('rules') }}">Rules</a>
-        <a class="top_bar_bonus" href="{{ url_for('sponsors') }}">Sponsors</a>
-        <a class="top_bar_bonus" href="#reg_proc">Registration Process</a>
-        <a class="top_bar_bonus" href="#gallery">Gallery</a>
 
+  <!-- ══════════════ NAV ══════════════ -->
+  <header class="site-header">
+    <div class="container-x">
+      <a href="{{ url_for('index') }}" class="brand">
+        <img src="/static/logo3.png" alt="8 Hours Relay" />
+        <span class="brand-name">8 Hours Relay</span>
+      </a>
+
+      <nav class="nav-links">
+        <a class="nav-link" href="{{ url_for('rules') }}">Rules</a>
+        <a class="nav-link" href="{{ url_for('sponsors') }}">Sponsors</a>
+        <a class="nav-link" href="#reg_proc">Registration Process</a>
+        <a class="nav-link" href="#gallery">Gallery</a>
+      </nav>
+
+      <div class="nav-actions">
         {% if is_logged_in %}
-        <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
-        <a class="top_bar_bonus" href="{{ url_for('logout') }}">Logout</a>
+        <a class="nav-link" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
+        <a class="btn btn-outline btn-outline-small" href="{{ url_for('logout') }}">Logout</a>
         {% else %}
-
-        <a class="top_bar_normal" href="{{ url_for('login')}}">Sign In</a>
+        <a class="btn btn-outline btn-outline-small" href="{{ url_for('login') }}">Sign In</a>
         {% endif %}
       </div>
     </div>
-    <div class="countdown">
-      <h3 class="date_target">SEP 12 2026</h3>
-      <p class="date_subtext">COUNTDOWN TO THE EVENT</p>
-      <div class="countdown_insides_horizontal">
-        <div class="countdown">
-          <span id="day_count" class="countdown_num">{{ days }}</span>
-          <span class="countdown_subtext">Days</span>
+  </header>
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-inner">
+      <p class="eyebrow hero-eyebrow">Saturday, September 13, 2026 &middot; Greenfield Sports Complex</p>
+      <h1 class="hero-title">8 Hours Relay</h1>
+      <p class="hero-subtitle">Eight Hours. One Team. Endless Laps.</p>
+
+      <div class="countdown-row">
+        <div class="countdown-item">
+          <span id="day_count" class="countdown-num">{{ days }}</span>
+          <span class="countdown-label">Days</span>
         </div>
-        <div class="countdown">
-          <span id="hour_count" class="countdown_num">{{ hours }}</span>
-          <span class="countdown_subtext">Hours</span>
+        <div class="countdown-divider"></div>
+        <div class="countdown-item">
+          <span id="hour_count" class="countdown-num">{{ hours }}</span>
+          <span class="countdown-label">Hours</span>
         </div>
-        <div class="countdown">
-          <span id="minute_count" class="countdown_num">{{ minutes }}</span>
-          <span class="countdown_subtext">Minutes</span>
+        <div class="countdown-divider"></div>
+        <div class="countdown-item">
+          <span id="minute_count" class="countdown-num">{{ minutes }}</span>
+          <span class="countdown-label">Minutes</span>
         </div>
-        <div class="countdown">
-          <span id="second_count" class="countdown_num">{{ seconds }}</span>
-          <span class="countdown_subtext">Seconds</span>
+        <div class="countdown-divider"></div>
+        <div class="countdown-item">
+          <span id="second_count" class="countdown-num">{{ seconds }}</span>
+          <span class="countdown-label">Seconds</span>
         </div>
       </div>
+
+      <div class="hero-buttons">
+        {% if captain_status == 0 %}
+        <a class="btn btn-primary" href="{{ url_for('event_registration_choice') }}">Register for Event</a>
+        {% endif %}
+
+        {% if captain_status == 2 %}
+        <a class="btn btn-primary" href="{{ url_for('runner_registration') }}">Register as Runner</a>
+        {% endif %}
+
+        {% if captain_status == 1 %}
+        <a class="btn btn-ghost" href="{{ url_for('team_information', team_id=team_id) }}">View my Team</a>
+        {% endif %}
+
+        {% if captain_status == 2 %}
+        <a class="btn btn-ghost" href="{{ url_for('teams') }}">Manage my Teams</a>
+        {% endif %}
+
+        {% if is_admin %}
+        <a class="btn btn-ghost" href="{{ url_for('admin_panel') }}">Admin Panel</a>
+        {% endif %}
+      </div>
     </div>
-    <div class="buttons">
-      {% if captain_status == 0 %}
-      <a href="{{ url_for('event_registration_choice') }}">
-        Register for Event
-      </a>
-      {% endif %}
+  </section>
 
-      {% if captain_status == 2 %}
-      <a href="{{ url_for('runner_registration') }}">
-        Register as Runner
-      </a>
-      {% endif %}
-
-      {% if captain_status == 1 %}
-      <a href="{{ url_for('team_information', team_id=team_id) }}">
-        View my Team
-      </a>
-      {% endif %}
-
-      {% if captain_status == 2 %}
-      <a href="{{ url_for('teams') }}">
-        Manage my Teams
-      </a>
-      {% endif %}
-
-      {% if is_admin %}
-      <a href="{{ url_for('admin_panel') }}">
-        Admin Panel
-      </a>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="information">
-    <h3 class="sub_title">Mark Your Calendar</h3>
-    <div class="horizontal_info_panel">
-      <div class="info_block">
-        <span class="info_title">Team Fee</span>
-        <div class="info_block_sub_panel">
-          <div class="info_block_sub_block">
-            <span>Early Bird</span>
-            <span>$399</span>
+  <!-- ══════════════ MARK YOUR CALENDAR ══════════════ -->
+  <section class="section bg-white">
+    <div class="container-x">
+      <h3 class="h-section">Mark Your Calendar</h3>
+      <div class="split-panel">
+        <div class="split-block">
+          <span class="eyebrow">Team Fee</span>
+          <div class="fee-row">
+            <div class="fee-item">
+              <span class="fee-item-label">Early Bird</span>
+              <span class="fee-item-value">$399</span>
+            </div>
+            <div class="fee-item">
+              <span class="fee-item-label">Normal</span>
+              <span class="fee-item-value">$499</span>
+            </div>
           </div>
-          <div class="info_block_sub_block">
-            <span>Normal</span>
-            <span>$499</span>
-          </div>
+          <p class="text-note">Early Bird price is until the end of Aug 15th.</p>
         </div>
-        <p class="inner_bonus_text">Early Bird price is until the end of Aug 15th.</p>
-      </div>
-      <div class="info_block">
-        <span class="info_title">When</span>
-        <span>8:00am - 4:00pm</span>
-        <span>Sep. 12, 2026</span>
-      </div>
-      <div class="info_block">
-        <span class="info_title">Where</span>
-        <span>Swangard Stadium</span>
-        <span>Burnaby, British Columbia</span>
+        <div class="split-block">
+          <span class="eyebrow">When</span>
+          <span class="split-value">8:00am &ndash; 4:00pm</span>
+          <span class="split-sub">Sep. 12, 2026</span>
+        </div>
+        <div class="split-block">
+          <span class="eyebrow">Where</span>
+          <span class="split-value">Swangard Stadium</span>
+          <span class="split-sub">Burnaby, British Columbia</span>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="bottom_block poster_block">
-    <img class="poster_img" src="/static/img/573.jpg" width="640" height="932">
-  </div>
-  
-  <div class="bottom_block">
-    <p class="sub_title">Last Year's Highlights</p>
-    <iframe class="video" width="560" height="315" src="https://www.youtube.com/embed/H4vee_cnfEA?si=1JJ_5hKkJvfbQOx7"
-      title="YouTube video player" frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-  </div>
+  <!-- ══════════════ POSTER ══════════════ -->
+  <section class="section bg-alt">
+    <div class="container-x poster-wrap">
+      <img class="poster-img" src="/static/img/573.jpg" width="640" height="932" alt="Event poster" />
+    </div>
+  </section>
 
-  <div class="bottom_block about" id="about">
-    <h3 class="sub_title">About the Race</h3>
-    <p class="inner_text">The BMAI VANCOUVER RUNAHOLICS 8-Hour Relay is a team endurance event designed for runners of
-      all levels.
-      Unlike a traditional road race, this event focuses on teamwork, pacing, strategy, and community spirit. Each team
-      consists of 8 runners. Runners take turns completing 30-minute legs in a fixed order. After all 8 runners complete
-      their first leg, the same order repeats for the second round.
+  <!-- ══════════════ HIGHLIGHTS VIDEO ══════════════ -->
+  <section class="section bg-white">
+    <div class="container-x">
+      <h3 class="h-section">Last Year's Highlights</h3>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/H4vee_cnfEA?si=1JJ_5hKkJvfbQOx7"
+          title="YouTube video player" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
 
-    <p class="inner_text">The goal is simple: cover the longest total distance within 8 hours.
-      Hosted by Vancouver Runaholics Running & Fitness Society.</p>
-    </p>
-  </div>
+  <!-- ══════════════ ABOUT ══════════════ -->
+  <section class="section bg-white" id="about">
+    <div class="container-x section-narrow">
+      <h3 class="h-section">About the Race</h3>
+      <p class="text-body text-left">
+        The BMAI VANCOUVER RUNAHOLICS 8-Hour Relay is a team endurance event designed for runners of all levels.
+        Unlike a traditional road race, this event focuses on teamwork, pacing, strategy, and community spirit.
+        Each team consists of 8 runners. Runners take turns completing 30-minute legs in a fixed order. After all
+        8 runners complete their first leg, the same order repeats for the second round.
+      </p>
+      <p class="text-body text-left" style="margin-top: 1rem;">
+        The goal is simple: cover the longest total distance within 8 hours.
+        Hosted by Vancouver Runaholics Running &amp; Fitness Society.
+      </p>
+    </div>
+  </section>
 
-  <div class="bottom_block rules">
-    <h3 class="sub_title">Basic Rules</h3>
-    <div class="inner_rules">
-      <ul class="inner_text inside_list">
+  <!-- ══════════════ BASIC RULES ══════════════ -->
+  <section class="section bg-alt">
+    <div class="container-x section-narrow">
+      <h3 class="h-section">Basic Rules</h3>
+      <ul class="dash-list text-left">
         <li>Each team must have exactly 8 registered runners.</li>
         <li>Each runner completes exactly two legs.</li>
         <li>Each leg is approximately 30 minutes.</li>
-        <li>A ±3-minute margin is allowed to complete a full lap before exchange.</li>
+        <li>A &plusmn;3-minute margin is allowed to complete a full lap before exchange.</li>
         <li>Teams must submit a fixed running order before the registration deadline.</li>
         <li>The same running order is used for both rounds.</li>
         <li>The team covering the greatest total distance within 8 hours wins.</li>
         <li>Only completed laps are counted.</li>
       </ul>
-      <a href="{{ url_for('rules') }}">View more detailed rules here</a>
+      <a class="link-arrow" href="{{ url_for('rules') }}">View more detailed rules here &rarr;</a>
     </div>
-  </div>
+  </section>
 
-  <div class="bottom_block divisions">
-    <h3 class="sub_title">Divisions</h3>
-    <div class="horizontal_info_panel">
-      <div class="info_block">
-        <span>Open Division</span>
-        <ul class="inner_text inside_list">
-          <li>15+ years old</li>
-          <li>No gender requirement</li>
-        </ul>
-      </div>
-      <div class="info_block">
-        <span>Mixed Division</span>
-        <ul class="inner_text inside_list">
-          <li>4 male and 4 female runners</li>
-          <li>15+ years old</li>
-        </ul>
-      </div>
-      <div class="info_block">
-        <span>Master Division</span>
-        <ul class="inner_text inside_list">
-
-          <li>All runners must be 50 years old or above.</li>
-          <li>Standard team: 4 male + 4 female.</li>
-          <li>Distance adjustment may apply if gender balance differs.</li>
-        </ul>
+  <!-- ══════════════ DIVISIONS ══════════════ -->
+  <section class="section bg-white">
+    <div class="container-x">
+      <h3 class="h-section">Divisions</h3>
+      <div class="split-panel">
+        <div class="split-block split-block-left">
+          <span class="eyebrow">Open Division</span>
+          <ul class="dash-list dash-list-tight text-left">
+            <li>15+ years old</li>
+            <li>No gender requirement</li>
+          </ul>
+        </div>
+        <div class="split-block split-block-left">
+          <span class="eyebrow">Mixed Division</span>
+          <ul class="dash-list dash-list-tight text-left">
+            <li>4 male and 4 female runners</li>
+            <li>15+ years old</li>
+          </ul>
+        </div>
+        <div class="split-block split-block-left">
+          <span class="eyebrow">Master Division</span>
+          <ul class="dash-list dash-list-tight text-left">
+            <li>All runners must be 50 years old or above.</li>
+            <li>Standard team: 4 male + 4 female.</li>
+            <li>Distance adjustment may apply if gender balance differs.</li>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="bottom_block registration_process" id="reg_proc">
-    <h3 class="sub_title">Registration Process</h3>
-    <div class="inner_text">
-      <p class="inner_text">Each team registration requires the following information:</p>
-      <ul class="inner_text inside_list">
-        <li>Team name</li>
-        <li>Division</li>
-        <li>Team Captain's information</li>
-      </ul>
-      <p class="inner_text">Afterwards, runners join with the Team Code that is provided after team registration.
-        Each runner will need to provide the following information:
-      </p>
-      <ul class="inner_text inside_list">
-        <li>Runner name</li>
-        <li>Email address</li>
-        <li>Phone & emergency contact</li>
-        <li>Gender/age</li>
-      </ul>
-      <p class="inner_bonus_text">Once the runners have joined, the captain can edit their running order and also make a
-        payment.</p>
+  <!-- ══════════════ REGISTRATION PROCESS ══════════════ -->
+  <section class="section bg-alt" id="reg_proc">
+    <div class="container-x section-narrow">
+      <h3 class="h-section">Registration Process</h3>
+      <div class="text-left">
+        <p class="text-body">Each team registration requires the following information:</p>
+        <ul class="dash-list dash-list-tight" style="margin-top: 1rem; margin-left: 0;">
+          <li>Team name</li>
+          <li>Division</li>
+          <li>Team Captain's information</li>
+        </ul>
+        <p class="text-body" style="margin-top: 1.5rem;">Afterwards, runners join with the Team Code that is provided after team registration. Each runner will need to provide the following information:</p>
+        <ul class="dash-list dash-list-tight" style="margin-top: 1rem; margin-left: 0;">
+          <li>Runner name</li>
+          <li>Email address</li>
+          <li>Phone &amp; emergency contact</li>
+          <li>Gender/age</li>
+        </ul>
+        <p class="text-note" style="margin-top: 1.5rem;">Once the runners have joined, the captain can edit their running order and also make a payment.</p>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="bottom_block event_scheduling">
-    <h3 class="sub_title">Event Schedule</h3>
-    <div class="inner_text">
-      <p class="inner_text">
-      <ul class="inside_list">
+  <!-- ══════════════ EVENT SCHEDULE ══════════════ -->
+  <section class="section bg-white">
+    <div class="container-x section-narrow">
+      <h3 class="h-section">Event Schedule</h3>
+      <ul class="dash-list text-left" style="max-width: 28rem;">
         <li>7:00 AM Team Check-in</li>
         <li>7:30 AM Team Captain Meeting</li>
         <li>7:50 AM Opening Ceremony</li>
@@ -222,88 +254,97 @@
         <li>4:15 PM Result Verification</li>
         <li>4:30 PM Awards Ceremony</li>
       </ul>
-      </p>
     </div>
-  </div>
+  </section>
 
-  <div class="bottom_block venue_info" id="venue">
-    <h3 class="sub_title">Venue Information</h3>
-    <p class="inner_text">
-      Location:
-      Swangard Stadium, Burnaby, British Columbia
-    </p>
-
-    <p class="inner_bonus_text">
-      Standard 400m athletics track.
-      Designated team areas available.
-      Parking information will be announced before race day.
-    </p>
-  </div>
-
-  <div class="bottom_block awards">
-    <h3 class="sub_title">Awards</h3>
-    <p class="inner_text">
-      We will give champion awards for:
-    </p>
-
-    <ul class="inside_list">
-      <li>Open Division</li>
-      <li>Mixed Division</li>
-      <li>Master Division</li>
-    </ul>
-    <p class="inner_bonus_text">
-      Additional sponsor awards may be announced.
-    </p>
-  </div>
-
-  <div class="bottom_block faq_section">
-    <h3 class="sub_title">FAQ</h3>
-    <p class="inner_text">Can a runner join more than one team?</p>
-    <p class="inner_bonus_text">No.</p>
-
-    <p class="inner_text">Can runners be changed?</p>
-    <p class="inner_bonus_text">Before the final deadline only.</p>
-
-    <p class="inner_text">How is distance calculated?</p>
-    <p class="inner_bonus_text">Official lap and timing system.</p>
-
-    <p class="inner_text">Can spectators attend?</p>
-    <p class="inner_bonus_text">Yes.</p>
-  </div>
-
-  <div class="bottom_block gallery" id="gallery">
-    <h3 class="sub_title">Gallery</h3>
-    <div class="images_display_grid_awesomely">
-      <img src="/static/img/gallery1.webp">
-      <img src="/static/img/gallery2.webp">
-      <img src="/static/img/gallery3.webp">
-      <img src="/static/img/gallery4.webp">
-      <img src="/static/img/gallery5.webp">
-      <img src="/static/img/gallery6.webp">
-      <img src="/static/img/gallery7.webp">
-      <img src="/static/img/gallery8.webp">
-      <img src="/static/img/gallery9.webp">
-      <img src="/static/img/gallery10.webp">
-      <img src="/static/img/gallery11.webp">
-      <img src="/static/img/gallery12.webp">
-      <img src="/static/img/gallery13.webp">
-      <img src="/static/img/gallery14.webp">
-      <img src="/static/img/gallery15.webp">
-      <img src="/static/img/gallery16.webp">
+  <!-- ══════════════ VENUE ══════════════ -->
+  <section class="section bg-alt" id="venue">
+    <div class="container-x section-narrow">
+      <h3 class="h-section">Venue Information</h3>
+      <p class="text-body">Location: Swangard Stadium, Burnaby, British Columbia</p>
+      <p class="text-note" style="margin-top: 0.75rem;">Standard 400m athletics track. Designated team areas available. Parking information will be announced before race day.</p>
     </div>
-  </div>
+  </section>
 
-  <div class="bottommost_block copyright_block">
-    <h3 class="sub_title">Contact Us</h3>
-    <p class="inner_text">Email: vancouverrun@gmail.com</p>
-    <p class="inner_text">Websites: </p>
-    <ul class="inside_list">
-      <li>https://www.vancouverrunaholics.com/</li>
-      <li>https://bmai.ca/</li>
-    </ul>
-    <p class="inner_text bottom_label">© Vancouver Runaholics 2026</p>
-  </div>
+  <!-- ══════════════ AWARDS ══════════════ -->
+  <section class="section bg-white">
+    <div class="container-x section-narrow">
+      <h3 class="h-section">Awards</h3>
+      <p class="text-body">We will give champion awards for:</p>
+      <ul class="dash-list dash-list-tight text-left" style="max-width: 20rem; margin-top: 1rem;">
+        <li>Open Division</li>
+        <li>Mixed Division</li>
+        <li>Master Division</li>
+      </ul>
+      <p class="text-note" style="margin-top: 1rem;">Additional sponsor awards may be announced.</p>
+    </div>
+  </section>
 
+  <!-- ══════════════ FAQ ══════════════ -->
+  <section class="section bg-alt">
+    <div class="container-x" style="max-width: 42rem;">
+      <h3 class="h-section">FAQ</h3>
+      <div class="faq-list">
+        <div>
+          <p class="faq-question">Can a runner join more than one team?</p>
+          <p class="text-note faq-answer">No.</p>
+        </div>
+        <div>
+          <p class="faq-question">Can runners be changed?</p>
+          <p class="text-note faq-answer">Before the final deadline only.</p>
+        </div>
+        <div>
+          <p class="faq-question">How is distance calculated?</p>
+          <p class="text-note faq-answer">Official lap and timing system.</p>
+        </div>
+        <div>
+          <p class="faq-question">Can spectators attend?</p>
+          <p class="text-note faq-answer">Yes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ GALLERY ══════════════ -->
+  <section class="section bg-white" id="gallery">
+    <div class="container-x">
+      <h3 class="h-section">Gallery</h3>
+      <div class="gallery-grid">
+        <img src="/static/img/gallery1.webp" alt="" />
+        <img src="/static/img/gallery2.webp" alt="" />
+        <img src="/static/img/gallery3.webp" alt="" />
+        <img src="/static/img/gallery4.webp" alt="" />
+        <img src="/static/img/gallery5.webp" alt="" />
+        <img src="/static/img/gallery6.webp" alt="" />
+        <img src="/static/img/gallery7.webp" alt="" />
+        <img src="/static/img/gallery8.webp" alt="" />
+        <img src="/static/img/gallery9.webp" alt="" />
+        <img src="/static/img/gallery10.webp" alt="" />
+        <img src="/static/img/gallery11.webp" alt="" />
+        <img src="/static/img/gallery12.webp" alt="" />
+        <img src="/static/img/gallery13.webp" alt="" />
+        <img src="/static/img/gallery14.webp" alt="" />
+        <img src="/static/img/gallery15.webp" alt="" />
+        <img src="/static/img/gallery16.webp" alt="" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer class="site-footer">
+    <div class="container-x" style="max-width: 40rem;">
+      <h3 class="site-footer-title">Contact Us</h3>
+      <p>Email: vancouverrun@gmail.com</p>
+      <p>Websites:</p>
+      <ul class="site-footer-links">
+        <li><a href="https://www.vancouverrunaholics.com/">https://www.vancouverrunaholics.com/</a></li>
+        <li><a href="https://bmai.ca/">https://bmai.ca/</a></li>
+      </ul>
+      <p class="site-footer-copy">&copy; Vancouver Runaholics 2026</p>
+    </div>
+  </footer>
+
+  <!-- ══════════════ FLASH MESSAGES ══════════════ -->
   <div class="flashes">
     {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -313,6 +354,7 @@
     {% endif %}
     {% endwith %}
   </div>
+
 </body>
 
 </html>
