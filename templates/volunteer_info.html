@@ -30,7 +30,7 @@
             <p class="title">{{ opportunity["name"] }} (Enrolled)</p>
             <div class="info_box">
                 <p class="title">{{ opportunity["date"] }}</p>
-                <p class="muted">{{ opportunity["start_time"] }} - {{ opportunity["end_time"] }}</p>
+                <p class="muted">Time TBA</p>
                 <p class="title">{{ opportunity["remaining_capacity"] }} Spots Left</p>
             </div>
 
@@ -48,7 +48,7 @@
             <p class="title">{{ opportunity["name"] }}</p>
             <div class="info_box">
                 <p class="title">{{ opportunity["date"] }}</p>
-                <p class="muted">{{ opportunity["start_time"] }} - {{ opportunity["end_time"] }}</p>
+                <p class="muted">Time TBA</p>
                 <p class="title">{{ opportunity["capacity"] }} Spots Left</p>
             </div>
             <a href="{{ url_for('volunteer_registration',opportunity_id=opportunity['id']) }}" class="button">View
