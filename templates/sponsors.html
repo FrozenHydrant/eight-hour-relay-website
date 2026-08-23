@@ -7,25 +7,28 @@
 
 <body>
     <div class="top_bar_info">
-      <div class="top_bar_insides">
-        <a class="top_bar_normal" href="{{ url_for('index') }}">Home</a>
-        <a class="top_bar_bonus" href="{{ url_for('volunteer_info') }}">Volunteers</a>
-        <a class="top_bar_normal" href="{{ url_for('rules') }}">Rules</a>
-        <a class="top_bar_bonus" href="{{ url_for('index') + '#reg_proc' }}">Registration Process</a>
-        <a class="top_bar_bonus" href="{{ url_for('index') + '#gallery' }}">Gallery</a>
+        <div class="top_bar_insides">
+            <a class="top_bar_normal" href="{{ url_for('index') }}">Home</a>
+            <a class="top_bar_bonus" href="{{ url_for('volunteer_info') }}">Volunteers</a>
+            <a class="top_bar_normal" href="{{ url_for('rules') }}">Rules</a>
+            <a class="top_bar_bonus" href="{{ url_for('index') + '#reg_proc' }}">Registration Process</a>
+            <a class="top_bar_bonus" href="{{ url_for('index') + '#gallery' }}">Gallery</a>
 
-        {% if is_logged_in %}
-        <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
-        <a class="top_bar_bonus" href="{{ url_for('logout') }}">Logout</a>
-        {% else %}
+            {% if is_logged_in %}
+            <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
+            <a class="top_bar_bonus" href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
 
-        <a class="top_bar_normal" href="{{ url_for('login')}}">Sign In</a>
-        {% endif %}
-      </div>
+            <a class="top_bar_normal" href="{{ url_for('login')}}">Sign In</a>
+            {% endif %}
+        </div>
     </div>
     <div class="top_panel">
         <h1 class="main_title">Eight Hour Relay Sponsors</h1>
-        <p class="inner_text">These are the sponsors for this event</p>
+        <p class="inner_text">These are the sponsors for this event:</p>
+        <p></p>
+        <p class="inner_text"><a href="{{ url_for('index') + 'static/sponsor_package.pdf'}}">Click here for more
+                sponsor information</a></p>
     </div>
     <div class="bottom_panel">
         <div class="main_content">
@@ -42,10 +45,9 @@
                 <img class="grid_icon" src="/static/img/sponsor_alkiss.webp">
                 <img class="grid_icon" src="/static/img/sponsor_forerunners.webp">
                 <img class="grid_icon" src="/static/img/sponsor_herbaland.webp">
-                <img class="grid_icon" src="/static/img/sponsor_fortinet.webp"
+                <img class="grid_icon" src="/static/img/sponsor_fortinet.webp" </div>
             </div>
         </div>
-    </div>
 </body>
 
 </html>

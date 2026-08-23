@@ -71,7 +71,7 @@ def cookie_options():
 @app.after_request
 def add_cache_headers(response):
     # Cache static assets for 31 days
-    if request.path.startswith('/static/img'):
+    if request.path.startswith('/static/img') or request.path.endswith(".pdf"):
         response.headers['Cache-Control'] = 'public, max-age=2678400, immutable'
     return response
 
