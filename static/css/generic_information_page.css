@@ -198,6 +198,19 @@ body {
   box-shadow: none;
 }
 
+.grid_gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.grid_icon {
+  aspect-ratio: 3/1;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
 @media (max-width: 640px) {
   .bottom_panel {
     flex-direction: column;
