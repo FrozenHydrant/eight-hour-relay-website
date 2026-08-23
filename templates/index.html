@@ -8,7 +8,9 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
 
   <link rel="stylesheet" href="/static/css/index_new2.css" />
   <script type="text/javascript" src="/static/js/index2.js" defer></script>
@@ -34,14 +36,34 @@
 
       <div class="nav-actions">
         {% if is_logged_in %}
-        <a class="nav-link" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
-        <a class="btn btn-outline btn-outline-small" href="{{ url_for('logout') }}">Logout</a>
+        <a class="nav-link profile-text" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
+        <a class="btn btn-outline btn-outline-small log-change-button" href="{{ url_for('logout') }}">Logout</a>
         {% else %}
-        <a class="btn btn-outline btn-outline-small" href="{{ url_for('login') }}">Sign In</a>
+        <a class="btn btn-outline btn-outline-small log-change-button" href="{{ url_for('login') }}">Sign In</a>
         {% endif %}
+        <button class="btn btn-outline btn-outline-small dropdown-button" id="dropdown-button">Menu</button>
       </div>
     </div>
   </header>
+
+
+
+  <div class="special-dropdown-menu hidden" id="special-dropdown-menu">
+    <nav class="dropdown-nav-links dropdown-flex-down">
+      <a class="nav-link" href="{{ url_for('rules') }}">Rules</a>
+      <a class="nav-link" href="{{ url_for('volunteer_info') }}">Volunteers</a>
+      <a class="nav-link" href="{{ url_for('sponsors') }}">Sponsors</a>
+      <a class="nav-link" href="#reg_proc">Registration Process</a>
+      <a class="nav-link" href="#gallery">Gallery</a>
+
+      {% if is_logged_in %}
+      <a class="nav-link" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
+      <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+      {% else %}
+      <a class="nav-link" href="{{ url_for('login') }}">Sign In</a>
+      {% endif %}
+    </nav>
+  </div>
 
   <!-- ══════════════ HERO ══════════════ -->
   <section class="hero">
@@ -49,7 +71,7 @@
     <div class="hero-overlay"></div>
 
     <div class="hero-inner">
-      <p class="eyebrow hero-eyebrow">Saturday, September 13, 2026 &middot; Greenfield Sports Complex</p>
+      <p class="eyebrow hero-eyebrow">Saturday, September 12, 2026 &middot; Greenfield Sports Complex</p>
       <h1 class="hero-title">8 Hours Relay</h1>
       <p class="hero-subtitle">Eight Hours. One Team. Endless Laps.</p>
 
@@ -144,8 +166,8 @@
     <div class="container-x">
       <h3 class="h-section">Last Year's Highlights</h3>
       <div class="video-wrap">
-        <iframe src="https://www.youtube.com/embed/H4vee_cnfEA?si=1JJ_5hKkJvfbQOx7"
-          title="YouTube video player" frameborder="0"
+        <iframe src="https://www.youtube.com/embed/H4vee_cnfEA?si=1JJ_5hKkJvfbQOx7" title="YouTube video player"
+          frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
       </div>
@@ -229,14 +251,16 @@
           <li>Division</li>
           <li>Team Captain's information</li>
         </ul>
-        <p class="text-body" style="margin-top: 1.5rem;">Afterwards, runners join with the Team Code that is provided after team registration. Each runner will need to provide the following information:</p>
+        <p class="text-body" style="margin-top: 1.5rem;">Afterwards, runners join with the Team Code that is provided
+          after team registration. Each runner will need to provide the following information:</p>
         <ul class="dash-list dash-list-tight" style="margin-top: 1rem; margin-left: 0;">
           <li>Runner name</li>
           <li>Email address</li>
           <li>Phone &amp; emergency contact</li>
           <li>Gender/age</li>
         </ul>
-        <p class="text-note" style="margin-top: 1.5rem;">Once the runners have joined, the captain can edit their running order and also make a payment.</p>
+        <p class="text-note" style="margin-top: 1.5rem;">Once the runners have joined, the captain can edit their
+          running order and also make a payment.</p>
       </div>
     </div>
   </section>
@@ -263,7 +287,8 @@
     <div class="container-x section-narrow">
       <h3 class="h-section">Venue Information</h3>
       <p class="text-body">Location: Swangard Stadium, Burnaby, British Columbia</p>
-      <p class="text-note" style="margin-top: 0.75rem;">Standard 400m athletics track. Designated team areas available. Parking information will be announced before race day.</p>
+      <p class="text-note" style="margin-top: 0.75rem;">Standard 400m athletics track. Designated team areas available.
+        Parking information will be announced before race day.</p>
     </div>
   </section>
 

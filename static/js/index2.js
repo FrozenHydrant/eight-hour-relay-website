@@ -78,3 +78,17 @@ function update() {
     document.getElementById("hour_count").textContent = hours
     document.getElementById("day_count").textContent = days
 }
+
+// Menu Button
+// https://stackoverflow.com/questions/73074968/how-to-get-css-display-property-value-in-js
+document.getElementById("dropdown-button").addEventListener("click", toggleMenu)
+
+function toggleMenu() {
+  menu = document.getElementById("special-dropdown-menu")
+  
+  if (menu.classList.contains("hidden")) {
+    menu.classList.remove("hidden")
+  } else {
+    menu.classList.add("hidden")
+  }
+}
