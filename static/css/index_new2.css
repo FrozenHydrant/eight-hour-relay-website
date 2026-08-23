@@ -595,8 +595,11 @@ ul {
 
 /* ── Poster / media ── */
 .poster-wrap {
-  display: flex;
-  justify-content: center;
+  display: block;
+  overflow-x: scroll;
+  left: 50%;
+  transform: translateX(-50%);
+  position: relative;
 }
 
 .poster-img {
