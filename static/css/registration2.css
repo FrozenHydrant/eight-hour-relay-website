@@ -17,7 +17,7 @@ body {
   color: #1E2235;
 }
 
-.registration h3, .login h3 {
+.title {
   font-size: 1.35rem;
   font-weight: 600;
   color: #FFFFFF;
@@ -37,11 +37,6 @@ body {
   box-shadow:
     0 4px 24px rgba(30, 34, 53, 0.18),
     0 1px 4px rgba(30, 34, 53, 0.10);
-}
-
-.login {
-  display: inline-block;
-  padding-bottom: 2rem;
 }
 
 /* ── Form layout ── */
@@ -68,12 +63,6 @@ form {
     box-shadow 0.18s ease;
 }
 
-.dropdown {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
-
 /* ── Birthdate row (year / month / day side by side) ── */
 .date_row {
   display: flex;
@@ -91,9 +80,6 @@ form {
   border: 1.5px solid transparent;
   border-radius: 8px;
   outline: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
   transition:
     border-color 0.18s ease,
     box-shadow 0.18s ease;
@@ -103,11 +89,6 @@ form {
   border-color: #6C7AE0;
   box-shadow: 0 0 0 3.5px rgba(108, 122, 224, 0.22);
 }
-
-/* Placeholder hints via attribute — browsers show name as placeholder */
-.text_input[name="email"]::placeholder    { content: "Email address"; }
-.text_input[name="username"]::placeholder { content: "Username"; }
-.text_input[name="password"]::placeholder { content: "Password"; }
 
 /* Signature element: indigo glow on focus */
 .text_input:focus,
@@ -223,6 +204,10 @@ form {
 .extra_text a {
   font-size: 0.82rem;
   color: #6c7ae0;
+}
+
+.hidden {
+  display: none;
 }
 
 /* ── Flash messages ── */

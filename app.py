@@ -311,23 +311,12 @@ def volunteer_registration():
     if not user:
         return redirect(url_for("login",next_page="volunteer_registration"))
 
-    opportunity_id = request.args.get("opportunity_id")
-    opportunity_info = Data.get_opportunity_info(opportunity_id)
-    if opportunity_info is None:
-        return redirect(url_for("volunteer_info"))
-
-    # We aren't already in it
-
-    if user.id in Data.get_enrolled_volunteers_list(opportunity_id):
-        flash("You are already volunteering for this position!")
-        return redirect(url_for("volunteer_info"))
-
-    # Count
-    #print(len(Data.get_enrolled_volunteers_list(opportunity_id)), opportunity_info["capacity"])
-    if len(Data.get_enrolled_volunteers_list(opportunity_id)) >= opportunity_info["capacity"]:
-        flash("This opportunity is already filled!")
-        return redirect(url_for("volunteer_info"))
-
+    # Checks:
+    # Opportunity exists
+    # We aren't in it already
+    # We don't have another shift at the same time
+    # Opportunity is not full
+    
     users_info = Data.get_members_info([user.id])  
         
     if len(users_info) < 1:
@@ -339,7 +328,28 @@ def volunteer_registration():
         if user_info[k] is None:
             user_info[k] = "" 
 
-    return render_template("registration_volunteer.html", user_info=user_info, opportunity=opportunity_info)
+    opportunities = Data.get_opportunities()
+    for opportunity in opportunities:
+        opportunity["shifts"] = Data.get_shifts(opportunity, True)
+
+    # Check which positions we're already signed onto
+    enrolled_list = Data.get_enrolled_positions(user.id)
+
+    signed_positions = {}
+    for opportunity in enrolled_list:
+        # Parse shifts
+        shift_representation = opportunity["shifts"]
+        shifts = []
+        i = 0
+        while shift_representation > 0:
+            if shift_representation % 2 != 0:
+                shifts.append(i)
+            i += 1
+            shift_representation //= 2
+        signed_positions[opportunity["opportunity_id"]] = shifts
+    print(signed_positions)
+    
+    return render_template("registration_volunteer.html", user_info=user_info, opportunities=opportunities, signed_positions=signed_positions)
 
 @app.route("/volunteer_registration", methods=["POST"])
 def volunteer_registration_post():
@@ -351,32 +361,63 @@ def volunteer_registration_post():
     first_name = request.form.get("first_name")
     last_name = request.form.get("last_name")
     address = request.form.get("address")
-    volunteer_type = request.form.get("volunteer_type")
     phone_number = request.form.get("phone_number")
-    opportunity_id = request.form.get("opportunity_id")
+    # TODO: birthday
+    opportunity_id = request.form.get("volunteer_position")
     opportunity_info = Data.get_opportunity_info(opportunity_id)
 
     # Make sure opportunity is right
     if opportunity_info is None:
         return redirect(url_for("volunteer_info"))
 
-    if user.id in Data.get_enrolled_volunteers_list(opportunity_id):
-        flash("You are already volunteering for this position!")
-        return redirect(url_for("volunteer_info"))
+    # Checks TODO:
+    # We aren't in it already
+    # We don't have another shift at the same time
+    # Opportunity is not full
+    signed_shifts = []
+    for i in range(0, 12):
+        #print(i, request.form.get("signup_shift_"+str(i)))
+        if request.form.get("signup_shift_"+str(i)) == "on":
+            signed_shifts.append(i)
 
-    # Count
-    #print(len(Data.get_enrolled_volunteers_list(opportunity_id)), opportunity_info["capacity"])
-    if len(Data.get_enrolled_volunteers_list(opportunity_id)) >= opportunity_info["capacity"]:
-        flash("This opportunity is already filled!")
-        return redirect(url_for("volunteer_info"))
-    
-    success = Sanitization.verify_all_lists_and_create_response([], [address], [], [phone_number], [volunteer_type, first_name, last_name], [], [])
+    # Check shifts & time conflicts 
+    busy_intervals = Data.get_busy_intervals(user.id)
+    my_opp = Data.get_opportunities_dict()[opportunity_id]
+    targeted_shifts = Data.get_shifts(my_opp, False)
+    for my_pending_shift in signed_shifts:
+        time_to_check = targeted_shifts[my_pending_shift]
+        #print(busy_intervals, "busy_intervals")
+        for interval_opp_id in busy_intervals:
+            if interval_opp_id == opportunity_id:
+                #print(opportunity_id, "is the one we're trying to overwrite, so ignore that...")
+                continue
+            intervals = busy_intervals[interval_opp_id]
+            for interval in intervals:
+                #print(interval, "interval")
+
+                if time_to_check[1] < interval[0] or time_to_check[0] > interval[1]:
+                    pass
+                else:
+                    print("Requested time", time_to_check, " conflicts with ", interval)
+                    flash("The requested times would conmflict with your schedule!")
+                    return redirect(url_for("volunteer_registration"))
+
+    # Calculate the shift number from bits
+    shift_representation = 0
+    for i in signed_shifts:
+        shift_representation = shift_representation | (1 << i)
+
+    # TODO: secondary shift
+    # 
+             
+    success = Sanitization.verify_all_lists_and_create_response([], [address], [], [phone_number], [first_name, last_name], [], [])
     if not success:
         return redirect(url_for("volunteer_info"))
+
     
     try:
-        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "phone_number": phone_number, "address": address, "volunteer_type": volunteer_type})
-        _ = Data.enroll_user_as_volunteer(user.id, opportunity_id)
+        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "phone_number": phone_number, "address": address})
+        _ = Data.upsert_user_as_volunteer(user.id, opportunity_id, shift_representation)
     except Exception as e:
         print("Volunteer registration problem", e)
         return redirect(url_for("volunteer_info"))
@@ -1336,7 +1377,7 @@ def volunteer_info():
     # Handling teams we already in
     in_opportunities = []
     if user:
-        enrolled_opportunities_ids = Data.get_enrolled_opportunities(user.id)
+        enrolled_opportunities_ids = Data.get_enrolled_positions(user.id)
         for opportunity in opportunities:
             if opportunity["id"] in enrolled_opportunities_ids:
                 in_opportunities.append(opportunity)

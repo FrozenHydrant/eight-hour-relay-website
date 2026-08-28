@@ -1,6 +1,5 @@
 from supabase import Client, create_client
-from werkzeug.security import check_password_hash, generate_password_hash
-import secrets
+#import time as t
 import uuid
 from dotenv import load_dotenv
 import os
@@ -48,7 +47,7 @@ class Data:
     def get_opportunities():
         # Get all opportunities
         try:
-            response = Data.client.table("opportunities").select("id,name,date,start_time,end_time,capacity").execute()
+            response = Data.client.table("opportunities").select("*").execute()
         except Exception as e:
             return None
 
@@ -56,6 +55,98 @@ class Data:
             return None
         return [i for i in response.data]
 
+
+    def get_opportunities_dict():
+        # Opportunities dict by id
+        try: 
+            opportunities = Data.get_opportunities()
+            opp_dict = {}
+            for opportunity in opportunities:
+                opp_dict[str(opportunity["id"])] = opportunity
+            return opp_dict
+        except:
+            pass
+
+        return {}
+
+
+    def purge_enrolled_noshifts(user_id: str):
+        try:
+            response = Data.client.table("enrollment_volunteer").select("*").eq("user_id", user_id).execute()
+        except Exception as e:
+            return
+        if response is None:
+            return
+        if len(response.data) < 1:
+            return
+        for opportunity in response.data:
+            if opportunity["shifts"] == 0:
+                Data.client.table("enrollment_volunteer").delete().match({"opportunity_id": opportunity["opportunity_id"]}).execute()
+
+
+    def get_enrolled_positions(user_id: str):
+            try:
+                Data.purge_enrolled_noshifts(user_id)
+                response = Data.client.table("enrollment_volunteer").select("*").eq("user_id", user_id).execute()
+            except Exception as e:
+                return []
+            if response is None:
+                return []
+            if len(response.data) < 1:
+                return []
+            return response.data
+
+
+    def get_shifts(opportunity: dict, readable: bool):
+        # Times (dont care about date)
+        start_time = dt.datetime.strptime(opportunity["start_time"], "%H:%M:%S")
+        end_time = dt.datetime.strptime(opportunity["end_time"], "%H:%M:%S")
+
+        shift_length = dt.timedelta(hours=opportunity["shift_length"])
+        shifts = []
+
+        my_time = start_time
+        while my_time < end_time:
+            next_time = my_time + shift_length
+            if next_time > end_time:
+                next_time = end_time
+
+            if readable:
+                shifts.append(my_time.strftime("%I:%M %p") + " - " + next_time.strftime("%I:%M %p"))
+            else:
+                shifts.append((my_time, next_time))
+
+            my_time = next_time
+        return shifts
+
+
+    def get_busy_intervals(user_id: str):
+        opportunities_dict = Data.get_opportunities_dict()
+        enrolled_positions = Data.get_enrolled_positions(user_id)
+        all_intervals = {}
+
+        for p in enrolled_positions:
+            position_intervals = []
+            shift_representation = p["shifts"]
+
+            # Parse shifts
+            shifts = []
+            i = 0
+            while shift_representation > 0:
+                if shift_representation % 2 != 0:
+                    shifts.append(i)
+                i += 1
+                shift_representation //= 2
+
+            # Get shift timing
+            opportunity_shifts = Data.get_shifts(opportunities_dict[str(p["opportunity_id"])], False)
+            for enrolled_shift_num in shifts:
+                position_intervals.append(opportunity_shifts[enrolled_shift_num])
+            all_intervals[str(p["opportunity_id"])] = position_intervals 
+
+        return all_intervals
+
+        
     
     # Runners
     def get_sponsor_status(user_id: str) -> int:
@@ -122,9 +213,9 @@ class Data:
         return response.data[0]
 
 
-    def enroll_user_as_volunteer(user_id: str, opportunity_id: str):
+    def upsert_user_as_volunteer(user_id: str, opportunity_id: str, shift_representation: int):
         try:
-            _ = Data.client.table("enrollment_volunteer").insert({"user_id": user_id, "opportunity_id": opportunity_id}).execute()
+            _ = Data.client.table("enrollment_volunteer").upsert({"user_id": user_id, "opportunity_id": opportunity_id, "shifts": shift_representation}).execute()
         except Exception as e:
             print("Error occured while enrolling a user as a volunteer:", e)
             return False
@@ -158,18 +249,6 @@ class Data:
         if len(response.data) < 1:
             return []
         return [item["user_id"] for item in response.data]
-
-
-    def get_enrolled_volunteers_list(opportunity_id: str):
-        try:
-            response = Data.client.table("enrollment_volunteer").select("user_id").eq("opportunity_id", opportunity_id).execute()
-        except Exception as e:
-            return []
-        if response is None:
-            return []
-        if len(response.data) < 1:
-            return []
-        return [item["user_id"] for item in response.data]
     
 
     def get_enrolled_team(user_id: str):
@@ -182,19 +261,6 @@ class Data:
         if len(response.data) < 1:
             return None
         return response.data[0]["team_id"]
-
-
-    # Get a list of opportunities this user is enrolled for
-    def get_enrolled_opportunities(user_id: str):
-        try:
-            response = Data.client.table("enrollment_volunteer").select("opportunity_id").eq("user_id", user_id).execute()
-        except Exception as e:
-            return []
-        if response is None:
-            return []
-        if len(response.data) < 1:
-            return []
-        return [item["opportunity_id"] for item in response.data]
 
 
     # Given a list of member_ids, give their info from the member_info table

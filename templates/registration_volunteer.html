@@ -4,14 +4,14 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/static/css/registration2.css">
+    <script src="/static/js/registration_volunteer.js"></script>
 </head>
 
 <body>
     <div class="registration">
-        <h3>Register as Volunteer for {{ opportunity["name"] }}</h3>
-        <p class="inner_text">{{ opportunity["description"] }}</p>
+        <h3 class="title">Register as Volunteer</h3>
         <form method="POST">
-            <input type="hidden" class="text_input" name="opportunity_id" value="{{ opportunity['id'] }}">
+
             <input type="text" class="text_input" name="first_name" placeholder="First Name"
                 value="{{ user_info['first_name'] }}" required>
             <input type="text" class="text_input" name="last_name" placeholder="Last Name"
@@ -20,11 +20,83 @@
                 value="{{ user_info['phone_number'] }}" required>
             <input type="text" class="text_input" name="address" placeholder="Address"
                 value="{{ user_info['address'] }}" required>
-            <input type="text" class="text_input" name="volunteer_type" placeholder="Volunteer Type"
-                value="{{ user_info['volunteer_type'] }}" required>
+
+            <div class="date_row">
+                <select name="birthyear" class="short_dropdown" required>
+                    {% if not user_info['birthdate'] %}
+                    <option disabled selected value> -- birth year --</option>
+                    {% else %}
+                    <option disabled>-- birth year --</option>
+                    <option selected>{{ user_info['birthdate'].split("-")[0] }}</option>
+                    {% endif %}
+                    {% for i in range(1900, 2011) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <select name="birthmonth" class="short_dropdown" required>
+                    {% if not user_info['birthdate'] %}
+                    <option disabled selected value> -- birth month --</option>
+                    {% else %}
+                    <option disabled>-- birth month --</option>
+                    <option selected>{{ user_info['birthdate'].split("-")[1] }}</option>
+                    {% endif %}
+                    {% for i in range(1, 13) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <select id="birthday" name="birthday" class="short_dropdown" required>
+                    {% if not user_info['birthdate'] %}
+                    <option disabled selected value> -- birth day --</option>
+                    {% else %}
+                    <option disabled>-- birth day --</option>
+                    <option selected>{{ user_info['birthdate'].split("-")[2] }}</option>
+                    {% endif %}
+                    {% for i in range(1, 32) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <p class="inner_text">Select Preferred Position:</p>
+            <select name="volunteer_position" class="dropdown" id="volunteer_position" required>
+                <option disabled selected value>-- select a position --</option>
+                {% for opportunity in opportunities %}
+                <option value="{{ opportunity['id'] }}">{{ opportunity["name"] }}</option>
+                {% endfor %}
+            </select>
+
+            <p class="inner_text">Select Shift(s):</p>
+            <div class="" id="shifts_submission"></div>
+
+            <p class="inner_text">Select Backup Volunteering Position (optional):</p>
+            <select name="secondary_position" class="dropdown" id="secondary_position">
+                <option disabled selected value>-- (optional) select backup position --</option>
+                {% for opportunity in opportunities %}
+                <option value="{{ opportunity['id'] }}">{{ opportunity["name"] }}</option>
+                {% endfor %}
+            </select>
+
+            <p class="inner_text">Select Shift(s):</p>
+            <div class="" id="secondary_submission"></div>
+
             <button id="joinTeamButton" class="submit">Become a Volunteer</button>
         </form>
     </div>
+
+    <div class="hidden" id="shifts_info">
+        {% for opportunity in opportunities %}
+        <div id="shifts_{{ opportunity['id'] }}">
+            {% for shift in opportunity['shifts'] %}
+            <label for="checkbox_{{ opportunity['id'] }}_{{ loop.index }}" class="inner_text">
+                <input type="checkbox" id="checkbox_{{ opportunity['id'] }}_{{ loop.index0 }}"
+                    name="signup_shift_{{ loop.index0 }}" {% if loop.index0 in signed_positions[opportunity['id']] %} checked {% endif %}>
+                {{ shift }}<br>
+            </label>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
     <div class="extra_text">
         <p></p>
     </div>
