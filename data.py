@@ -56,6 +56,21 @@ class Data:
         return [i for i in response.data]
 
 
+    def check_intervals(signed_shifts: list[int], targeted_shifts: list, busy_intervals: list, opp_id: str):
+        for my_pending_shift in signed_shifts:
+            time_to_check = targeted_shifts[my_pending_shift]
+            for interval_opp_id in busy_intervals:
+                if interval_opp_id == opp_id:
+                    continue
+                intervals = busy_intervals[interval_opp_id]
+                for interval in intervals:
+                    if time_to_check[1] < interval[0] or time_to_check[0] > interval[1]:
+                        pass
+                    else:
+                        return False
+        return True
+
+
     def get_opportunities_dict():
         # Opportunities dict by id
         try: 
@@ -70,6 +85,19 @@ class Data:
         return {}
 
 
+    def purge_all_enrolled(user_id: str):
+        try:
+            response = Data.client.table("enrollment_volunteer").select("*").eq("user_id", user_id).execute()
+        except Exception as e:
+            return
+        if response is None:
+            return
+        if len(response.data) < 1:
+            return
+        for opportunity in response.data:
+                Data.client.table("enrollment_volunteer").delete().match({"opportunity_id": opportunity["opportunity_id"]}).execute()
+
+        
     def purge_enrolled_noshifts(user_id: str):
         try:
             response = Data.client.table("enrollment_volunteer").select("*").eq("user_id", user_id).execute()
@@ -95,6 +123,19 @@ class Data:
             if len(response.data) < 1:
                 return []
             return response.data
+
+
+    def parse_shift_representation(shift_representation: int):
+            # Parse shifts
+            shifts = []
+            i = 0
+            while shift_representation > 0:
+                if shift_representation % 2 != 0:
+                    shifts.append(i)
+                i += 1
+                shift_representation //= 2
+
+            return shifts
 
 
     def get_shifts(opportunity: dict, readable: bool):
@@ -128,15 +169,7 @@ class Data:
         for p in enrolled_positions:
             position_intervals = []
             shift_representation = p["shifts"]
-
-            # Parse shifts
-            shifts = []
-            i = 0
-            while shift_representation > 0:
-                if shift_representation % 2 != 0:
-                    shifts.append(i)
-                i += 1
-                shift_representation //= 2
+            shifts = Data.parse_shift_representation(shift_representation)
 
             # Get shift timing
             opportunity_shifts = Data.get_shifts(opportunities_dict[str(p["opportunity_id"])], False)
@@ -213,9 +246,9 @@ class Data:
         return response.data[0]
 
 
-    def upsert_user_as_volunteer(user_id: str, opportunity_id: str, shift_representation: int):
+    def upsert_user_as_volunteer(user_id: str, opportunity_id: str, shift_representation: int, is_primary: bool):
         try:
-            _ = Data.client.table("enrollment_volunteer").upsert({"user_id": user_id, "opportunity_id": opportunity_id, "shifts": shift_representation}).execute()
+            _ = Data.client.table("enrollment_volunteer").upsert({"user_id": user_id, "opportunity_id": opportunity_id, "shifts": shift_representation, "is_primary": is_primary}).execute()
         except Exception as e:
             print("Error occured while enrolling a user as a volunteer:", e)
             return False

@@ -60,6 +60,7 @@
             <p class="inner_text">Select Preferred Position:</p>
             <select name="volunteer_position" class="dropdown" id="volunteer_position" required>
                 <option disabled selected value>-- select a position --</option>
+                
                 {% for opportunity in opportunities %}
                 <option value="{{ opportunity['id'] }}">{{ opportunity["name"] }}</option>
                 {% endfor %}
@@ -87,7 +88,7 @@
         {% for opportunity in opportunities %}
         <div id="shifts_{{ opportunity['id'] }}">
             {% for shift in opportunity['shifts'] %}
-            <label for="checkbox_{{ opportunity['id'] }}_{{ loop.index }}" class="inner_text">
+            <label for="checkbox_{{ opportunity['id'] }}_{{ loop.index0 }}" class="inner_text">
                 <input type="checkbox" id="checkbox_{{ opportunity['id'] }}_{{ loop.index0 }}"
                     name="signup_shift_{{ loop.index0 }}" {% if loop.index0 in signed_positions[opportunity['id']] %} checked {% endif %}>
                 {{ shift }}<br>

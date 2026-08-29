@@ -339,17 +339,11 @@ def volunteer_registration():
     for opportunity in enrolled_list:
         # Parse shifts
         shift_representation = opportunity["shifts"]
-        shifts = []
-        i = 0
-        while shift_representation > 0:
-            if shift_representation % 2 != 0:
-                shifts.append(i)
-            i += 1
-            shift_representation //= 2
+        shifts = Data.parse_shift_representation(shift_representation)
         signed_positions[opportunity["opportunity_id"]] = shifts
-    print(signed_positions)
-    
-    return render_template("registration_volunteer.html", user_info=user_info, opportunities=opportunities, signed_positions=signed_positions)
+
+
+    return render_template("registration_volunteer.html", user_info=user_info, opportunities=opportunities, signed_positions=signed_positions, enrolled_list=enrolled_list)
 
 @app.route("/volunteer_registration", methods=["POST"])
 def volunteer_registration_post():
@@ -362,12 +356,29 @@ def volunteer_registration_post():
     last_name = request.form.get("last_name")
     address = request.form.get("address")
     phone_number = request.form.get("phone_number")
-    # TODO: birthday
-    opportunity_id = request.form.get("volunteer_position")
-    opportunity_info = Data.get_opportunity_info(opportunity_id)
+
+    # Birthday
+    birthyear = request.form.get("birthyear")
+    birthmonth = request.form.get("birthmonth")
+    birthday = request.form.get("birthday")
+
+    birthdate = None
+    try:
+        birthdate = dt.datetime(int(birthyear), int(birthmonth), int(birthday))
+    except Exception as e:
+        flash("Bad birthdate entered.")
+        return redirect(url_for("volunteer_registration"))
+
+    primary_opportunity_id = request.form.get("volunteer_position")
+    primary_opportunity_info = Data.get_opportunity_info(primary_opportunity_id)
+
+    secondary_opportunity_id = request.form.get("secondary_position")
+    using_secondary = True
+    if secondary_opportunity_id is None:
+        using_secondary = False
 
     # Make sure opportunity is right
-    if opportunity_info is None:
+    if primary_opportunity_info is None:
         return redirect(url_for("volunteer_info"))
 
     # Checks TODO:
@@ -380,44 +391,49 @@ def volunteer_registration_post():
         if request.form.get("signup_shift_"+str(i)) == "on":
             signed_shifts.append(i)
 
+    # secondary shift
+    secondary_signed_shifts = []
+    secondary_opportunity_info = None
+    if using_secondary:
+        secondary_opportunity_info = Data.get_opportunity_info(secondary_opportunity_id)
+        for i in range(0, 12):
+            if request.form.get("secondary_signup_shift_"+str(i)) == "on":
+                secondary_signed_shifts.append(i)
+
     # Check shifts & time conflicts 
     busy_intervals = Data.get_busy_intervals(user.id)
-    my_opp = Data.get_opportunities_dict()[opportunity_id]
-    targeted_shifts = Data.get_shifts(my_opp, False)
-    for my_pending_shift in signed_shifts:
-        time_to_check = targeted_shifts[my_pending_shift]
-        #print(busy_intervals, "busy_intervals")
-        for interval_opp_id in busy_intervals:
-            if interval_opp_id == opportunity_id:
-                #print(opportunity_id, "is the one we're trying to overwrite, so ignore that...")
-                continue
-            intervals = busy_intervals[interval_opp_id]
-            for interval in intervals:
-                #print(interval, "interval")
+    targeted_shifts = Data.get_shifts(primary_opportunity_info, False)
+    primary_success = Data.check_intervals(signed_shifts, targeted_shifts, busy_intervals, primary_opportunity_id)
+    secondary_success = True
+    if using_secondary:
+        targeted_secondary_shifts = Data.get_shifts(secondary_opportunity_info, False)
+        secondary_success = Data.check_intervals(secondary_signed_shifts, targeted_secondary_shifts, busy_intervals, secondary_opportunity_id)    
 
-                if time_to_check[1] < interval[0] or time_to_check[0] > interval[1]:
-                    pass
-                else:
-                    print("Requested time", time_to_check, " conflicts with ", interval)
-                    flash("The requested times would conmflict with your schedule!")
-                    return redirect(url_for("volunteer_registration"))
-
+    if not primary_success or not secondary_success:
+        flash("That would result in a time conflict!")
+        return redirect(url_for("volunteer_registration"))
+    
     # Calculate the shift number from bits
     shift_representation = 0
     for i in signed_shifts:
         shift_representation = shift_representation | (1 << i)
 
-    # TODO: secondary shift
-    # 
-             
+    secondary_shift_representation = 0
+    for i in secondary_signed_shifts:
+        secondary_shift_representation = secondary_shift_representation | (1 << i)
+
     success = Sanitization.verify_all_lists_and_create_response([], [address], [], [phone_number], [first_name, last_name], [], [])
     if not success:
         return redirect(url_for("volunteer_info"))
 
-    
     try:
-        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "phone_number": phone_number, "address": address})
-        _ = Data.upsert_user_as_volunteer(user.id, opportunity_id, shift_representation)
+        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "phone_number": phone_number, "address": address, "birthdate": birthdate.strftime("%m/%d/%Y")})
+        # Clear it all
+        Data.purge_all_enrolled(user.id)
+
+        _ = Data.upsert_user_as_volunteer(user.id, primary_opportunity_id, shift_representation, True)
+        if using_secondary:
+            _ = Data.upsert_user_as_volunteer(user.id, secondary_opportunity_id, secondary_shift_representation, False)
     except Exception as e:
         print("Volunteer registration problem", e)
         return redirect(url_for("volunteer_info"))
