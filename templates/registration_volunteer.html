@@ -59,10 +59,16 @@
 
             <p class="inner_text">Select Preferred Position:</p>
             <select name="volunteer_position" class="dropdown" id="volunteer_position" required>
+                {% if not primary_position %}
                 <option disabled selected value>-- select a position --</option>
-                
+                {% else %}
+                <option selected value="{{ primary_position['id'] }}">{{ primary_position["name"] }}</option>
+                {% endif %}
+
                 {% for opportunity in opportunities %}
-                <option value="{{ opportunity['id'] }}">{{ opportunity["name"] }}</option>
+                    {% if not primary_position or primary_position['id'] != opportunity['id'] %}
+                        <option value="{{ opportunity['id'] }}">{{ opportunity["name"] }}</option>
+                    {% endif %}
                 {% endfor %}
             </select>
 
@@ -71,9 +77,16 @@
 
             <p class="inner_text">Select Backup Volunteering Position (optional):</p>
             <select name="secondary_position" class="dropdown" id="secondary_position">
+                {% if not secondary_position %}
                 <option disabled selected value>-- (optional) select backup position --</option>
+                {% else %}
+                <option selected value="{{ secondary_position['id'] }}">{{ secondary_position["name"] }}</option>
+                {% endif %}
+
                 {% for opportunity in opportunities %}
-                <option value="{{ opportunity['id'] }}">{{ opportunity["name"] }}</option>
+                    {% if not secondary_position or secondary_position['id'] != opportunity['id'] %}
+                        <option value="{{ opportunity['id'] }}">{{ opportunity["name"] }}</option>
+                    {% endif %}
                 {% endfor %}
             </select>
 

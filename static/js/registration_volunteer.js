@@ -4,6 +4,9 @@ function changeShifts() {
     // console.log(my_name)
 
     const shifts_info = document.querySelector("#shifts_info #shifts_" + my_name)
+    if (shifts_info == null) {
+        return
+    }
     var cloned = shifts_info.cloneNode(true)
     
     // Clear existing and add new
@@ -17,6 +20,9 @@ function secondaryShifts() {
     // console.log(my_name)
 
     const shifts_info = document.querySelector("#shifts_info #shifts_" + my_name)
+    if (shifts_info == null) {
+        return
+    }
     var cloned = shifts_info.cloneNode(true)
 
     // change checkbox names
@@ -38,4 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     opportunity_dropdown.addEventListener('change', changeShifts)
     secondary_dropdown.addEventListener('change', secondaryShifts)
+
+    changeShifts()
+    secondaryShifts()
 })

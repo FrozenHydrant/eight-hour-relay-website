@@ -334,6 +334,14 @@ def volunteer_registration():
 
     # Check which positions we're already signed onto
     enrolled_list = Data.get_enrolled_positions(user.id)
+    #
+    primary_info = None
+    secondary_info = None
+    for enrolled in enrolled_list:
+        if enrolled["is_primary"]:
+            primary_info = Data.get_opportunity_info(enrolled["opportunity_id"])
+        else:
+            secondary_info = Data.get_opportunity_info(enrolled["opportunity_id"])
 
     signed_positions = {}
     for opportunity in enrolled_list:
@@ -342,8 +350,7 @@ def volunteer_registration():
         shifts = Data.parse_shift_representation(shift_representation)
         signed_positions[opportunity["opportunity_id"]] = shifts
 
-
-    return render_template("registration_volunteer.html", user_info=user_info, opportunities=opportunities, signed_positions=signed_positions, enrolled_list=enrolled_list)
+    return render_template("registration_volunteer.html", user_info=user_info, opportunities=opportunities, signed_positions=signed_positions, enrolled_list=enrolled_list, primary_position=primary_info, secondary_position=secondary_info)
 
 @app.route("/volunteer_registration", methods=["POST"])
 def volunteer_registration_post():
@@ -401,12 +408,25 @@ def volunteer_registration_post():
                 secondary_signed_shifts.append(i)
 
     # Check shifts & time conflicts 
-    busy_intervals = Data.get_busy_intervals(user.id)
+    busy_intervals = {}
     targeted_shifts = Data.get_shifts(primary_opportunity_info, False)
-    primary_success = Data.check_intervals(signed_shifts, targeted_shifts, busy_intervals, primary_opportunity_id)
-    secondary_success = True
+    targeted_secondary_shifts = []
+    # If secondary shift change specified: check it
     if using_secondary:
         targeted_secondary_shifts = Data.get_shifts(secondary_opportunity_info, False)
+        new_intervals = []
+        for i in secondary_signed_shifts:
+            new_intervals.append(targeted_secondary_shifts[i])
+        busy_intervals[secondary_opportunity_id] = new_intervals
+
+    primary_success = Data.check_intervals(signed_shifts, targeted_shifts, busy_intervals, primary_opportunity_id)
+    secondary_success = True
+
+    if using_secondary:
+        new_intervals = []
+        for i in signed_shifts:
+            new_intervals.append(targeted_shifts[i])
+        busy_intervals[primary_opportunity_id] = new_intervals
         secondary_success = Data.check_intervals(secondary_signed_shifts, targeted_secondary_shifts, busy_intervals, secondary_opportunity_id)    
 
     if not primary_success or not secondary_success:

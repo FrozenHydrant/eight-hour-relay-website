@@ -67,6 +67,7 @@ class Data:
                     if time_to_check[1] < interval[0] or time_to_check[0] > interval[1]:
                         pass
                     else:
+                        print("Conflicting intervals: ", time_to_check, interval)
                         return False
         return True
 
@@ -160,24 +161,24 @@ class Data:
             my_time = next_time
         return shifts
 
+    @DeprecationWarning
+    #def get_busy_intervals(user_id: str):
+    #    opportunities_dict = Data.get_opportunities_dict()
+    #    enrolled_positions = Data.get_enrolled_positions(user_id)
+    #    all_intervals = {}
 
-    def get_busy_intervals(user_id: str):
-        opportunities_dict = Data.get_opportunities_dict()
-        enrolled_positions = Data.get_enrolled_positions(user_id)
-        all_intervals = {}
-
-        for p in enrolled_positions:
-            position_intervals = []
-            shift_representation = p["shifts"]
-            shifts = Data.parse_shift_representation(shift_representation)
+    #    for p in enrolled_positions:
+    #        position_intervals = []
+    #        shift_representation = p["shifts"]
+    #        shifts = Data.parse_shift_representation(shift_representation)
 
             # Get shift timing
-            opportunity_shifts = Data.get_shifts(opportunities_dict[str(p["opportunity_id"])], False)
-            for enrolled_shift_num in shifts:
-                position_intervals.append(opportunity_shifts[enrolled_shift_num])
-            all_intervals[str(p["opportunity_id"])] = position_intervals 
+    #        opportunity_shifts = Data.get_shifts(opportunities_dict[str(p["opportunity_id"])], False)
+    #        for enrolled_shift_num in shifts:
+    #            position_intervals.append(opportunity_shifts[enrolled_shift_num])
+    #        all_intervals[str(p["opportunity_id"])] = position_intervals 
 
-        return all_intervals
+    #    return all_intervals
 
         
     
