@@ -165,6 +165,8 @@ body {
 }
 
 .button {
+  display: block;
+  margin-top: 1.5rem;
   width: 100%;
   padding: 0.85rem 1rem;
   font-family: inherit;

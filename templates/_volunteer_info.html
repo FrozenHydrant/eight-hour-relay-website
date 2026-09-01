@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" href="/static/css/title_then_list.css">
+</head>
+
+<body>
+    <div class="top_bar_info">
+        <div class="top_bar_insides">
+            <a class="top_bar_normal" href="{{ url_for('index') }}">Home Page</a>
+
+            {% if is_logged_in %}
+            <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_name or user_email }}</a>
+            <a class="top_bar_bonus" href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+            <a class="top_bar_normal" href="{{ url_for('login')}}">Sign In</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="top_info">
+        <div>
+            <h3>Volunteering Opportunities</h3>
+            <p>The following positions are available:</p>
+        </div>
+    </div>
+    <div class="bottom_list">
+
+        {% for opportunity in in_opportunities %}
+        <div class="bottom_list_item">
+            <p class="title">{{ opportunity["name"] }} (Enrolled)</p>
+            <div class="info_box">
+                <p class="title">{{ opportunity["date"] }}</p>
+                <p class="muted">Time TBA</p>
+                <p class="title">{{ opportunity["remaining_capacity"] }} Spots Left</p>
+            </div>
+
+            <form method="POST">
+                <input type="hidden" name="opportunity_id" value="{{ opportunity['id'] }}">
+                <input type="hidden" name="action" value="withdraw">
+                <button class="button red_button">Withdraw my Volunteer Registration</a>
+            </form>
+        </div>
+        {% endfor %}
+
+        {% for opportunity in opportunities %}
+        {% if "enrollable" not in opportunity or opportunity["enrollable"] %}
+        <div class="bottom_list_item">
+            <p class="title">{{ opportunity["name"] }}</p>
+            <div class="info_box">
+                <p class="title">{{ opportunity["date"] }}</p>
+                <p class="muted">Time TBA</p>
+                <p class="title">{{ opportunity["capacity"] }} Spots Left</p>
+            </div>
+            <a href="{{ url_for('volunteer_registration',opportunity_id=opportunity['id']) }}" class="button">View
+                Details</a>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+    </div>
+</body>

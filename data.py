@@ -161,7 +161,6 @@ class Data:
             my_time = next_time
         return shifts
 
-    @DeprecationWarning
     #def get_busy_intervals(user_id: str):
     #    opportunities_dict = Data.get_opportunities_dict()
     #    enrolled_positions = Data.get_enrolled_positions(user_id)

@@ -1408,23 +1408,18 @@ def volunteer_info():
                 if "first_name" in user_info:
                     user_name = user_info["first_name"]
 
-    opportunities = Data.get_opportunities()
-
     # Handling teams we already in
-    in_opportunities = []
-    if user:
-        enrolled_opportunities_ids = Data.get_enrolled_positions(user.id)
-        for opportunity in opportunities:
-            if opportunity["id"] in enrolled_opportunities_ids:
-                in_opportunities.append(opportunity)
-                opportunity["enrollable"] = False # marked
+    #in_opportunities = []
+    #if user:
+    #    enrolled_opportunities_ids = Data.get_enrolled_positions(user.id)
+    #    for opportunity in opportunities:
+    #        if opportunity["id"] in enrolled_opportunities_ids:
+    #            in_opportunities.append(opportunity)
+    #            opportunity["enrollable"] = False # marked
 
-    # Signup count
-    for opportunity in in_opportunities:
-        volunteers_list = Data.get_enrolled_volunteers_list(opportunity["id"])
-        opportunity["remaining_capacity"] = opportunity["capacity"] - len(volunteers_list)
+    volunteer_registration_exists = len(Data.get_enrolled_positions(user.id)) > 0
 
-    return render_template("volunteer_info.html", is_logged_in=is_logged_in, user_email=user_email, user_name=user_name, opportunities=opportunities, in_opportunities=in_opportunities)
+    return render_template("volunteer_info.html", is_logged_in=is_logged_in, user_email=user_email, user_name=user_name, volunteer_registration_exists=volunteer_registration_exists)
 
 
 @app.route("/volunteer_info", methods=["POST"])
