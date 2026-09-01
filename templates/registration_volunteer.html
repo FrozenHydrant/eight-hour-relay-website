@@ -104,8 +104,8 @@
             {% for shift in opportunity['shifts'] %}
             <label for="checkbox_{{ opportunity['id'] }}_{{ loop.index0 }}" class="inner_text">
                 <input type="checkbox" id="checkbox_{{ opportunity['id'] }}_{{ loop.index0 }}"
-                    name="signup_shift_{{ loop.index0 }}" {% if loop.index0 in signed_positions[opportunity['id']] %} checked {% endif %}>
-                {{ shift }} ({{ opportunity['capacities'][loop.index0] }} spots left)<br>
+                    name="signup_shift_{{ loop.index0 }}" {% if loop.index0 in signed_positions[opportunity['id']] %} checked {% endif %} {% if opportunity['effective_capacity'] < 1 or opportunity['capacities'][loop.index0] == 0 %} disabled {% endif %}>
+                {{ shift }} {% if opportunity['capacities'][loop.index0] > -1 %}({{ opportunity['capacities'][loop.index0] }} spots left){% endif %}<br>
             </label>
             {% endfor %}
         </div>

@@ -439,7 +439,28 @@ def volunteer_registration_post():
     if not primary_success or not secondary_success:
         flash("That would result in a time conflict!")
         return redirect(url_for("volunteer_registration"))
-    
+
+    # Check capacities
+    primary_total_capacity = Data.get_effective_total_opportunity_capacity(primary_opportunity_info, user.id)
+    secondary_total_capacity = Data.get_effective_total_opportunity_capacity(secondary_opportunity_info, user.id)
+    if primary_total_capacity < 1:
+        flash("Your main selected position has no spots left!")
+        return redirect(url_for("volunteer_registration"))
+    if secondary_total_capacity < 1:
+        flash("Your secondary selected position has no spots left!")
+        return redirect(url_for("volunteer_registration"))
+    primary_shift_capacities = Data.get_effective_shift_capacities(primary_opportunity_info, user.id)
+    secondary_shift_capacities = Data.get_effective_shift_capacities(secondary_opportunity_info, user.id)
+
+    for i in signed_shifts:
+        if primary_shift_capacities[i] == 0:
+            flash("You've signed up for shifts in your main position which do not have spots left!")
+            return redirect(url_for("volunteer_registration"))
+    for i in secondary_signed_shifts:
+        if secondary_shift_capacities[i] == 0:
+            flash("You've signed up for shifts in your secondary position which do not have spots left!")
+            return redirect(url_for("volunteer_registration"))
+            
     # Calculate the shift number from bits
     shift_representation = 0
     for i in signed_shifts:
@@ -449,7 +470,7 @@ def volunteer_registration_post():
     for i in secondary_signed_shifts:
         secondary_shift_representation = secondary_shift_representation | (1 << i)
 
-    success = Sanitization.verify_all_lists_and_create_response([], [address], [], [phone_number], [first_name, last_name], [], [])
+    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number], [first_name, last_name], [], [], addresses=[address])
     if not success:
         return redirect(url_for("volunteer_info"))
 
@@ -517,7 +538,7 @@ def sponsor_registration_post():
     sponsor_organization = request.form.get("sponsor_organization")
     phone_number = request.form.get("phone_number")
 
-    success = Sanitization.verify_all_lists_and_create_response([], [address, sponsor_organization], [], [phone_number], [first_name, last_name, sponsor_type], [], [])
+    success = Sanitization.verify_all_lists_and_create_response([], [sponsor_organization], [], [phone_number], [first_name, last_name, sponsor_type], [], [], addresses=[address])
     if not success:
         return redirect(url_for("sponsor_registration"))
     

@@ -7,6 +7,7 @@ class Sanitization:
     valid_characters = string.ascii_letters + string.digits + string.punctuation
     valid_username_characters = string.ascii_letters + string.digits + "._ " 
     valid_teamname_characters = string.ascii_letters + string.digits + "._∞ "
+    valid_address_characters = valid_name_characters + string.digits
 
     def verify_name_characters(name: str) -> bool:
         if all(c in Sanitization.valid_name_characters for c in name):
@@ -32,6 +33,11 @@ class Sanitization:
     
     def verify_password_characters(password: str) -> bool:
         if all(c in Sanitization.valid_characters for c in password):
+            return True
+        return False
+
+    def verify_address_characters(address: str) -> bool:
+        if all(c in Sanitization.valid_address_characters for c in address):
             return True
         return False
 
@@ -75,6 +81,11 @@ class Sanitization:
             if email.split("@")[1].count(".") == 1:
                 return True
         return False 
+
+    def verify_address_length(address: str) -> bool:
+        if address is not None and len(address) < 128 and len(address) > 7:
+            return True
+        return False
     
     def verify_next_page(next_page: str) -> str:
         valid_next_pages = ("captain_registration","runner_registration")
@@ -112,7 +123,7 @@ class Sanitization:
             return False
         return True
 
-    def verify_all_lists_and_create_response(emails: list[str], usernames: list[str], passwords: list[str], phones: list[str], names: list[str], genders: list[str], teamnames: list[str]):
+    def verify_all_lists_and_create_response(emails: list[str], usernames: list[str], passwords: list[str], phones: list[str], names: list[str], genders: list[str], teamnames: list[str], addresses=[]):
         for email in emails:
             if not Sanitization.verify_email_length(email):
                 flash("Bad email length.")
@@ -170,6 +181,14 @@ class Sanitization:
                 return False
             if not Sanitization.verify_teamname_characters(teamname):
                 flash("Teamname contains invalid characters.")
+                return False
+
+        for address in addresses:
+            if not Sanitization.verify_address_length(address):
+                flash("Please ensure your address is entered properly.")
+                return False
+            if not Sanitization.verify_address_characters(address):
+                flash("Address contains invalid characters.")
                 return False
             
             
