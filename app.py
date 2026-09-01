@@ -1396,18 +1396,20 @@ def sponsors():
 def volunteer_info():
         
     user = user_logout_status()
+    if not user: 
+        flash("You must be logged in to view that.")
+        return redirect(url_for("login"))
+        
     user_email = None
     user_name = None
-    is_logged_in = False
-    if user:
-            user_email = user.email
-            is_logged_in = True
-            self_data = Data.get_members_info([user.id])
-            if len(self_data) > 0:
-                user_info = self_data[0]
-                if "first_name" in user_info:
-                    user_name = user_info["first_name"]
-
+    user_email = user.email
+    is_logged_in = True
+    self_data = Data.get_members_info([user.id])
+    if len(self_data) > 0:
+        user_info = self_data[0]
+        if "first_name" in user_info:
+            user_name = user_info["first_name"]
+        
     # Handling teams we already in
     #in_opportunities = []
     #if user:
