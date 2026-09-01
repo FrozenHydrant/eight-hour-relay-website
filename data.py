@@ -96,7 +96,7 @@ class Data:
         if len(response.data) < 1:
             return
         for opportunity in response.data:
-                Data.client.table("enrollment_volunteer").delete().match({"opportunity_id": opportunity["opportunity_id"]}).execute()
+                Data.client.table("enrollment_volunteer").delete().match({"opportunity_id": opportunity["opportunity_id"], "user_id": user_id}).execute()
 
         
     def purge_enrolled_noshifts(user_id: str):
@@ -138,6 +138,9 @@ class Data:
 
     def parse_shift_representation(shift_representation: int):
             # Parse shifts
+            if shift_representation == -1:
+                return [-1]
+            
             shifts = []
             i = 0
             while shift_representation > 0:

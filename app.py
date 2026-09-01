@@ -404,6 +404,8 @@ def volunteer_registration_post():
         #print(i, request.form.get("signup_shift_"+str(i)))
         if request.form.get("signup_shift_"+str(i)) == "on":
             signed_shifts.append(i)
+    if request.form.get("signup_flexible") == "on":
+        signed_shifts = [-1]
 
     # secondary shift
     secondary_signed_shifts = []
@@ -413,6 +415,8 @@ def volunteer_registration_post():
         for i in range(0, 12):
             if request.form.get("secondary_signup_shift_"+str(i)) == "on":
                 secondary_signed_shifts.append(i)
+    if request.form.get("secondary_signup_flexible") == "on":
+        secondary_signed_shifts = [-1]
 
     # Check shifts & time conflicts 
     busy_intervals = {}
@@ -426,7 +430,9 @@ def volunteer_registration_post():
             new_intervals.append(targeted_secondary_shifts[i])
         busy_intervals[secondary_opportunity_id] = new_intervals
 
-    primary_success = Data.check_intervals(signed_shifts, targeted_shifts, busy_intervals, primary_opportunity_id)
+    primary_success = True
+    if signed_shifts[0] != -1: # actually shifts to check, otherwise we are flexible!
+        Data.check_intervals(signed_shifts, targeted_shifts, busy_intervals, primary_opportunity_id)
     secondary_success = True
 
     if using_secondary:
@@ -434,7 +440,8 @@ def volunteer_registration_post():
         for i in signed_shifts:
             new_intervals.append(targeted_shifts[i])
         busy_intervals[primary_opportunity_id] = new_intervals
-        secondary_success = Data.check_intervals(secondary_signed_shifts, targeted_secondary_shifts, busy_intervals, secondary_opportunity_id)    
+        if secondary_signed_shifts[0] != -1:
+            secondary_success = Data.check_intervals(secondary_signed_shifts, targeted_secondary_shifts, busy_intervals, secondary_opportunity_id)    
 
     if not primary_success or not secondary_success:
         flash("That would result in a time conflict!")
@@ -462,13 +469,20 @@ def volunteer_registration_post():
             return redirect(url_for("volunteer_registration"))
             
     # Calculate the shift number from bits
+    # Set it to -1 if we are flexible
     shift_representation = 0
-    for i in signed_shifts:
-        shift_representation = shift_representation | (1 << i)
+    if signed_shifts[0] != -1:
+        for i in signed_shifts:
+            shift_representation = shift_representation | (1 << i)
+    else:
+        shift_representation = -1
 
     secondary_shift_representation = 0
-    for i in secondary_signed_shifts:
-        secondary_shift_representation = secondary_shift_representation | (1 << i)
+    if secondary_signed_shifts[0] != -1:
+        for i in secondary_signed_shifts:
+            secondary_shift_representation = secondary_shift_representation | (1 << i)
+    else:
+        secondary_shift_representation = -1
 
     success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number], [first_name, last_name], [], [], addresses=[address])
     if not success:

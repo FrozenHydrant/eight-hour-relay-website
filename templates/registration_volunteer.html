@@ -101,6 +101,7 @@
         {% for opportunity in opportunities %}
         <div id="shifts_{{ opportunity['id'] }}">
             <p class="inner_text">Overall Spots Left: {{ opportunity["effective_capacity"] }}</p>
+            <label class="inner_text"><input type="checkbox" name="signup_flexible" {% if -1 in signed_positions[opportunity['id']] %} checked {% endif %}>I'm flexible- put me anywhere!</label><br>
             {% for shift in opportunity['shifts'] %}
             <label for="checkbox_{{ opportunity['id'] }}_{{ loop.index0 }}" class="inner_text">
                 <input type="checkbox" id="checkbox_{{ opportunity['id'] }}_{{ loop.index0 }}"
