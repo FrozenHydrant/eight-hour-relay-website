@@ -331,6 +331,8 @@ def volunteer_registration():
     opportunities = Data.get_opportunities()
     for opportunity in opportunities:
         opportunity["shifts"] = Data.get_shifts(opportunity, True)
+        opportunity["capacities"] = Data.get_effective_shift_capacities(opportunity, user.id)
+        opportunity["effective_capacity"] = Data.get_effective_total_opportunity_capacity(opportunity, user.id)
 
     # Check which positions we're already signed onto
     enrolled_list = Data.get_enrolled_positions(user.id)
@@ -350,7 +352,7 @@ def volunteer_registration():
         shifts = Data.parse_shift_representation(shift_representation)
         signed_positions[opportunity["opportunity_id"]] = shifts
 
-    return render_template("registration_volunteer.html", user_info=user_info, opportunities=opportunities, signed_positions=signed_positions, enrolled_list=enrolled_list, primary_position=primary_info, secondary_position=secondary_info)
+    return render_template("registration_volunteer.html", user_info=user_info, opportunities=opportunities, signed_positions=signed_positions, primary_position=primary_info, secondary_position=secondary_info)
 
 @app.route("/volunteer_registration", methods=["POST"])
 def volunteer_registration_post():
@@ -388,6 +390,11 @@ def volunteer_registration_post():
     if primary_opportunity_info is None:
         return redirect(url_for("volunteer_info"))
 
+    # Make sure primary and secondary differ
+    if primary_opportunity_id == secondary_opportunity_id:
+        flash("You must pick a different position from your first choice as your backup.")
+        return redirect(url_for("volunteer_registration"))
+    
     # Checks TODO:
     # We aren't in it already
     # We don't have another shift at the same time
@@ -1422,34 +1429,6 @@ def volunteer_info():
     volunteer_registration_exists = len(Data.get_enrolled_positions(user.id)) > 0
 
     return render_template("volunteer_info.html", is_logged_in=is_logged_in, user_email=user_email, user_name=user_name, volunteer_registration_exists=volunteer_registration_exists)
-
-
-@app.route("/volunteer_info", methods=["POST"])
-def volunteer_info_post():
-        
-    user = user_logout_status()
-    if not user:
-        return redirect(url_for("login"))
-
-    opportunity_id = request.form.get("opportunity_id")
-    action = request.form.get("action")
-
-    # Make sure opportunity exists
-    if Data.get_opportunity_info(opportunity_id) is None:
-        return redirect(url_for("volunteer_info"))
-
-    try:
-        opportunity_id = int(opportunity_id)
-    except:
-        return redirect(url_for("volunteer_info"))
-
-    if action == "withdraw":
-        # Check if we are enrolled 
-        if opportunity_id not in Data.get_enrolled_opportunities(user.id):
-            return redirect(url_for("volunteer_info"))
-
-        Data.unenroll_member_from_opportunity(user.id, opportunity_id)
-    return redirect(url_for("volunteer_info"))
 
 
 @app.route("/admin_panel")

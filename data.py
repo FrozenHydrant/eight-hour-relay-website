@@ -126,6 +126,16 @@ class Data:
             return response.data
 
 
+    def get_enrollments(opportunity_id: str):
+        try:
+            response = Data.client.table("enrollment_volunteer").select("*").eq("opportunity_id", opportunity_id).execute()
+        except Exception as e:
+            return []
+        if response is None:
+            return []
+        return response.data
+
+
     def parse_shift_representation(shift_representation: int):
             # Parse shifts
             shifts = []
@@ -161,6 +171,41 @@ class Data:
             my_time = next_time
         return shifts
 
+
+    def get_effective_shift_capacities(opportunity: dict, to_exclude: str):
+
+        opportunity_id = opportunity["id"]
+        enrolled = Data.get_enrollments(opportunity_id)
+        shifts = Data.get_shifts(opportunity, False)
+        per_shift_capacity = opportunity["per_shift_capacity"]
+        shift_capacities = [per_shift_capacity for _ in range(len(shifts))]
+
+        # Subtract used
+        if enrolled:
+            for enrollment in enrolled:
+                #print(enrollment)
+                if enrollment["user_id"] != to_exclude:
+                    shift_representation = enrollment["shifts"]
+                    signed_shifts = Data.parse_shift_representation(shift_representation)
+                    for i in signed_shifts:
+                        shift_capacities[i] -= 1
+
+        return shift_capacities
+
+
+    def get_effective_total_opportunity_capacity(opportunity: dict, to_exclude: str):
+        opportunity_id = opportunity["id"]
+        enrolled = Data.get_enrollments(opportunity_id)
+        total_capacity = opportunity["capacity"]
+
+        if enrolled:
+            for enrollment in enrolled:
+                if enrollment["user_id"] != to_exclude:
+                    total_capacity -= 1
+
+        return total_capacity
+    
+        
     #def get_busy_intervals(user_id: str):
     #    opportunities_dict = Data.get_opportunities_dict()
     #    enrolled_positions = Data.get_enrolled_positions(user_id)
