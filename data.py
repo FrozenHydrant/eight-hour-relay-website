@@ -307,7 +307,10 @@ class Data:
 
     def upsert_user_as_volunteer(user_id: str, opportunity_id: str, shift_representation: int, is_primary: bool):
         try:
-            _ = Data.client.table("enrollment_volunteer").upsert({"user_id": user_id, "opportunity_id": opportunity_id, "shifts": shift_representation, "is_primary": is_primary}).execute()
+            if shift_representation != 0:
+                _ = Data.client.table("enrollment_volunteer").upsert({"user_id": user_id, "opportunity_id": opportunity_id, "shifts": shift_representation, "is_primary": is_primary}).execute()
+            else: # Deletion
+                _ = Data.client.table("enrollment_volunteer").delete().match({"user_id": user_id, "opportunity_id": opportunity_id}).execute()
         except Exception as e:
             print("Error occured while enrolling a user as a volunteer:", e)
             return False
