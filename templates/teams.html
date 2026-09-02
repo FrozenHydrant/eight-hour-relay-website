@@ -10,6 +10,11 @@
   <div class="top_bar_info">
     <div class="top_bar_insides">
       <a class="top_bar_normal" href="{{ url_for('index') }}">Home Page</a>
+
+      {% if is_admin %}
+      <a class="top_bar_normal" href="{{ url_for('admin_opportunities') }}">Manage Volunteers</a>
+      {% endif %}
+      
       <a class="top_bar_normal" href="{{ url_for('profile') }}">Profile</a>
     </div>
   </div>
@@ -35,13 +40,13 @@
   </div>
 
   <div class="flashes">
-  {% with flashes = get_flashed_messages() %}
-  {% if flashes %}
-  {% for flashed_message in flashes %}
-  <p>{{ flashed_message }}</p>
-  {% endfor %}
-  {% endif %}
-  {% endwith %}
+    {% with flashes = get_flashed_messages() %}
+    {% if flashes %}
+    {% for flashed_message in flashes %}
+    <p>{{ flashed_message }}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
   </div>
 </body>
 

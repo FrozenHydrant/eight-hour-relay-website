@@ -383,6 +383,7 @@ def volunteer_registration_post():
 
     secondary_opportunity_id = request.form.get("secondary_position")
     using_secondary = True
+    #print(secondary_opportunity_id)
     if secondary_opportunity_id is None:
         using_secondary = False
 
@@ -418,6 +419,10 @@ def volunteer_registration_post():
     if request.form.get("secondary_signup_flexible") == "on":
         secondary_signed_shifts = [-1]
 
+    # If we deselect our main shift, deselect secondaries too.
+    if len(signed_shifts) < 1:
+        secondary_signed_shifts = []
+
     # Check shifts & time conflicts 
     busy_intervals = {}
     targeted_shifts = Data.get_shifts(primary_opportunity_info, False)
@@ -431,7 +436,7 @@ def volunteer_registration_post():
         busy_intervals[secondary_opportunity_id] = new_intervals
 
     primary_success = True
-    if signed_shifts[0] != -1: # actually shifts to check, otherwise we are flexible!
+    if len(signed_shifts) > 0 and signed_shifts[0] != -1: # actually shifts to check, otherwise we are flexible!
         Data.check_intervals(signed_shifts, targeted_shifts, busy_intervals, primary_opportunity_id)
     secondary_success = True
 
@@ -440,7 +445,7 @@ def volunteer_registration_post():
         for i in signed_shifts:
             new_intervals.append(targeted_shifts[i])
         busy_intervals[primary_opportunity_id] = new_intervals
-        if secondary_signed_shifts[0] != -1:
+        if len(secondary_signed_shifts) > 0 and secondary_signed_shifts[0] != -1:
             secondary_success = Data.check_intervals(secondary_signed_shifts, targeted_secondary_shifts, busy_intervals, secondary_opportunity_id)    
 
     if not primary_success or not secondary_success:
@@ -449,40 +454,46 @@ def volunteer_registration_post():
 
     # Check capacities
     primary_total_capacity = Data.get_effective_total_opportunity_capacity(primary_opportunity_info, user.id)
-    secondary_total_capacity = Data.get_effective_total_opportunity_capacity(secondary_opportunity_info, user.id)
     if primary_total_capacity < 1:
         flash("Your main selected position has no spots left!")
         return redirect(url_for("volunteer_registration"))
-    if secondary_total_capacity < 1:
-        flash("Your secondary selected position has no spots left!")
-        return redirect(url_for("volunteer_registration"))
+    if using_secondary:
+        secondary_total_capacity = Data.get_effective_total_opportunity_capacity(secondary_opportunity_info, user.id)
+        if secondary_total_capacity < 1:
+            flash("Your secondary selected position has no spots left!")
+            return redirect(url_for("volunteer_registration"))
+
     primary_shift_capacities = Data.get_effective_shift_capacities(primary_opportunity_info, user.id)
-    secondary_shift_capacities = Data.get_effective_shift_capacities(secondary_opportunity_info, user.id)
+    if using_secondary:
+        secondary_shift_capacities = Data.get_effective_shift_capacities(secondary_opportunity_info, user.id)
 
     for i in signed_shifts:
         if primary_shift_capacities[i] == 0:
             flash("You've signed up for shifts in your main position which do not have spots left!")
             return redirect(url_for("volunteer_registration"))
-    for i in secondary_signed_shifts:
-        if secondary_shift_capacities[i] == 0:
-            flash("You've signed up for shifts in your secondary position which do not have spots left!")
-            return redirect(url_for("volunteer_registration"))
+    if using_secondary:
+        for i in secondary_signed_shifts:
+            if secondary_shift_capacities[i] == 0:
+                flash("You've signed up for shifts in your secondary position which do not have spots left!")
+                return redirect(url_for("volunteer_registration"))
             
     # Calculate the shift number from bits
     # Set it to -1 if we are flexible
     shift_representation = 0
-    if signed_shifts[0] != -1:
-        for i in signed_shifts:
-            shift_representation = shift_representation | (1 << i)
-    else:
-        shift_representation = -1
+    if len(signed_shifts) > 0:
+        if signed_shifts[0] != -1:
+            for i in signed_shifts:
+                shift_representation = shift_representation | (1 << i)
+        else:
+            shift_representation = -1
 
     secondary_shift_representation = 0
-    if secondary_signed_shifts[0] != -1:
-        for i in secondary_signed_shifts:
-            secondary_shift_representation = secondary_shift_representation | (1 << i)
-    else:
-        secondary_shift_representation = -1
+    if len(secondary_signed_shifts) > 0:
+        if secondary_signed_shifts[0] != -1:
+            for i in secondary_signed_shifts:
+                secondary_shift_representation = secondary_shift_representation | (1 << i)
+        else:
+            secondary_shift_representation = -1
 
     success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number], [first_name, last_name], [], [], addresses=[address])
     if not success:
@@ -1478,6 +1489,71 @@ def admin_panel():
 
     teams = Data.get_all_teams_info()
     return render_template("teams.html", is_admin=is_admin, username="Awesome Eighthourrelay Admin", teams=teams)
+
+
+@app.route("/admin_opportunities")
+def admin_opportunities():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+
+    # Then check admin
+    is_admin = Data.is_user_admin(user.id)
+    if not is_admin:
+        flash("You do not have authority to view this page!")
+        return redirect(url_for("index"))
+
+    opportunities = Data.get_opportunities_with_enrollment_counts()
+
+    return render_template("admin_opportunities.html", username="Awesome Eighthourrelay Admin", opportunities=opportunities)
+
+
+@app.route("/opportunity_info")
+def opportunity_info():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+
+    # Admin-only
+    is_admin = Data.is_user_admin(user.id)
+    if not is_admin:
+        flash("You don't have access to that page!")
+        return redirect(url_for("index"))
+
+    opportunity_id = request.args.get("opportunity_id")
+    if opportunity_id is None:
+        flash("No opportunity was specified in the request!")
+        return redirect(url_for("admin_opportunities"))
+
+    opportunity = Data.get_opportunity_info(opportunity_id)
+    if opportunity is None:
+        flash("We couldn't get the information about that opportunity!")
+        return redirect(url_for("admin_opportunities"))
+
+    opportunity["spots_filled"] = opportunity["capacity"] - Data.get_effective_total_opportunity_capacity(opportunity, None)
+
+    enrollments = Data.get_enrollments(opportunity_id)
+    member_ids = [enrollment["user_id"] for enrollment in enrollments]
+    combined_member_infos = Data.get_members_info(member_ids)
+
+    readable_shifts = Data.get_shifts(opportunity, True)
+
+    # Attach role (primary/backup) and readable shift(s) to each member
+    for member_info in combined_member_infos:
+        member_info["role"] = "Backup"
+        member_info["shift"] = "None"
+        for enrollment in enrollments:
+            if enrollment["user_id"] == member_info["user_id"]:
+                member_info["role"] = "Primary" if enrollment["is_primary"] else "Backup"
+                signed_shifts = Data.parse_shift_representation(enrollment["shifts"])
+                if signed_shifts and signed_shifts[0] == -1:
+                    member_info["shift"] = "Flexible"
+                elif signed_shifts:
+                    member_info["shift"] = ", ".join(readable_shifts[i] for i in signed_shifts if i < len(readable_shifts))
+
+    combined_member_infos.sort(key=lambda x: x["role"])
+
+    return render_template("opportunity_info.html", user_email=user.email, is_admin=is_admin, opportunity=opportunity, members=combined_member_infos)
 
 
 @app.route("/admin_teams_sheet")

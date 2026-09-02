@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/static/css/title_then_list.css">
+</head>
+
+<body>
+  <div class="top_bar_info">
+    <div class="top_bar_insides">
+      <a class="top_bar_normal" href="{{ url_for('index') }}">Home Page</a>
+      <a class="top_bar_normal" href="{{ url_for('admin_opportunities') }}">All Opportunities</a>
+      <a class="top_bar_normal" href="{{ url_for('profile') }}">{{ user_email }}</a>
+      <a class="top_bar_bonus" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </div>
+  <div class="flashes">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+  </div>
+  <div class="top_info">
+    <h3>Opportunity: {{ opportunity["name"] }}</h3>
+  </div>
+  <div class="team_info_box">
+    <p class="inner_text">Shift Window: {{ opportunity["start_time"] }} - {{ opportunity["end_time"] }}</p>
+    <p class="inner_text">Shift Length: {{ opportunity["shift_length"] }} hr</p>
+    <p class="inner_text">Per-Shift Capacity: {{ opportunity["per_shift_capacity"] }}</p>
+    <p class="inner_text">Total Capacity: {{ opportunity["capacity"] }}</p>
+    <p class="inner_text">Spots Filled: {{ opportunity["spots_filled"] }}</p>
+  </div>
+  <div class="bottom_info">
+    <h3>Members:</h3>
+  </div>
+  <div class="bottom_list">
+    <table class="members_table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Name</th>
+          <th>Birthday</th>
+          <th>Address</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Shift(s)</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for member in members %}
+        <tr>
+          <td>{{ member["role"] }}</td>
+          <td>{{ member["first_name"] }} {{ member["last_name"] }}</td>
+          <td>{{ member["birthdate"] }}</td>
+          <td>{{ member["address"] }}</td>
+          <td>{{ member["email"] }}</td>
+          <td>{{ member["phone_number"] }}</td>
+          <td>{{ member["shift"] }}</td>
+          <td class="actions_cell"></td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8">No one has signed up for this opportunity yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+
+</html>

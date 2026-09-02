@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/static/css/title_then_list.css">
+</head>
+
+<body>
+  <div class="top_bar_info">
+    <div class="top_bar_insides">
+      <a class="top_bar_normal" href="{{ url_for('index') }}">Home Page</a>
+      <a class="top_bar_normal" href="{{ url_for('profile') }}">Profile</a>
+    </div>
+  </div>
+  <div class="top_info">
+    <div>
+      <h3>Welcome {{ username }}.</h3>
+      <p>Existing volunteering opportunities are listed below:</p>
+    </div>
+  </div>
+  <div class="bottom_list">
+    {% for opportunity in opportunities %}
+    <div class="bottom_list_item">
+      <p class="title">{{ opportunity["name"] }}</p>
+      <p class="muted">{{ opportunity["start_time"] }} - {{ opportunity["end_time"] }} &middot; {{ opportunity["spots_filled"] }}/{{ opportunity["capacity"] }} filled</p>
+      <a href="{{ url_for('opportunity_info', opportunity_id=opportunity['id']) }}" class="button">Manage</a>
+    </div>
+    {% else %}
+    <div class="bottom_list_item">
+      <p class="title">No opportunities found.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="flashes">
+  {% with flashes = get_flashed_messages() %}
+  {% if flashes %}
+  {% for flashed_message in flashes %}
+  <p>{{ flashed_message }}</p>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+  </div>
+</body>
+
+</html>

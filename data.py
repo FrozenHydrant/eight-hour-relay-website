@@ -207,7 +207,18 @@ class Data:
                     total_capacity -= 1
 
         return total_capacity
-    
+
+
+    def get_opportunities_with_enrollment_counts():
+    # Get all opportunities, annotated with how many volunteers are currently signed up
+        opportunities = Data.get_opportunities()
+        if not opportunities:
+            return []
+
+        for opportunity in opportunities:
+            opportunity["spots_filled"] = opportunity["capacity"] - Data.get_effective_total_opportunity_capacity(opportunity, None)
+
+        return opportunities
         
     #def get_busy_intervals(user_id: str):
     #    opportunities_dict = Data.get_opportunities_dict()
