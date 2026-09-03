@@ -365,6 +365,8 @@ def volunteer_registration_post():
     last_name = request.form.get("last_name")
     address = request.form.get("address")
     phone_number = request.form.get("phone_number")
+    emergency_name = request.form.get("emergency_name")
+    emergency_phone = request.form.get("emergency_phone")
 
     # Birthday
     birthyear = request.form.get("birthyear")
@@ -495,12 +497,12 @@ def volunteer_registration_post():
         else:
             secondary_shift_representation = -1
 
-    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number], [first_name, last_name], [], [], addresses=[address])
+    success = Sanitization.verify_all_lists_and_create_response([], [], [], [phone_number, emergency_phone], [first_name, last_name, emergency_name], [], [], addresses=[address])
     if not success:
-        return redirect(url_for("volunteer_info"))
+        return redirect(url_for("volunteer_registration"))
 
     try:
-        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "phone_number": phone_number, "address": address, "birthdate": birthdate.strftime("%m/%d/%Y")})
+        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "phone_number": phone_number, "address": address, "birthdate": birthdate.strftime("%m/%d/%Y"), "emergency_name": emergency_name, "emergency_phone": emergency_phone})
         # Clear it all
         Data.purge_all_enrolled(user.id)
 

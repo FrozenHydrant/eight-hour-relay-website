@@ -213,6 +213,34 @@ body {
   border-radius: 8px;
 }
 
+/* ══════════════════════════════════════
+   FLASH MESSAGES
+══════════════════════════════════════ */
+.flashes {
+  position: fixed;
+  left: 50%;
+  top: 5rem;
+  transform: translateX(-50%);
+  z-index: 200;
+  width: 100%;
+  max-width: 24rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.flashes p {
+  background: #FFF5F5;
+  color: #C53030;
+  border: 1px solid #FEB2B2;
+  border-radius: 0.75rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
 @media (max-width: 640px) {
   .bottom_panel {
     flex-direction: column;
