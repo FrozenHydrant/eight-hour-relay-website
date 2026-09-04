@@ -510,8 +510,11 @@ def volunteer_registration_post():
         _ = Data.upsert_user_as_volunteer(user.id, primary_opportunity_id, shift_representation, True)
         if using_secondary:
             _ = Data.upsert_user_as_volunteer(user.id, secondary_opportunity_id, secondary_shift_representation, False)
-
-        EmailSender.send_volunteer_registration_email(user.email, primary_opportunity_info["name"], secondary_opportunity_info["name"])
+            #print(primary_opportunity_info["name"], secondary_opportunity_info["name"])
+            EmailSender.send_volunteer_registration_email(user.email, primary_opportunity_info["name"], secondary_opportunity_info["name"])
+        else:
+            EmailSender.send_volunteer_registration_email(user.email, primary_opportunity_info["name"], "N/A (no secondary selection)")
+        #print(primary_opportunity_info, secondary_opportunity_info)
 
     except Exception as e:
         print("Volunteer registration problem", e)
