@@ -153,6 +153,34 @@ class EmailSender:
             return False
 
 
+    def send_volunteer_registration_email(to_email: str, primary_opportunity_name: str, secondary_opportunity_name: str):
+            if not all([EmailSender.smtp_host, EmailSender.smtp_user, EmailSender.smtp_password, EmailSender.from_email]):
+                return False
+            
+            message = EmailMessage()
+            message["Subject"] = "Your volunteer application has been successfully submitted/updated "
+            message["From"] = EmailSender.from_email
+            message["To"] = to_email
+            message.set_content(
+                f"Hello,\n\n"
+                f"We successfully received your volunteer application, with primary choice: {primary_opportunity_name} and\n "
+                f"secondary choice: {secondary_opportunity_name}.\n"
+                f"To view details or modify your application, please go to the Volunteers tab on the website.\n"
+                f"Thank you for participating!\n\n\n"
+                f"This is an automated email. Please DO NOT reply to this email."
+            )
+    
+            try:
+                with smtplib.SMTP(EmailSender.smtp_host, EmailSender.smtp_port) as smtp:
+                    smtp.starttls()
+                    smtp.login(EmailSender.smtp_user, EmailSender.smtp_password)
+                    smtp.send_message(message)
+                return True
+            except Exception as e:
+                print(e)
+                return False
+
+
     def send_password_reset_email(to_email: str, url: str):
         if not all([EmailSender.smtp_host, EmailSender.smtp_user, EmailSender.smtp_password, EmailSender.from_email]):
             return False

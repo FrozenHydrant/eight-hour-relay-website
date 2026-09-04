@@ -336,6 +336,7 @@ def volunteer_registration():
 
     # Check which positions we're already signed onto
     enrolled_list = Data.get_enrolled_positions(user.id)
+    volunteer_registration_exists = len(enrolled_list) > 0
     #
     primary_info = None
     secondary_info = None
@@ -352,7 +353,7 @@ def volunteer_registration():
         shifts = Data.parse_shift_representation(shift_representation)
         signed_positions[opportunity["opportunity_id"]] = shifts
 
-    return render_template("registration_volunteer.html", user_info=user_info, opportunities=opportunities, signed_positions=signed_positions, primary_position=primary_info, secondary_position=secondary_info)
+    return render_template("registration_volunteer.html", user_info=user_info, opportunities=opportunities, signed_positions=signed_positions, primary_position=primary_info, secondary_position=secondary_info, volunteer_registration_exists=volunteer_registration_exists)
 
 @app.route("/volunteer_registration", methods=["POST"])
 def volunteer_registration_post():
@@ -509,6 +510,9 @@ def volunteer_registration_post():
         _ = Data.upsert_user_as_volunteer(user.id, primary_opportunity_id, shift_representation, True)
         if using_secondary:
             _ = Data.upsert_user_as_volunteer(user.id, secondary_opportunity_id, secondary_shift_representation, False)
+
+        EmailSender.send_volunteer_registration_email(user.email, primary_opportunity_info["name"], secondary_opportunity_info["name"])
+
     except Exception as e:
         print("Volunteer registration problem", e)
         return redirect(url_for("volunteer_info"))
