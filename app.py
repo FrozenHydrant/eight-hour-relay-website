@@ -1490,6 +1490,35 @@ def volunteer_info():
     return render_template("volunteer_info.html", is_logged_in=is_logged_in, user_email=user_email, user_name=user_name, volunteer_registration_exists=volunteer_registration_exists)
 
 
+@app.route('/admin_set_team_position', methods=["POST"])
+def admin_set_team_position():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+    
+    is_admin = Data.is_user_admin(user.id)
+    if not is_admin:
+        return redirect(url_for("index"))
+
+    member_id = request.form.get("member_id")
+    team_id = request.form.get("team_id") # To redirect only
+    new_position = request.form.get("new_position")
+    
+    #if not Data.has_authority_over_member(user.id, member_id, team_id):
+    #    flash("We don't have authority over this member")
+    #    return redirect(url_for("team_information", team_id=team_id))
+
+    set_position = None
+    try:
+        set_position = int(new_position)
+    except:
+        flash("That's not a valid position")
+        return redirect(url_for("team_information", team_id=team_id))
+
+    Data.set_user_position_in_team(member_id, set_position)
+    return redirect(url_for("team_information", team_id=team_id))
+
+
 @app.route("/admin_panel")
 def admin_panel():
     user = user_logout_status()
@@ -1657,7 +1686,7 @@ def admin_volunteers_sheet():
     
     return send_file(BytesIO(csv_data.encode()),as_attachment=True,download_name="all_volunteer_info.csv")
 
-        
+
 # Admin Delete
 @app.route("/admin_delete_team")
 def admin_delete_team():

@@ -458,6 +458,15 @@ class Data:
         return True
 
 
+    def set_user_position_in_team(member_id: str, new_position: int) -> bool:
+        try:
+            Data.client.table("runner_positions").upsert({"user_id": member_id, "position": new_position}).execute()
+        except Exception as e:
+            print("Problem while setting runner position", e)
+            return False
+        return True
+
+    
     def move_member_position_in_team(member_id: str, team_id: str, direction: str) -> bool:
         try:
             target_position = Data.get_member_position_in_team(member_id)

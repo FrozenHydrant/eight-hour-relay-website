@@ -105,6 +105,15 @@
             </form>
             {% endif %}
             {% endif %}
+
+            {% if is_admin %}
+            <form method="POST" action="{{ url_for('admin_set_team_position') }}" class="right_form">
+              <input type="hidden" name="team_id" value="{{ team['id'] }}">
+              <input type="hidden" name="member_id" value="{{ member['user_id'] }}">
+              <input type="text" name="new_position" class="inner_text" placeholder="New Position">
+              <button class="button">Set Position</button>
+            </form>
+            {% endif %}
           </td>
         </tr>
         {% endfor %}
