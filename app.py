@@ -81,7 +81,7 @@ def generate_cookied_response(response, key_value):
     cookied_response.set_cookie(
         key_value["key"],
         key_value["value"],
-        max_age=3600,
+        max_age=7200,
         **cookie_options(),
     )
     return cookied_response
