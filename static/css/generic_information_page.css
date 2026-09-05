@@ -206,6 +206,10 @@ body {
   gap: 0.5rem;
 }
 
+.single_icon {
+  aspect-ratio: 2/1;
+}
+
 .grid_icon {
   aspect-ratio: 1/1;
   width: 100%;
