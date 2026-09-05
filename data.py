@@ -363,17 +363,16 @@ class Data:
 
         member_infos = []
         for member_id in member_ids:
-            for attempt in range(3):
-                try:
-                    #print(member_id, "m_id")
-                    response = Data.client.table("runner_info").select("*").eq("user_id", member_id).execute()
-                    #print("Get members resp:", member_id, response)
-                except Exception as e:
-                    print("Get members info problem", e)
-                    continue
-                if response is not None and len(response.data) > 0:
-                    member_infos.append(response.data[0])
-                    break
+            #for attempt in range(3):
+            try:
+                #print(member_id, "m_id")
+                response = Data.client.table("runner_info").select("*").eq("user_id", member_id).execute()
+                #print("Get members resp:", member_id, response)
+            except Exception as e:
+                print("Get members info problem", e)
+                continue
+            if response is not None and len(response.data) > 0:
+                member_infos.append(response.data[0])
         return member_infos
             
 

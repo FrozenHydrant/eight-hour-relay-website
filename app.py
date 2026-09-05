@@ -1581,6 +1581,39 @@ def admin_teams_sheet():
     csv_data = create_csv(teams)
 
     return send_file(BytesIO(csv_data.encode()),as_attachment=True,download_name="teams.csv")
+
+
+@app.route("/admin_teams_sheet_complete")
+def admin_teams_sheet_complete():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+
+    is_admin = Data.is_user_admin(user.id)
+
+    if not is_admin:
+        flash("You don't have authority to do that!")
+        return redirect(url_for("index"))
+
+    teams = Data.get_all_teams_combined_info()
+    #print(teams)
+    all_members_info = []
+
+    for team in teams:
+        members = Data.get_members_list(team["id"])
+        #print(members, "are in team: ", team["team_name"])
+        #print("\n")
+        members_info = Data.get_members_info(members)
+        #print(members_info, "\n")
+
+        # Small changes
+        for m in members_info:
+            m["team_name"] = team["team_name"] 
+        all_members_info += members_info
+            
+    csv_data = create_csv(all_members_info)
+
+    return send_file(BytesIO(csv_data.encode()),as_attachment=True,download_name="all_runner_info.csv")
     
 
 # Admin Delete

@@ -26,6 +26,7 @@
     <a href="{{ url_for('team_registration') }}" class="top_button">Create Team</a>
     {% if is_admin %}
     <a href="{{ url_for('admin_teams_sheet') }}" class="top_button">Download Teams as .csv</a>
+    <a href="{{ url_for('admin_teams_sheet_complete') }}" class="top_button">All Info as .csv</a>
     {% endif %}
   </div>
   <div class="bottom_list">
