@@ -18,6 +18,7 @@
       <h3>Welcome {{ username }}.</h3>
       <p>Existing volunteering opportunities are listed below:</p>
     </div>
+    <a href="{{ url_for('admin_volunteers_sheet') }}" class="top_button">Download info as .csv</a>
   </div>
   <div class="bottom_list">
     {% for opportunity in opportunities %}

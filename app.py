@@ -116,7 +116,11 @@ def create_csv(data: list[dict]):
     for line in data:
         my_line = ""
         for info in line.values():
-            my_line += str(info)
+            # Comma handling
+            if "," in str(info):
+                my_line += f"'{str(info)}'"
+            else:    
+                my_line += str(info)
             my_line += ","
         my_line = my_line[:-1:]
         my_line += "\n"
@@ -1614,8 +1618,46 @@ def admin_teams_sheet_complete():
     csv_data = create_csv(all_members_info)
 
     return send_file(BytesIO(csv_data.encode()),as_attachment=True,download_name="all_runner_info.csv")
-    
 
+
+@app.route("/admin_volunteers_sheet")
+def admin_volunteers_sheet():
+    user = user_logout_status()
+    if not user:
+        return redirect(url_for("login"))
+
+    is_admin = Data.is_user_admin(user.id)
+
+    if not is_admin:
+        flash("You don't have authority to do that!")
+        return redirect(url_for("index"))
+
+    opportunities = Data.get_opportunities()
+    all_members_info = []
+
+    for opportunity in opportunities:
+        enrollments = Data.get_enrollments(opportunity["id"])
+        readable_shifts = Data.get_shifts(opportunity, True)
+
+        for enrollment in enrollments:
+            member_id = enrollment["user_id"]
+            member_info = Data.get_members_info([member_id])[0]
+
+            # Small changes
+            member_info["position_name"] = opportunity["name"]
+            member_info["role"] = "Primary" if enrollment["is_primary"] else "Backup"
+            signed_shifts = Data.parse_shift_representation(enrollment["shifts"])
+            if signed_shifts and signed_shifts[0] == -1:
+                member_info["shifts"] = "Flexible"
+            else:
+                member_info["shifts"] = ",".join([readable_shifts[i] for i in signed_shifts])
+            all_members_info.append(member_info)
+
+    csv_data = create_csv(all_members_info)
+    
+    return send_file(BytesIO(csv_data.encode()),as_attachment=True,download_name="all_volunteer_info.csv")
+
+        
 # Admin Delete
 @app.route("/admin_delete_team")
 def admin_delete_team():
