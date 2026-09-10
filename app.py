@@ -1670,8 +1670,15 @@ def admin_volunteers_sheet():
 
         for enrollment in enrollments:
             member_id = enrollment["user_id"]
-            member_info = Data.get_members_info([member_id])[0]
 
+            # Sometimes, bad things can happen / check to make sure it exists
+            member_info = None
+            member_data = Data.get_members_info([member_id])
+            if len(member_data) > 0:
+                member_info = member_data[0]
+            else: 
+                continue
+                
             # Small changes
             member_info["position_name"] = opportunity["name"]
             member_info["role"] = "Primary" if enrollment["is_primary"] else "Backup"
