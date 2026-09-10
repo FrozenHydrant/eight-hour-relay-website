@@ -1642,8 +1642,13 @@ def admin_teams_sheet_complete():
         # Small changes
         for m in members_info:
             m["team_name"] = team["team_name"] 
-        all_members_info += members_info
+            m["division"] = team["division"]
+            # Position
+            position = Data.get_member_position_in_team(m["user_id"])
+            m["position"] = position
             
+        # Update all_members_info with this member info
+        all_members_info += members_info
     csv_data = create_csv(all_members_info)
 
     return send_file(BytesIO(csv_data.encode()),as_attachment=True,download_name="all_runner_info.csv")
