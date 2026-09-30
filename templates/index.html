@@ -75,6 +75,7 @@
       <h1 class="hero-title">8 Hours Relay</h1>
       <p class="hero-subtitle">Eight Hours. One Team. Endless Laps.</p>
 
+      {% if event_reg_open %}
       <div class="countdown-row">
         <div class="countdown-item">
           <span id="day_count" class="countdown-num">{{ days }}</span>
@@ -96,14 +97,19 @@
           <span class="countdown-label">Seconds</span>
         </div>
       </div>
+      {% else %}
+        <p class="hero-subtitle">Event Ended!</p>
+      {% endif %}
 
       <div class="hero-buttons">
+        {% if event_reg_open %}
         {% if captain_status == 0 %}
         <a class="btn btn-primary" href="{{ url_for('event_registration_choice') }}">Register for Event</a>
         {% endif %}
 
         {% if captain_status == 2 %}
         <a class="btn btn-primary" href="{{ url_for('runner_registration') }}">Register as Runner</a>
+        {% endif %}
         {% endif %}
 
         {% if captain_status == 1 %}

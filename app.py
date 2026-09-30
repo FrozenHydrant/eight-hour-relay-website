@@ -41,7 +41,6 @@ s_client = stripe.StripeClient(s_key)
 s_price_id = os.getenv("STRIPE_PRICE_ID")
 s_endpoint_secret = os.getenv("STRIPE_ENDPOINT_SECRET")
 
-
 # Helpers Functions
 def user_logout_status(access_token=None):
     if access_token is None:
@@ -53,7 +52,6 @@ def user_logout_status(access_token=None):
     try:
         user_response = auth_client.auth.get_user(access_token)
         if user_response is not None:
-            #print(user_response.user, type(user_response.user))
             return user_response.user
     except:
         return None
@@ -101,7 +99,6 @@ def generate_uncookied_response(response, keys):
     
 def create_csv(data: list[dict]):
     all_info = ""
-
     # As long as data not empty, put columns as first heading
     if len(data) > 0:
         my_line = ""
@@ -130,6 +127,7 @@ def create_csv(data: list[dict]):
 
 #
 # Routes <Main Page>
+#
 @app.route('/')
 def index():
     user = user_logout_status()
@@ -175,13 +173,17 @@ def index():
                     pass
                 return redirect(url_for("index"))
             
-
     time_left = EVENT_DATE - dt.datetime.now()
+    event_reg_open = True
+    if dt.datetime.now() > EVENT_DATE:
+        event_reg_open = False
     
     if team_id is None:
         team_id = "no_team"
 
-    return render_template("index.html", is_logged_in=is_logged_in, user_name=user_name, user_email=user_email, team_id=team_id, is_admin=is_admin, captain_status=captain_status, days=time_left.days, hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
+    return render_template("index.html", event_reg_open=event_reg_open, is_logged_in=is_logged_in, user_name=user_name, user_email=user_email, team_id=team_id,\
+                            is_admin=is_admin, captain_status=captain_status, days=time_left.days,\
+                            hours=math.floor(time_left.seconds/3600), minutes=math.ceil(time_left.seconds%3600/60), seconds=time_left.seconds%60)
 
 
 # Registration for the whole website
@@ -227,6 +229,10 @@ def registration_post():
 # Captain registration
 @app.route("/captain_registration")
 def captain_registration():
+    if EVENT_DATE < dt.datetime.now():
+        flash("No event is accepting registrations right now!")
+        return redirect(url_for("index"))
+    
     user = user_logout_status()
     if not user:
         return redirect(url_for("login",next_page="captain_registration"))
@@ -258,6 +264,10 @@ def captain_registration():
 
 @app.route("/captain_registration", methods=["POST"])
 def captain_registration_post():
+    if EVENT_DATE < dt.datetime.now():
+            flash("No event is accepting registrations right now!")
+            return redirect(url_for("index"))
+    
     user = user_logout_status()
     if not user:
         return redirect(url_for("login"))
@@ -292,13 +302,9 @@ def captain_registration_post():
         flash("Bad birthdate entered.")
         return redirect(url_for("captain_registration"))
     
-    # Calculate age via birthdate
-    age = relativedelta.relativedelta(EVENT_DATE, birthdate).years
-    #print(age)
-    
     # Do captain enrollment
     try:
-        upd_resp = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "birthdate": birthdate.strftime("%m/%d/%Y"), "phone_number": phone_number})
+        _ = Data.update_runner_info(user.id, {"first_name": first_name, "last_name": last_name, "gender": gender, "birthdate": birthdate.strftime("%m/%d/%Y"), "phone_number": phone_number})
         _ = Data.upsert_captain_status(user.id, True)
     except Exception as e:
         flash(str(e))
@@ -310,6 +316,9 @@ def captain_registration_post():
 # Volunteering registration
 @app.route("/volunteer_registration")
 def volunteer_registration():
+    if EVENT_DATE < dt.datetime.now():
+            flash("No event is accepting registrations right now!")
+            return redirect(url_for("index"))
     
     user = user_logout_status()
     if not user:
@@ -361,6 +370,9 @@ def volunteer_registration():
 
 @app.route("/volunteer_registration", methods=["POST"])
 def volunteer_registration_post():
+    if EVENT_DATE < dt.datetime.now():
+            flash("No event is accepting registrations right now!")
+            return redirect(url_for("index"))
     
     user = user_logout_status()
     if not user:
@@ -405,8 +417,6 @@ def volunteer_registration_post():
     
     # Checks TODO:
     # We aren't in it already
-    # We don't have another shift at the same time
-    # Opportunity is not full
     signed_shifts = []
     for i in range(0, 12):
         #print(i, request.form.get("signup_shift_"+str(i)))
@@ -529,6 +539,10 @@ def volunteer_registration_post():
 # Sponsor registration
 @app.route("/sponsor_registration")
 def sponsor_registration():
+    if EVENT_DATE < dt.datetime.now():
+            flash("No event is accepting registrations right now!")
+            return redirect(url_for("index"))
+    
     user = user_logout_status()
     if not user:
         return redirect(url_for("login",next_page="sponsor_registration"))
@@ -554,6 +568,10 @@ def sponsor_registration():
 
 @app.route("/sponsor_registration", methods=["POST"])
 def sponsor_registration_post():
+    if EVENT_DATE < dt.datetime.now():
+            flash("No event is accepting registrations right now!")
+            return redirect(url_for("index"))
+    
     user = user_logout_status()
     if not user:
         return redirect(url_for("login"))
@@ -652,9 +670,14 @@ def logout():
 # Runner registration
 @app.route("/runner_registration")
 def runner_registration():
+    if EVENT_DATE < dt.datetime.now():
+            flash("No event is accepting registrations right now!")
+            return redirect(url_for("index"))
+    
     user = user_logout_status()
     if not user:
         return redirect(url_for("login", next_page="runner_registration"))
+    
     # Autofill some information
     token = request.args.get("token")
     team_id = request.args.get("team_id")
@@ -705,6 +728,10 @@ def runner_registration():
 
 @app.route("/runner_registration", methods=["POST"])
 def runner_registration_post():
+    if EVENT_DATE < dt.datetime.now():
+            flash("No event is accepting registrations right now!")
+            return redirect(url_for("index"))
+    
     user = user_logout_status()
     if not user:
         return redirect(url_for("login"))
@@ -903,6 +930,10 @@ def profile_post():
 
 @app.route("/team_registration")
 def team_registration():
+    if EVENT_DATE < dt.datetime.now():
+            flash("No team creation is allowed right now!")
+            return redirect(url_for("index"))
+    
     user = user_logout_status()
     if not user:
         return redirect(url_for("login"))
@@ -916,6 +947,10 @@ def team_registration():
 
 @app.route("/team_registration", methods=["POST"])
 def team_registration_post():
+    if EVENT_DATE < dt.datetime.now():
+            flash("No team creation is allowed right now!")
+            return redirect(url_for("index"))
+    
     user = user_logout_status()
     if not user:
         return redirect(url_for("login"))
@@ -1188,6 +1223,10 @@ def teams():
 
 @app.route("/delete_from_team", methods=["POST"])
 def delete_from_team():
+    if EVENT_DATE < dt.datetime.now():
+            flash("No team member modification is allowed right now!")
+            return redirect(url_for("index"))
+    
     user = user_logout_status()
     if not user:
         return redirect(url_for("login"))
@@ -1239,6 +1278,10 @@ def team_payment_webhook():
 
 @app.route("/move_team_member_up", methods=["POST"])
 def move_team_member_up():
+    if EVENT_DATE < dt.datetime.now():
+            flash("No team modification is allowed right now!")
+            return redirect(url_for("index"))
+    
     user = user_logout_status()
     if not user:
         return redirect(url_for("login"))
@@ -1796,8 +1839,6 @@ def admin_edit_team_payment_post():
     if success:
         flash("Successfully changed payment status.")
         return redirect(url_for("team_information", team_id=team_id))
-
-
 
 
 if __name__ == '__main__':
